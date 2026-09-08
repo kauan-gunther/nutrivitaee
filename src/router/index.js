@@ -64,6 +64,12 @@ const router = createRouter({
     },
 
     // --- CONSULTAS E AGENDAMENTOS ---
+     {
+      path: '/meus-agendamentos',
+      alias: '/agendamentos',
+      name: 'meus-agendamentos',
+      component: () => import('@/view/meusAgendamentosView.vue'), // 
+    },
     {
       path: '/consultas',
       name: 'consultas',
