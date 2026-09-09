@@ -65,23 +65,27 @@ onMounted(() => {
   const salvo = localStorage.getItem('dadosAgendamento')
   if (salvo) {
     const dados = JSON.parse(salvo)
+    // Se ainda for um objeto antigo (de antes da mudança), envolve num array.
+    const lista = Array.isArray(dados) ? dados : [dados]
 
-    const novoAgendamento = {
-      id: Date.now(),
+    // Transforma CADA agendamento salvo no mesmo formato usado pelos
+    // cards mockados acima, e insere todos no início da lista exibida.
+    const novosAgendamentos = lista.map((item, index) => ({
+      id: Date.now() + index,
       profissional: {
-        nome: dados.profissional.nome || 'Profissional não informado',
-        foto: dados.profissional.foto || '/profissionais/ana.png',
+        nome: item.profissional?.nome || 'Profissional não informado',
+        foto: item.profissional?.foto || '/profissionais/ana.png',
       },
       paciente: {
-        nome: dados.usuario.nome || 'Paciente não informado',
-        foto: dados.usuario.foto || '/logo.png',
+        nome: item.usuario?.nome || 'Paciente não informado',
+        foto: item.usuario?.foto || '/logo.png',
       },
-      data: dados.consulta.data,
-      horario: dados.consulta.horario,
-      tipo: dados.consulta.tipo,
-    }
+      data: item.consulta?.data,
+      horario: item.consulta?.horario,
+      tipo: item.consulta?.tipo,
+    }))
 
-    agendamentos.value.unshift(novoAgendamento)
+    agendamentos.value.unshift(...novosAgendamentos)
   }
 })
 

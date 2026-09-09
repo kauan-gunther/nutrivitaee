@@ -29,7 +29,12 @@ const agendamento = ref({
 onMounted(() => {
   const dadosSalvos = localStorage.getItem('dadosAgendamento')
   if (dadosSalvos) {
-    agendamento.value = JSON.parse(dadosSalvos)
+    const dados = JSON.parse(dadosSalvos)
+    // Se ainda for um objeto antigo (de antes da mudança), envolve num array.
+    const lista = Array.isArray(dados) ? dados : [dados]
+    // O resumo é sempre do agendamento que acabou de ser feito,
+    // ou seja, o último item da lista.
+    agendamento.value = lista[lista.length - 1]
   }
 })
 

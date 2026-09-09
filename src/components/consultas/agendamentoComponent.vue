@@ -115,7 +115,22 @@ function agendar() {
   if (!validarFormulario()) return
 
   try {
-    localStorage.setItem('dadosAgendamento', JSON.stringify(agendamento.value))
+    // 1) Pega o que já está salvo (pode não existir ainda, pode ser
+    //    um objeto antigo de uma versão anterior, ou já pode ser uma lista).
+    const salvos = localStorage.getItem('dadosAgendamento')
+    let lista = []
+    if (salvos) {
+      const dados = JSON.parse(salvos)
+      lista = Array.isArray(dados) ? dados : [dados]
+    }
+
+    // 2) Acrescenta o agendamento novo no FINAL da lista,
+    //    sem apagar os que já existiam.
+    lista.push(agendamento.value)
+
+    // 3) Salva a lista inteira de volta (não mais um objeto sozinho).
+    localStorage.setItem('dadosAgendamento', JSON.stringify(lista))
+
     router.push('/resumo')
   } catch (error) {
     alert('Erro ao salvar o agendamento.')
