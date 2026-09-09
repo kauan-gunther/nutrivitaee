@@ -1,16 +1,16 @@
 <template>
   <div class="perfil-container">
-    <EditarPerfilView 
-      v-if="editando" 
-      :usuario="usuario" 
-      @salvar-edicao="salvarAlteracoes" 
+    <EditarPerfilView
+      v-if="editando"
+      :usuario="usuario"
+      @salvar-edicao="salvarAlteracoes"
       @cancelar="editando = false"
     />
 
     <div v-else class="perfil-content">
-      <button 
-        class="delete-icon-btn" 
-        title="Excluir Perfil" 
+      <button
+        class="delete-icon-btn"
+        title="Excluir Perfil"
         @click="router.push('/perfil/deletar')"
       >
         <i class="mdi mdi-delete-outline"></i>
@@ -18,7 +18,11 @@
 
       <div class="profile-header">
         <div class="avatar-wrapper">
-          <img :src="usuario.foto || 'https://via.placeholder.com/150'" :alt="usuario.nome" class="avatar-img" />
+          <img
+            :src="usuario.foto || 'https://via.placeholder.com/150'"
+            :alt="usuario.nome"
+            class="avatar-img"
+          />
         </div>
         <h1 class="user-name">{{ usuario.nome }}</h1>
       </div>
@@ -36,13 +40,21 @@
           <span class="label-text">Idade:</span>
           <span class="valor-text">{{ calcularIdade(usuario.dataNascimento) }} anos</span>
         </div>
+               <div class="info-box input-pill">
+          <span class="label-text">email:</span>
+          <span class="valor-text">{{ usuario.email }}</span>
+        </div>
+             <div class="info-box input-pill">
+          <span class="label-text">cpf</span>
+          <span class="valor-text">{{ usuario.cpf }}</span>
+      </div>
       </div>
 
       <div class="cards-grid">
         <div class="card-box light-card">
           <h3 class="card-title">Preferencias</h3>
           <hr class="card-divider" />
-          
+
           <p class="section-subtitle">gosto:</p>
           <ul>
             <li v-if="!usuario.preferencias?.gosto?.length">• Não registrado</li>
@@ -66,11 +78,7 @@
         </div>
       </div>
 
-      <button 
-        class="floating-edit-btn" 
-        title="Editar Perfil" 
-        @click="editando = true"
-      >
+      <button class="floating-edit-btn" title="Editar Perfil" @click="editando = true">
         <i class="mdi mdi-pencil-outline"></i>
       </button>
     </div>
@@ -78,12 +86,12 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import EditarPerfilView from './EditarPerfilView.vue';
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import EditarPerfilView from './EditarPerfilView.vue'
 
-const router = useRouter();
-const editando = ref(false);
+const router = useRouter()
+const editando = ref(false)
 
 const usuario = reactive({
   nome: '',
@@ -94,40 +102,40 @@ const usuario = reactive({
   telefone: '',
   foto: '',
   preferencias: { gosto: [], naoGosto: [] },
-  alergias: []
-});
+  alergias: [],
+})
 
 onMounted(() => {
-  const dadosSalvos = localStorage.getItem('usuarioLogado');
+  const dadosSalvos = localStorage.getItem('usuarioLogado')
   if (dadosSalvos) {
-    Object.assign(usuario, JSON.parse(dadosSalvos));
+    Object.assign(usuario, JSON.parse(dadosSalvos))
   }
-});
+})
 
 const salvarAlteracoes = (novosDados) => {
-  Object.assign(usuario, novosDados);
-  localStorage.setItem('usuarioLogado', JSON.stringify(novosDados));
-  editando.value = false;
-};
+  Object.assign(usuario, novosDados)
+  localStorage.setItem('usuarioLogado', JSON.stringify(novosDados))
+  editando.value = false
+}
 
 const calcularIdade = (dataNasc) => {
-  if (!dataNasc) return '--';
-  const hoje = new Date();
-  const nascimento = new Date(dataNasc);
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const m = hoje.getMonth() - nascimento.getMonth();
+  if (!dataNasc) return '--'
+  const hoje = new Date()
+  const nascimento = new Date(dataNasc)
+  let idade = hoje.getFullYear() - nascimento.getFullYear()
+  const m = hoje.getMonth() - nascimento.getMonth()
   if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
-    idade--;
+    idade--
   }
-  return idade;
-};
+  return idade
+}
 </script>
 
 <style scoped>
 .perfil-container {
   width: 100%;
   max-width: 820px;
-  margin: 40px auto 80px auto; 
+  margin: 40px auto 80px auto;
   padding: 0 20px;
   box-sizing: border-box;
   position: relative;
@@ -284,7 +292,7 @@ li {
 
 .floating-edit-btn {
   position: absolute;
-  bottom: -60px; 
+  bottom: -60px;
   left: -60px;
   width: 48px;
   height: 48px;
@@ -306,10 +314,11 @@ li {
 }
 
 @media (max-width: 768px) {
-  .info-grid, .cards-grid {
+  .info-grid,
+  .cards-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-header {
     flex-direction: column;
     text-align: center;
@@ -317,7 +326,7 @@ li {
 
   .floating-edit-btn {
     bottom: -50px;
-    left: 0; 
+    left: 0;
   }
 }
 </style>

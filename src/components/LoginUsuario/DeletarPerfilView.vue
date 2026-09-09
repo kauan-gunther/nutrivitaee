@@ -27,6 +27,14 @@
         <span class="label-text">Idade:</span>
         <span class="valor-text">{{ calcularIdade(usuario.dataNascimento) }} anos</span>
       </div>
+               <div class="input-pill col-half">
+          <span class="label-text">email:</span>
+          <span class="valor-text">{{ usuario.email }}</span>
+        </div>
+             <div class="input-pill col-half">
+          <span class="label-text">cpf</span>
+          <span class="valor-text">{{ usuario.cpf }}</span>
+      </div>
     </div>
 
     <!-- Cards de Preferências e Alergias -->
