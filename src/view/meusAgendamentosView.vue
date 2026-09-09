@@ -41,10 +41,10 @@ function formatarData(dataIso) {
       <section v-if="!estaLogado" class="card-status-box dashed-border">
         <h2 class="status-title">Não há agendamentos para você</h2>
         <p class="status-sub">
-          Converse com profissionais e agende suas consultas. Elas aparecerão aqui!
+          Você precisa estar logado para visualizar seus agendamentos. Eles aparecerão aqui!
         </p>
 
-        <RouterLink to="/cadastro" class="btn-action"> Fazer o Cadastro </RouterLink>
+        <RouterLink to="/cadastro" class="btn-action"> Fazer o login </RouterLink>
       </section>
 
       <!-- ESTADO 2: Logada, mas ainda sem nenhum agendamento -->
@@ -100,9 +100,8 @@ function formatarData(dataIso) {
 }
 
 .hero-banner h1 {
-  color: #efe8d3;
-  font-family: 'Playfair Display', serif, Georgia;
-  font-size: 2.8rem;
+  color: #F1EDD2;
+  font-size: 80px;
   font-weight: normal;
   margin: 0;
   text-align: center;
@@ -128,10 +127,9 @@ function formatarData(dataIso) {
 }
 
 .status-title {
-  color: #586937;
+  color: #536236;
   font-size: 1.4rem;
-  font-family: 'Playfair Display', serif, Georgia;
-  font-weight: normal;
+  font-weight: bold;
   margin: 0 0 12px 0;
 }
 
@@ -144,8 +142,8 @@ function formatarData(dataIso) {
 
 .btn-action {
   display: inline-block;
-  background-color: #586937;
-  color: #ffffff;
+  background-color: #536236;
+  color: #F1EDD2;
   border: none;
   padding: 12px 32px;
   border-radius: 25px;
@@ -175,17 +173,16 @@ function formatarData(dataIso) {
 }
 
 .status-title-alt {
-  color: #586937;
-  font-size: 1.4rem;
-  font-family: 'Playfair Display', serif, Georgia;
-  font-weight: normal;
+  color: #536236;
+  font-size: 30px;
+  font-weight: bold;
   margin: 0;
 }
 
 .btn-action-small {
   display: inline-block;
-  background-color: #586937;
-  color: #ffffff;
+  background-color: #536236;
+  color: #F1EDD2;
   padding: 8px 20px;
   border-radius: 20px;
   font-weight: bold;
@@ -211,22 +208,24 @@ function formatarData(dataIso) {
 
 .agendamento-info p {
   margin: 4px 0;
-  color: #333f34;
+  color: #BF945A;
   font-size: 0.95rem;
+  font-weight: bold;
 }
 
 .agendamento-info strong {
-  color: #586937;
+  color: #536236;
+  font-weight: bold;
 }
 
 .btn-detalhe {
   background-color: transparent;
-  border: 1.5px solid #586937;
+  border: 1.5px solid #536236;
   color: #333f34;
   font-weight: bold;
   border-radius: 14px;
   padding: 8px 18px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   text-decoration: none;
   white-space: nowrap;
 }
