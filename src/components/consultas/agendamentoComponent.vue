@@ -33,6 +33,7 @@ onMounted(() => {
   if (usuarioLogado.value) {
     if (isPaciente.value) {
       agendamento.value.usuario = {
+        id: usuarioLogado.value.id,
         nome: usuarioLogado.value.nome || '',
         telefone: usuarioLogado.value.telefone || '',
         email: usuarioLogado.value.email || '',
@@ -41,6 +42,7 @@ onMounted(() => {
       }
     } else if (isProfissional.value) {
       agendamento.value.profissional = {
+        id: usuarioLogado.value.id,
         nome: usuarioLogado.value.nome || '',
         telefone: usuarioLogado.value.telefone || '',
         email: usuarioLogado.value.email || '',

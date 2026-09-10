@@ -25,6 +25,7 @@
           />
         </div>
         <h1 class="user-name">{{ usuario.nome }}</h1>
+        <button class="btn-sair" @click="sair">Sair</button>
       </div>
 
       <div class="info-grid">
@@ -99,6 +100,14 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import EditarPerfilView from './EditarPerfilView.vue'
+import { useAuth } from '@/composables/useAuth'
+
+const { logout } = useAuth()
+
+function sair() {
+  logout()
+  router.push('/login')
+}
 
 const router = useRouter()
 const editando = ref(false)
@@ -177,6 +186,18 @@ const calcularIdade = (dataNasc) => {
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+.btn-sair {
+  background-color: transparent;
+  border: 1.5px solid #536236;
+  color: #536236;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
 }
 
 .delete-icon-btn {

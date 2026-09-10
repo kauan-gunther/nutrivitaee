@@ -8,10 +8,18 @@ const meusAgendamentos = ref([])
 
 onMounted(() => {
   carregarUsuario()
+
   const salvos = localStorage.getItem('dadosAgendamento')
-  if (salvos) {
+  if (salvos && usuarioLogado.value) {
     const dados = JSON.parse(salvos)
-    meusAgendamentos.value = Array.isArray(dados) ? dados : [dados]
+    const lista = Array.isArray(dados) ? dados : [dados]
+
+    meusAgendamentos.value = lista.filter((item) => {
+      if (isProfissional.value) {
+        return item.profissional?.id === usuarioLogado.value.id
+      }
+      return item.usuario?.id === usuarioLogado.value.id
+    })
   }
 })
 
@@ -27,9 +35,7 @@ function formatarData(dataIso) {
 
 const textos = computed(() => {
   if (!estaLogado.value) {
-    return {
-      hero: 'Agendamentos',
-    }
+    return { hero: 'Agendamentos' }
   }
   if (isProfissional.value) {
     return {
@@ -58,14 +64,15 @@ const textos = computed(() => {
 
     <div class="content-body">
       <!-- ESTADO 1: Deslogado -> Redireciona para /cadastro -->
-      <section v-if="!estaLogado" class="card-status-box dashed-border">
-        <h2 class="status-title">Não há agendamentos para você</h2>
-        <p class="status-sub">
-          Você precisa estar logado para visualizar seus agendamentos. Eles aparecerão aqui!
-        </p>
+    <section v-if="!estaLogado" class="card-status-box dashed-border">
+  <h2 class="status-title">Não há agendamentos para você</h2>
+  <p class="status-sub">
+    Você precisa estar logado para visualizar seus agendamentos. Eles aparecerão aqui!
+  </p>
 
-        <RouterLink to="/cadastro" class="btn-action"> Fazer o login </RouterLink>
-      </section>
+  <RouterLink to="/login" class="btn-action">Fazer login</RouterLink>
+</section>
+      
 
       <!-- ESTADO 2: Logada, mas ainda sem nenhum agendamento -->
       <section v-else-if="!temAgendamentos" class="card-status-box dashed-border">
