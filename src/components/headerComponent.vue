@@ -50,13 +50,6 @@ const destinoNutricionistas = computed(() =>
             </RouterLink>
           </li>
 
-          <li>
-            <RouterLink to="/login">
-              <i class="mdi mdi-login-variant"></i>
-              Login
-            </RouterLink>
-          </li>
-
           <div class="user">
             <li>
               <RouterLink to="/perfil">
@@ -70,6 +63,14 @@ const destinoNutricionistas = computed(() =>
                 Receitas
               </RouterLink>
             </li>
+
+            
+          <li>
+            <RouterLink to="/login">
+              <i class="mdi mdi-login-variant"></i>
+              Login
+            </RouterLink>
+          </li>
           </div>
           <li>
             <RouterLink to="/sobreNos">
@@ -83,6 +84,7 @@ const destinoNutricionistas = computed(() =>
           <RouterLink to="/">
             <img src="/logo.png" alt="logo" class="logo" />
           </RouterLink>
+          
         </div>
       </nav>
     </div>
@@ -90,7 +92,9 @@ const destinoNutricionistas = computed(() =>
       <RouterLink to="/">
         <img src="/logo.png" alt="logo" />
       </RouterLink>
+      
     </h1>
+    
   </header>
 </template>
 
