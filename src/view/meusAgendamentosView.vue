@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const { usuarioLogado, carregarUsuario } = useAuth()
+const { usuarioLogado, isPaciente, isProfissional, carregarUsuario } = useAuth()
 const meusAgendamentos = ref([])
 
 onMounted(() => {
@@ -17,27 +17,47 @@ onMounted(() => {
 
 const estaLogado = computed(() => !!usuarioLogado.value)
 
-// NOVO: diz se, além de logada, a pessoa já tem algum agendamento salvo.
-// É essa variável que vai decidir entre o ESTADO 2 e o ESTADO 3 do template.
 const temAgendamentos = computed(() => meusAgendamentos.value.length > 0)
 
-// Mesma função de formatação de data que você já usa no resumoComponent,
-// só repeti aqui porque essa view não importa nada de lá.
 function formatarData(dataIso) {
   if (!dataIso) return ''
   const [ano, mes, dia] = dataIso.split('-')
   return `${dia}/${mes}/${ano}`
 }
+
+const textos = computed(() => {
+  if (!estaLogado.value) {
+    return {
+      hero: 'Agendamentos',
+    }
+  }
+  if (isProfissional.value) {
+    return {
+      hero: 'Suas Consultas Agendadas Com os Seus Pacientes',
+      semAgendTitulo: 'Você ainda não tem nenhuma consulta agendada',
+      semAgendSub: 'Escolha um paciente e agende sua primeira consulta. Ela vai aparecer aqui!',
+      listaTitulo: 'Suas consultas agendadas',
+      botaoNovo: '+ Nova consulta',
+    }
+  }
+  return {
+    hero: 'Seus agendamentos com profissionais de saúde',
+    semAgendTitulo: 'Você ainda não tem agendamentos',
+    semAgendSub: 'Escolha um profissional e marque sua primeira consulta. Ela vai aparecer aqui!',
+    listaTitulo: 'Seus agendamentos',
+    botaoNovo: '+ Novo agendamento',
+  }
+})
 </script>
 
 <template>
   <main class="agendamentos-container">
     <header class="hero-banner">
-      <h1>Seus agendamentos com profissionais de saúde</h1>
+      <h1>{{ textos.hero }}</h1>
     </header>
 
     <div class="content-body">
-      <!-- ESTADO 1: Deslogado -> Redireciona para /cadastro (igual já estava) -->
+      <!-- ESTADO 1: Deslogado -> Redireciona para /cadastro -->
       <section v-if="!estaLogado" class="card-status-box dashed-border">
         <h2 class="status-title">Não há agendamentos para você</h2>
         <p class="status-sub">
@@ -49,19 +69,16 @@ function formatarData(dataIso) {
 
       <!-- ESTADO 2: Logada, mas ainda sem nenhum agendamento -->
       <section v-else-if="!temAgendamentos" class="card-status-box dashed-border">
-        <h2 class="status-title">Você ainda não tem agendamentos</h2>
-        <p class="status-sub">
-          Escolha um profissional e marque sua primeira consulta. Ela vai aparecer aqui!
-        </p>
-
-        <RouterLink to="/agendamento" class="btn-action"> Agendar Consulta </RouterLink>
+        <h2 class="status-title">{{ textos.semAgendTitulo }}</h2>
+        <p class="status-sub">{{ textos.semAgendSub }}</p>
+        <RouterLink to="/agendamento" class="btn-action">Agendar Consulta</RouterLink>
       </section>
 
       <!-- ESTADO 3: Logada e com um ou mais agendamentos -->
       <section v-else class="lista-agendamentos">
         <div class="lista-header">
-          <h2 class="status-title-alt">Seus agendamentos</h2>
-          <RouterLink to="/agendamento" class="btn-action-small">+ Novo agendamento</RouterLink>
+          <h2 class="status-title-alt">{{ textos.listaTitulo }}</h2>
+          <RouterLink to="/agendamento" class="btn-action-small">{{ textos.botaoNovo }}</RouterLink>
         </div>
 
         <div v-for="(item, index) in meusAgendamentos" :key="index" class="agendamento-card">
@@ -85,8 +102,7 @@ function formatarData(dataIso) {
 <style scoped>
 .hero-banner {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-    url('/img/banner-agendamentos.png');
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-agendamentos.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -100,7 +116,7 @@ function formatarData(dataIso) {
 }
 
 .hero-banner h1 {
-  color: #F1EDD2;
+  color: #f1edd2;
   font-size: 80px;
   font-weight: normal;
   margin: 0;
@@ -143,7 +159,7 @@ function formatarData(dataIso) {
 .btn-action {
   display: inline-block;
   background-color: #536236;
-  color: #F1EDD2;
+  color: #f1edd2;
   border: none;
   padding: 12px 32px;
   border-radius: 25px;
@@ -182,7 +198,7 @@ function formatarData(dataIso) {
 .btn-action-small {
   display: inline-block;
   background-color: #536236;
-  color: #F1EDD2;
+  color: #f1edd2;
   padding: 8px 20px;
   border-radius: 20px;
   font-weight: bold;
@@ -208,7 +224,7 @@ function formatarData(dataIso) {
 
 .agendamento-info p {
   margin: 4px 0;
-  color: #BF945A;
+  color: #bf945a;
   font-size: 0.95rem;
   font-weight: bold;
 }
