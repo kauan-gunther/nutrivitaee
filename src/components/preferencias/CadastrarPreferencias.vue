@@ -43,6 +43,24 @@ function confirmar() {
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferencias.value))
+
+    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
+
+    const gostoList = []
+    if (preferencias.value.preferencias) gostoList.push(preferencias.value.preferencias)
+    if (preferencias.value.adicionar) gostoList.push(preferencias.value.adicionar)
+
+    usuarioLogado.preferencias = {
+      gosto: gostoList,
+      naoGosto: usuarioLogado.preferencias?.naoGosto || [],
+    }
+
+    if (preferencias.value.restricoes) {
+      usuarioLogado.alergias = [preferencias.value.restricoes]
+    }
+
+    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado))
+
     router.push('/perfil')
   } catch (error) {
     console.error('Erro ao salvar preferências:', error)
@@ -51,7 +69,7 @@ function confirmar() {
 }
 
 function redirecionar() {
-  router.push('/buscar')
+  router.push('/consultas')
 }
 </script>
 
@@ -99,10 +117,8 @@ function redirecionar() {
     <div class="botoes">
       <button @click="limpar" class="btn-limpar">Limpar/Cancelar</button>
       <button @click="confirmar" class="btn-salvar">Confirmar</button>
-
     </div>
-      <button @click="redirecionar" class="btn-buscar">Buscar Profissionais</button>
-   
+    <button @click="redirecionar" class="btn-buscar">Buscar Profissionais</button>
   </main>
 </template>
 
@@ -120,7 +136,6 @@ h1 {
   margin-bottom: 24px;
 }
 
-/* Grid layout de 2 colunas */
 .grid-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -138,11 +153,10 @@ h1 {
 }
 
 .comida label {
-  color: #333F34;
+  color: #333f34;
   font-weight: bold;
   white-space: nowrap;
   font-size: 1rem;
-
 }
 
 .comida input {
@@ -150,7 +164,7 @@ h1 {
   background: transparent;
   border: none;
   outline: none;
-  color: #73441B;
+  color: #73441b;
   font-size: 1rem;
   font-weight: bold;
 }
@@ -171,12 +185,14 @@ h1 {
   padding: 10px 16px;
   box-shadow: 4px 5px 8px rgba(0, 0, 0, 0.25);
 }
+
 .input-card label {
   color: #333f34;
   font-weight: bold;
   margin-right: 8px;
   white-space: nowrap;
 }
+
 .input-card input {
   width: 100%;
   background: transparent;
@@ -187,25 +203,13 @@ h1 {
   font-weight: bold;
 }
 
-.btn-limpar {
+.btn-limpar,
+.btn-salvar,
+.btn-buscar {
   display: flex;
   align-items: center;
-  margin-top: 24px;
-  padding: 12px;
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1px solid #536236;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-.btn-salvar {
-  display: flex;
-  align-items: center;
-  margin-top: 24px;
+  justify-content: center;
+  margin: 12px auto 0 auto;
   padding: 11px 38px;
   background-color: #9a9e70;
   color: #333f34;

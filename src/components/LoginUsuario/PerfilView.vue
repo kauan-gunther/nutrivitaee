@@ -40,19 +40,29 @@
           <span class="label-text">Idade:</span>
           <span class="valor-text">{{ calcularIdade(usuario.dataNascimento) }} anos</span>
         </div>
-               <div class="info-box input-pill">
+        <div class="info-box input-pill">
           <span class="label-text">email:</span>
           <span class="valor-text">{{ usuario.email }}</span>
         </div>
-             <div class="info-box input-pill">
+        <div class="info-box input-pill">
           <span class="label-text">cpf</span>
           <span class="valor-text">{{ usuario.cpf }}</span>
-      </div>
+        </div>
       </div>
 
       <div class="cards-grid">
         <div class="card-box light-card">
-          <h3 class="card-title">Preferencias</h3>
+          <div class="card-header-action">
+            <h3 class="card-title">Preferências</h3>
+            <button
+              class="btn-definir-pref"
+              title="Definir Preferências"
+              @click="router.push('/CadastrarPreferencias')"
+            >
+              Definir
+            </button>
+          </div>
+
           <hr class="card-divider" />
 
           <p class="section-subtitle">gosto:</p>
@@ -61,7 +71,7 @@
             <li v-for="(item, i) in usuario.preferencias?.gosto" :key="i">• {{ item }}</li>
           </ul>
 
-          <p class="section-subtitle mt-2">Não gosta</p>
+          <p class="section-subtitle mt-2">Não gosta:</p>
           <ul>
             <li v-if="!usuario.preferencias?.naoGosto?.length">• Não registrado</li>
             <li v-for="(item, i) in usuario.preferencias?.naoGosto" :key="i">• {{ item }}</li>
@@ -69,7 +79,7 @@
         </div>
 
         <div class="card-box light-card">
-          <h3 class="card-title">Alergias</h3>
+          <h3 class="card-title">Alergias / Restrições</h3>
           <hr class="card-divider" />
           <ul>
             <li v-if="!usuario.alergias?.length">• Não registrado</li>
@@ -109,6 +119,28 @@ onMounted(() => {
   const dadosSalvos = localStorage.getItem('usuarioLogado')
   if (dadosSalvos) {
     Object.assign(usuario, JSON.parse(dadosSalvos))
+  }
+
+  const prefsSalvas = localStorage.getItem('nutriVitae.preferencias')
+  if (prefsSalvas) {
+    try {
+      const prefs = JSON.parse(prefsSalvas)
+
+      const gostoList = []
+      if (prefs.preferencias) gostoList.push(prefs.preferencias)
+      if (prefs.adicionar) gostoList.push(prefs.adicionar)
+
+      usuario.preferencias = {
+        gosto: gostoList.length > 0 ? gostoList : usuario.preferencias?.gosto || [],
+        naoGosto: usuario.preferencias?.naoGosto || [],
+      }
+
+      if (prefs.restricoes) {
+        usuario.alergias = [prefs.restricoes]
+      }
+    } catch (e) {
+      console.error('Erro ao ler preferências:', e)
+    }
   }
 })
 
@@ -249,13 +281,36 @@ const calcularIdade = (dataNasc) => {
   min-height: 200px;
 }
 
+.card-header-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .card-title {
   text-align: center;
   font-family: 'Italiana', serif, sans-serif;
   font-size: 1.4rem;
   color: #705335;
   font-weight: 600;
-  margin: 0 0 8px 0;
+  margin: 0;
+}
+
+.btn-definir-pref {
+  background-color: #9a9e70;
+  color: #333f34;
+  border: 1px solid #536236;
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-definir-pref:hover {
+  background-color: #888c60;
 }
 
 .card-divider {
