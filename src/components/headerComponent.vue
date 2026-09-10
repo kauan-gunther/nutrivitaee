@@ -1,10 +1,18 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+
+const { usuarioLogado, carregarUsuario } = useAuth()
+carregarUsuario()
+
+const destinoNutricionistas = computed(() =>
+  usuarioLogado.value?.tag === 'nutricionista' ? '/cadastro-profissional' : '/profissionais',
+)
 </script>
 
 <template>
   <header>
- 
     <div class="menu-hamburguer">
       <input type="checkbox" id="menu-toggle" />
       <label for="menu-toggle" class="menu-icon">
@@ -24,7 +32,7 @@ import { RouterLink } from 'vue-router';
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/profissionais">
+            <RouterLink :to="destinoNutricionistas">
               <i class="mdi mdi-food-apple-outline"></i>
               Nutricionistas
             </RouterLink>
@@ -63,19 +71,16 @@ import { RouterLink } from 'vue-router';
           </li>
         </ul>
         <div class="div">
-          <RouterLink to="/CadastroSuporte">
-            Suporte
-          </RouterLink>
+          <RouterLink to="/CadastroSuporte"> Suporte </RouterLink>
           <RouterLink to="/">
             <img src="/logo.png" alt="logo" class="logo" />
           </RouterLink>
         </div>
       </nav>
-
     </div>
     <h1 class="logo">
       <RouterLink to="/">
-        <img src="/logo.png" alt="logo">
+        <img src="/logo.png" alt="logo" />
       </RouterLink>
     </h1>
   </header>
@@ -89,14 +94,14 @@ header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;           
-  height: auto;       
+  width: 100%;
+  height: auto;
   display: flex;
-  flex-direction: row;    
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 15px 40px;   
+  padding: 15px 40px;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
@@ -111,11 +116,10 @@ header h1 img {
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1));
 }
 
-
 header a {
   text-decoration: none;
-  font-size: 16px;         
-  color: #F1EDD2;
+  font-size: 16px;
+  color: #f1edd2;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -139,14 +143,14 @@ div.linha {
   width: 25px;
   height: 3px;
   margin: 4px 0;
-  background: #F1EDD2;
+  background: #f1edd2;
   border-radius: 2px;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
 .menu-icon:hover .linha {
-  background: #9A9E70;
+  background: #9a9e70;
 }
 
 /*============ Overlay / Menu Interno (Desktop) ===========*/
@@ -161,7 +165,7 @@ div.linha {
 }
 
 .overlay .logo {
-  display: none; 
+  display: none;
 }
 
 .menu-list {
@@ -176,7 +180,7 @@ div.linha {
 
 .menu-list li,
 .user li {
-  margin: 0; 
+  margin: 0;
 }
 
 .user {
@@ -185,10 +189,9 @@ div.linha {
 }
 
 .menu-list a:hover {
-  color: #9A9E70;
+  color: #9a9e70;
   transform: scale(1.05);
 }
-
 
 /*====================================
       ESTILO MOBILE (Até 768px)
@@ -198,7 +201,7 @@ div.linha {
     display: block;
     cursor: pointer;
   }
-  
+
   .overlay .logo {
     display: block;
     margin: 20px auto;

@@ -14,8 +14,36 @@ const form = ref({
   telefone: '',
   dataNascimento: '',
   senha: '',
-  confirmarSenha: ''
+  confirmarSenha: '',
 })
+
+const somenteNumeros = (valor) => valor.replace(/\D/g, '')
+
+const dataValida = (data) => data && new Date(`${data}T00:00:00`) <= new Date()
+
+function gerarIdCadastro(cadastros) {
+  let id
+  do {
+    const quantidadeDigitos = (crypto.getRandomValues(new Uint32Array(1))[0] % 8) + 2
+    const menorValor = 10 ** (quantidadeDigitos - 1)
+    const intervalo = 10 ** quantidadeDigitos - menorValor
+    const valorAleatorio = crypto.getRandomValues(new Uint32Array(1))[0] % intervalo
+    id = String(menorValor + valorAleatorio)
+  } while (cadastros.some((cadastro) => String(cadastro.id) === id))
+
+  return id
+}
+
+function cadastroDuplicado(cpf, email) {
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const atual = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
+  const registros = atual ? [...cadastros, atual] : cadastros
+  return registros.some(
+    (registro) =>
+      registro.tipo === 'profissional' &&
+      (registro.cpf === cpf || registro.email.toLowerCase() === email.toLowerCase()),
+  )
+}
 
 function validarFormulario() {
   if (
@@ -27,12 +55,29 @@ function validarFormulario() {
     !form.value.senha ||
     !form.value.confirmarSenha
   ) {
-    alert("Preencha todos os campos.")
+    alert('Preencha todos os campos.')
     return false
   }
 
   if (form.value.senha !== form.value.confirmarSenha) {
-    alert("As senhas não coincidem.")
+    alert('As senhas não coincidem.')
+    return false
+  }
+
+  const cpf = somenteNumeros(form.value.cpf)
+  const telefone = somenteNumeros(form.value.telefone)
+  const email = form.value.email.trim()
+
+  if (!dataValida(form.value.dataNascimento)) {
+    alert('Digite uma data de nascimento válida.')
+    return false
+  }
+  if (form.value.senha.length < 6) {
+    alert('A senha deve ter pelo menos 6 caracteres.')
+    return false
+  }
+  if (cadastroDuplicado(cpf, email)) {
+    alert('Já existe um profissional com este CPF ou e-mail.')
     return false
   }
 
@@ -42,18 +87,28 @@ function validarFormulario() {
 function cadastrar() {
   if (!validarFormulario()) return
 
+  const cpf = somenteNumeros(form.value.cpf)
+  const telefone = somenteNumeros(form.value.telefone)
+  const email = form.value.email.trim()
+
   const dadosProfissional = {
+    id: gerarIdCadastro(JSON.parse(localStorage.getItem('cadastros') || '[]')),
     tipo: 'profissional',
+    tag: 'nutricionista',
     nome: form.value.nome,
-    email: form.value.email,
-    cpf: form.value.cpf,
-    telefone: form.value.telefone,
+    email,
+    cpf,
+    telefone,
     dataNascimento: form.value.dataNascimento,
-    senha: form.value.senha
+    senha: form.value.senha,
+    formacoes: [],
+    especializacoes: [],
   }
 
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  localStorage.setItem('cadastros', JSON.stringify([...cadastros, dadosProfissional]))
   localStorage.setItem('usuarioLogado', JSON.stringify(dadosProfissional))
-  router.push('/profissionais')
+  router.push(`/profissional/${dadosProfissional.id}`)
 }
 function limparCampos() {
   form.value = {
@@ -63,10 +118,9 @@ function limparCampos() {
     telefone: '',
     dataNascimento: '',
     senha: '',
-    confirmarSenha: ''
+    confirmarSenha: '',
   }
 }
-
 </script>
 
 <template>
@@ -125,7 +179,7 @@ function limparCampos() {
 .cadastroPro {
   width: 100%;
   min-height: 100vh;
-  background-color: #EFE8D3;
+  background-color: #efe8d3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -133,7 +187,7 @@ function limparCampos() {
 }
 
 h1 {
-  font-size: clamp(3rem, 5vw, 4.5rem); 
+  font-size: clamp(3rem, 5vw, 4.5rem);
   color: #536236;
   font-weight: 400;
   margin-bottom: 50px;
@@ -142,7 +196,7 @@ h1 {
 
 .form {
   width: 100%;
-  max-width: 1100px; 
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -151,17 +205,17 @@ h1 {
 .grid-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px 36px; 
+  gap: 28px 36px;
 }
 
 input {
   width: 100%;
-  padding: 18px 24px; 
-  border: 1.5px solid #8C7355;
+  padding: 18px 24px;
+  border: 1.5px solid #8c7355;
   border-radius: 20px;
   background-color: rgba(239, 232, 211, 0.6);
-  font-size: 1.25rem; 
-  color: #333F34;
+  font-size: 1.25rem;
+  color: #333f34;
   outline: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
@@ -174,7 +228,7 @@ input::placeholder {
 
 input:focus {
   border-color: #536236;
-  background-color: #EFE8D3;
+  background-color: #efe8d3;
 }
 
 .campo-nascimento {
@@ -192,7 +246,7 @@ input:focus {
 }
 
 .campo-nascimento input {
-  padding-left: 200px; 
+  padding-left: 200px;
 }
 
 .campo-input-icone {
@@ -229,13 +283,15 @@ button {
   transition: all 0.25s ease;
 }
 
-.btn-salvar, .btn-cancelar {
+.btn-salvar,
+.btn-cancelar {
   background-color: #536236;
-  color: #F1EDD2;
+  color: #f1edd2;
   box-shadow: 0 4px 14px rgba(83, 98, 54, 0.25);
 }
 
-.btn-salvar:hover, .btn-cancelar:hover {
+.btn-salvar:hover,
+.btn-cancelar:hover {
   background-color: #414e2a;
   transform: translateY(-2px);
 }
@@ -244,7 +300,7 @@ button {
   .grid-inputs {
     grid-template-columns: 1fr;
   }
-  
+
   .full-width {
     grid-column: auto;
   }

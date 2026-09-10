@@ -1,25 +1,31 @@
 <script setup>
-import { useRoute } from "vue-router"
-import { profissionais } from "@/data/profissionais"
+import { useRoute } from 'vue-router'
+import { profissionais } from '@/data/profissionais'
 
 const route = useRoute()
 
-const profissional = profissionais.find(
-  p => p.id === Number(route.params.id)
+const profissionaisCadastrados = JSON.parse(localStorage.getItem('cadastros') || '[]').filter(
+  (cadastro) => cadastro.tag === 'nutricionista',
+)
+
+const profissional = [...profissionais, ...profissionaisCadastrados].find(
+  (item) => String(item.id) === String(route.params.id),
 )
 </script>
 
 <template>
   <main v-if="profissional" class="perfil-container">
-   
-    <RouterLink :to="`/profissional/${profissional.id}/delete`" class="btn-icone btn-deletar" title="Excluir">
+    <RouterLink
+      :to="`/profissional/${profissional.id}/delete`"
+      class="btn-icone btn-deletar"
+      title="Excluir"
+    >
       <i class="mdi mdi-delete-outline"></i>
     </RouterLink>
 
     <h1>Perfil do Profissional</h1>
 
     <div class="perfil-conteudo">
-
       <div class="dados-pessoais">
         <div class="linha-nome">
           <img :src="profissional.foto" :alt="profissional.nome" class="foto-perfil" />
@@ -65,7 +71,11 @@ const profissional = profissionais.find(
       </div>
     </div>
 
-    <RouterLink :to="`/profissional/${profissional.id}/edit`" class="btn-icone btn-editar" title="Editar">
+    <RouterLink
+      :to="`/profissional/${profissional.id}/edit`"
+      class="btn-icone btn-editar"
+      title="Editar"
+    >
       <i class="mdi mdi-pencil-outline"></i>
     </RouterLink>
   </main>
@@ -83,7 +93,7 @@ const profissional = profissionais.find(
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #EFE8D3;
+  background-color: #efe8d3;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -129,7 +139,7 @@ h1 {
 .campo-dado {
   width: 100%;
   padding: 16px 24px;
-  border: 1.5px solid #8C7355;
+  border: 1.5px solid #8c7355;
   border-radius: 18px;
   background-color: rgba(239, 232, 211, 0.6);
   display: flex;
@@ -150,7 +160,7 @@ h1 {
 
 .campo-dado .valor {
   font-size: 1.25rem;
-  color: #333F34;
+  color: #333f34;
 }
 
 .cards-informacoes {
@@ -161,7 +171,7 @@ h1 {
 }
 
 .card-info {
-  border: 1.5px solid #8C7355;
+  border: 1.5px solid #8c7355;
   border-radius: 20px;
   padding: 28px;
   background-color: rgba(239, 232, 211, 0.4);
@@ -188,17 +198,17 @@ h1 {
   align-items: baseline;
   gap: 8px;
   font-size: 1.1rem;
-  color: #333F34;
+  color: #333f34;
 }
 
 .card-info .bullet {
-  color: #333F34;
+  color: #333f34;
   font-size: 1.2rem;
 }
 
 .card-info .tipo {
   font-weight: 600;
-  color: #333F34;
+  color: #333f34;
 }
 
 .card-info .nome {
@@ -210,7 +220,7 @@ h1 {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background-color: #EFE8D3;
+  background-color: #efe8d3;
   border: 1px solid rgba(140, 115, 85, 0.3);
   display: flex;
   align-items: center;
@@ -218,14 +228,14 @@ h1 {
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   font-size: 1.5rem;
-  color: #333F34;
+  color: #333f34;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .btn-icone:hover {
   transform: scale(1.08);
-  background-color: #E6DFC9;
+  background-color: #e6dfc9;
 }
 
 .btn-deletar {
@@ -240,7 +250,7 @@ h1 {
 
 .naoEncontrado {
   min-height: 100vh;
-  background-color: #EFE8D3;
+  background-color: #efe8d3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -261,7 +271,7 @@ h1 {
   align-items: center;
   gap: 10px;
   background-color: #536236;
-  color: #F1EDD2;
+  color: #f1edd2;
   padding: 14px 28px;
   border-radius: 50px;
   font-size: 1.2rem;

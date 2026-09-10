@@ -22,11 +22,13 @@ export function useAuth() {
 
   const isPaciente = computed(() => usuarioLogado.value?.tipo === 'paciente')
   const isProfissional = computed(() => usuarioLogado.value?.tipo === 'profissional')
+  const isAdmin = computed(() => usuarioLogado.value?.tag === 'admin')
 
   return {
     usuarioLogado,
     isPaciente,
     isProfissional,
+    isAdmin,
     carregarUsuario,
     login,
     logout
