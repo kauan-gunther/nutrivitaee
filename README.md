@@ -13,10 +13,10 @@ Nossa plataforma foi desenvolvida para ajudar cada paciente a encontrar um profi
 - Cadastro de suporte. (cadastro de suporte)
 - Cadastro de agendamento. (cadastro de consulta)
 - Cadastro de pratos. (cadastro de pratos personalizados)
-- Cadastro de preferencias. (Não deu tempo de implementar)
-- Cadastro de formação acadêmica. (Não deu tempo de implementar)
-- Cadastrar conversas(Chat). (Não deu tempo de implementar)
-- página sobre nós, páginas agendamentos, página profissional. (Não deu tempo de implementar)
+- Cadastro de preferencias. (Em desenvolvimento)
+- Cadastro de formação acadêmica. (Em desenvolvimento)
+- Cadastrar conversas(Chat). (Cadastro de conversas.)
+- página sobre nós, páginas agendamentos, página profissional. (Em desenvolvimento)
 
 ### Funcionalidades Efetivamente Desenvolvidas:
 - Cadastro do profissional.
@@ -24,6 +24,9 @@ Nossa plataforma foi desenvolvida para ajudar cada paciente a encontrar um profi
 - Cadastro de suporte.
 - Cadastro de agendamento.
 - Cadastro de pratos.
+- Cadastro de conversas.
+- Página sobre nós.
+- Página agendamentos.
 
 ## Dificuldades Encontradas
 - Algumas partes de implementação foram difíceis.
