@@ -53,6 +53,7 @@ function entrar() {
       <button type="submit" class="btn-pill btn-entrar">Entrar</button>
     </form>
 
+    <!-- AQUI: fora do form, mas ainda dentro do login-container -->
     <div class="rodape-cadastro">
       <p>Ainda não tem conta?</p>
       <div class="links-cadastro">

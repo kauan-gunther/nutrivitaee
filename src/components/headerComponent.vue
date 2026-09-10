@@ -44,11 +44,19 @@ const destinoNutricionistas = computed(() =>
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="#">
+            <RouterLink to="/mensagens">
               <i class="mdi mdi-forum-outline"></i>
               Conversas
             </RouterLink>
           </li>
+
+          <li>
+            <RouterLink to="/login">
+              <i class="mdi mdi-login-variant"></i>
+              Login
+            </RouterLink>
+          </li>
+
           <div class="user">
             <li>
               <RouterLink to="/perfil">
@@ -132,7 +140,7 @@ header .div {
   gap: 15px;
 }
 
-/*============ Configurações do Hambúrguer e Mobile (Escondidos no Desktop) ===========*/
+/*============ Mobile ===========*/
 #menu-toggle,
 .menu-icon,
 .backdrop {
@@ -197,6 +205,15 @@ div.linha {
       ESTILO MOBILE (Até 768px)
 =====================================*/
 @media (max-width: 768px) {
+
+.menu-hamburguer {
+  order: 2;
+}
+
+h1.logo {
+  order: 1;
+}
+
   .menu-icon {
     display: block;
     cursor: pointer;
@@ -204,8 +221,8 @@ div.linha {
 
   .overlay .logo {
     display: block;
-    margin: 20px auto;
-    height: 60px;
+    margin: 14px auto;
+    height: 48px;
   }
 
   /* Menu Drawer Transição */
@@ -213,12 +230,12 @@ div.linha {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 260px;
+    width: 220px;
     height: 100vh;
     background-color: #536236;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 20px;
+    padding: 28px 16px;
     transition: right 0.4s ease-in-out;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -250,7 +267,7 @@ div.linha {
   }
 
   header a {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 </style>
