@@ -42,12 +42,7 @@
 
         <div class="input-pill date-field">
           <span class="label-text">Data de nascimento:</span>
-          <input
-            type="date"
-            v-model="form.dataNascimento"
-            placeholder="DD/MM/AAAA"
-            required
-          />
+          <input type="date" v-model="form.dataNascimento" placeholder="DD/MM/AAAA" required />
         </div>
 
         <div class="input-pill">
@@ -84,25 +79,73 @@ const form = reactive({
   confirmarSenha: '',
 })
 
+const somenteNumeros = (valor) => valor.replace(/\D/g, '')
+
+const dataValida = (data) => data && new Date(`${data}T00:00:00`) <= new Date()
+
+const gerarIdCadastro = (cadastros) => {
+  let id
+  do {
+    const quantidadeDigitos = (crypto.getRandomValues(new Uint32Array(1))[0] % 8) + 2
+    const menorValor = 10 ** (quantidadeDigitos - 1)
+    const intervalo = 10 ** quantidadeDigitos - menorValor
+    const valorAleatorio = crypto.getRandomValues(new Uint32Array(1))[0] % intervalo
+    id = String(menorValor + valorAleatorio)
+  } while (cadastros.some((cadastro) => String(cadastro.id) === id))
+
+  return id
+}
+
+const cadastroDuplicado = (tipo, cpf, email) => {
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const atual = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
+  const registros = atual ? [...cadastros, atual] : cadastros
+  return registros.some(
+    (registro) =>
+      registro.tipo === tipo &&
+      (registro.cpf === cpf || registro.email.toLowerCase() === email.toLowerCase()),
+  )
+}
+
 const submitCadastro = () => {
-  if (form.senha && form.senha !== form.confirmarSenha) {
+  const cpf = somenteNumeros(form.cpf)
+  const telefone = somenteNumeros(form.telefone)
+  const email = form.email.trim()
+
+  if (!dataValida(form.dataNascimento)) {
+    alert('Digite uma data de nascimento válida.')
+    return
+  }
+  if (form.senha.length < 6) {
+    alert('A senha deve ter pelo menos 6 caracteres.')
+    return
+  }
+  if (form.senha !== form.confirmarSenha) {
     alert('As senhas não coincidem!')
+    return
+  }
+  if (cadastroDuplicado('paciente', cpf, email)) {
+    alert('Já existe um paciente com este CPF ou e-mail.')
     return
   }
 
   const dadosUsuario = {
+    id: gerarIdCadastro(JSON.parse(localStorage.getItem('cadastros') || '[]')),
     tipo: 'paciente',
+    tag: 'paciente',
     nome: form.nome,
-    cpf: form.cpf,
+    cpf,
     peso: form.peso.includes('kg') ? form.peso : `${form.peso}kg`,
     dataNascimento: form.dataNascimento,
-    email: form.email,
-    telefone: form.telefone,
+    email,
+    telefone,
     senha: form.senha,
     preferencias: { gosto: [], naoGosto: [] },
     alergias: [],
   }
 
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  localStorage.setItem('cadastros', JSON.stringify([...cadastros, dadosUsuario]))
   localStorage.setItem('usuarioLogado', JSON.stringify(dadosUsuario))
   router.push('/perfil')
 }
@@ -211,7 +254,9 @@ const cancelarCadastro = () => {
   font-weight: 500;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
   text-align: center;
 }
 
