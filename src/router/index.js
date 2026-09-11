@@ -200,6 +200,11 @@ const router = createRouter({
       name: 'ConfirmDeleteModal',
       component: () => import("@/components/academic/ConfirmDeleteModal.vue")
     },
+    {
+      path: '/mensagens',
+      name: 'mensagens',
+      component: () => import("@/components/mensagens/Mensagens.vue")
+    },
 
     // --- SOBRE NÓS ---
     {
