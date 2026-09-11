@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { profissionais } from '@/data/profissionais'
+import AcademicCreate from '@/components/academic/AcademicCreate.vue'
 
 const props = defineProps({
   idProp: {
@@ -12,6 +13,8 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
+
+const exibirModalAcademic = ref(false)
 
 const profissional = computed(() => {
   const targetId = props.idProp || route.params.id
@@ -25,6 +28,35 @@ const profissional = computed(() => {
 
   return listaCompleta.find((item) => String(item.id) === String(targetId))
 })
+
+function salvarFormacao(novaFormacao) {
+  if (!profissional.value) return
+
+  if (!profissional.value.formacoes) {
+    profissional.value.formacoes = []
+  }
+
+  profissional.value.formacoes.push({
+    tipo: novaFormacao.grau || 'Formação',
+    nome: `${novaFormacao.curso} - ${novaFormacao.instituicao}`,
+    diplomaFoto: novaFormacao.diplomaFoto,
+  })
+
+  // Atualiza LocalStorage
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const idx = cadastros.findIndex((c) => String(c.id) === String(profissional.value.id))
+  if (idx !== -1) {
+    cadastros[idx] = profissional.value
+    localStorage.setItem('cadastros', JSON.stringify(cadastros))
+  }
+
+  const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
+  if (usuarioLogado && String(usuarioLogado.id) === String(profissional.value.id)) {
+    localStorage.setItem('usuarioLogado', JSON.stringify(profissional.value))
+  }
+
+  exibirModalAcademic.value = false
+}
 
 function sair() {
   localStorage.removeItem('usuarioLogado')
@@ -76,16 +108,30 @@ function sair() {
       </div>
 
       <div class="cards-informacoes">
+        <!-- Box Formação Acadêmica -->
         <div class="card-info">
-          <h2>Formação Acadêmica</h2>
+          <div class="card-header">
+            <h2>Formação Acadêmica</h2>
+            <button class="btn-definir" @click="exibirModalAcademic = true">
+              Definir
+            </button>
+          </div>
           <ul>
             <li v-if="!profissional.formacoes?.length" class="sem-registro">
               • Não registrada
             </li>
-            <li v-for="(formacao, index) in profissional.formacoes" :key="index">
-              <span class="bullet">•</span>
-              <span class="tipo">{{ formacao.tipo }}:</span>
-              <span class="nome">{{ formacao.nome }}</span>
+            <li v-for="(formacao, index) in profissional.formacoes" :key="index" class="item-formacao">
+              <div class="texto-formacao">
+                <span class="bullet">•</span>
+                <span class="tipo">{{ formacao.tipo }}:</span>
+                <span class="nome">{{ formacao.nome }}</span>
+              </div>
+              <img
+                v-if="formacao.diplomaFoto"
+                :src="formacao.diplomaFoto"
+                alt="Diploma"
+                class="foto-diploma-preview"
+              />
             </li>
           </ul>
         </div>
@@ -113,6 +159,13 @@ function sair() {
     >
       <i class="mdi mdi-pencil-outline"></i>
     </RouterLink>
+
+    <!-- Modal do Formulário AcademicCreate -->
+    <div v-if="exibirModalAcademic" class="modal-overlay">
+      <div class="modal-card">
+        <AcademicCreate @salvar="salvarFormacao" @cancelar="exibirModalAcademic = false" />
+      </div>
+    </div>
   </main>
 
   <main v-else class="naoEncontrado">
@@ -241,11 +294,35 @@ h1 {
   background-color: rgba(239, 232, 211, 0.4);
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .card-info h2 {
   font-size: 1.8rem;
   color: #536236;
   font-weight: 400;
-  margin-bottom: 20px;
+  margin: 0;
+}
+
+.btn-definir {
+  background-color: #9a9e70;
+  border: 2px solid #536236;
+  color: #333f34;
+  border-radius: 20px;
+  padding: 6px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-definir:hover {
+  background-color: #536236;
+  color: #efe8d3;
 }
 
 .card-info ul {
@@ -257,12 +334,27 @@ h1 {
   gap: 14px;
 }
 
-.card-info li {
+.item-formacao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.texto-formacao {
   display: flex;
   align-items: baseline;
   gap: 8px;
   font-size: 1.1rem;
   color: #333f34;
+}
+
+.foto-diploma-preview {
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #8c7355;
+  margin-top: 4px;
 }
 
 .sem-registro {
@@ -315,6 +407,28 @@ h1 {
 .btn-editar {
   bottom: 30px;
   left: 40px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-card {
+  background-color: #efe8d3;
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 750px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .naoEncontrado {
