@@ -40,7 +40,7 @@ const router = createRouter({
     {
       path: '/cadastro-profissional',
       name: 'cadastro-profissional',
-      component: () => import('@/components/profissional/cadastroProfissional.vue'), 
+      component: () => import('@/components/profissional/cadastroProfissional.vue'),
     },
     {
       path: '/profissionais',
@@ -64,7 +64,7 @@ const router = createRouter({
     },
 
     // --- CONSULTAS E AGENDAMENTOS ---
-     {
+    {
       path: '/meus-agendamentos',
       alias: '/agendamentos',
       name: 'meus-agendamentos',
@@ -108,6 +108,11 @@ const router = createRouter({
 
     // --- PRATOS E RECEITAS ---
     {
+      path: '/receitas-recomendadas',
+      name: 'receitasRecomendadas',
+      component: () => import('@/view/receitasRecomendadasView.vue'),
+    },
+    {
       path: '/pratos/:id/cadastro',
       name: 'cadastro-prato',
       component: () => import('@/components/pratos/cadastroComponents.vue'),
@@ -120,14 +125,19 @@ const router = createRouter({
     {
       path: '/pratos/buscar',
       name: 'buscar-pratos',
-      component: () => import('@/components/pratos/buscarComponents.vue'),
+      redirect: '/receitas-recomendadas',
+    },
+    {
+      path: '/pratos/:id/buscar',
+      name: 'buscar-pratos-id',
+      redirect: '/receitas-recomendadas',
     },
     {
       path: '/pratos/editar',
       name: 'editar-prato',
       component: () => import('@/components/pratos/editarComponents.vue'),
     },
-      {
+    {
       path: '/pratos/excluir',
       name: 'excluir-prato',
       component: () => import('@/components/pratos/excluirComponents.vue'),
@@ -137,66 +147,61 @@ const router = createRouter({
       name: 'ver-prato',
       component: () => import('@/components/pratos/visualizarComponents.vue'),
     },
-    {
-      path: '/pratos/:id/buscar',
-      name: 'buscar-pratos-id',
-      component: () => import('@/components/pratos/buscarComponents.vue'),
-    },
 
     // --- SUporte ---
 
     {
-    path: '/CadastroSuporte',
-    name: 'CadastroSuporte',
-    component: () => import("@/components/Suporte/cadastroSuporte.vue")
-  },
-  {
-    path: '/buscar-suporte',
-    name: 'BuscarSuporte',
-    component: () => import("@/components/Suporte/buscarSuporte.vue")
-  },
-  {
-    path: '/perfilSuporte',
-    name: 'PerfilSuporte',
-    component: () => import("@/components/Suporte/perfilSuporte.vue")
-  },
+      path: '/CadastroSuporte',
+      name: 'CadastroSuporte',
+      component: () => import("@/components/Suporte/cadastroSuporte.vue")
+    },
     {
-    path: '/CadastrarPreferencias',
-    name: 'CadastrarPreferencias',
+      path: '/buscar-suporte',
+      name: 'BuscarSuporte',
+      component: () => import("@/components/Suporte/buscarSuporte.vue")
+    },
+    {
+      path: '/perfilSuporte',
+      name: 'PerfilSuporte',
+      component: () => import("@/components/Suporte/perfilSuporte.vue")
+    },
+    {
+      path: '/CadastrarPreferencias',
+      name: 'CadastrarPreferencias',
       component: () => import("@/components/preferencias/CadastrarPreferencias.vue"),
-  },
-  {
-    path: '/PerfilPreferencias',
-    name: 'PerfilPreferencias',
-         component: () => import("@/components/preferencias/PerfilPreferencias.vue"),
-  },
-  {
-    path: '/BuscarPreferencias',
-    name: 'BuscarPreferencias',
+    },
+    {
+      path: '/PerfilPreferencias',
+      name: 'PerfilPreferencias',
+      component: () => import("@/components/preferencias/PerfilPreferencias.vue"),
+    },
+    {
+      path: '/BuscarPreferencias',
+      name: 'BuscarPreferencias',
       component: () => import("@/components/preferencias/BuscarPreferencias.vue"),
-  },
-  {
-    path: '/AcademicCreate',
-    name: 'AcademicCreate',
-    component: () => import("@/components/academic/AcademicCreate.vue")
-  },
-{
-    path: '/AcademicEdit',
-    name: 'AcademicEdit',
-    component: () => import("@/components/academic/AcademicEdit.vue")
-  },
-{
-    path: '/AcademicViewCard',
-    name: 'AcademicViewCard',
-    component: () => import("@/components/academic/AcademicViewCard.vue")
-  },
-{
-  path: '/ConfirmDeleteModal',
-  name: 'ConfirmDeleteModal',
-    component: () => import("@/components/academic/ConfirmDeleteModal.vue")
-  },
+    },
+    {
+      path: '/AcademicCreate',
+      name: 'AcademicCreate',
+      component: () => import("@/components/academic/AcademicCreate.vue")
+    },
+    {
+      path: '/AcademicEdit',
+      name: 'AcademicEdit',
+      component: () => import("@/components/academic/AcademicEdit.vue")
+    },
+    {
+      path: '/AcademicViewCard',
+      name: 'AcademicViewCard',
+      component: () => import("@/components/academic/AcademicViewCard.vue")
+    },
+    {
+      path: '/ConfirmDeleteModal',
+      name: 'ConfirmDeleteModal',
+      component: () => import("@/components/academic/ConfirmDeleteModal.vue")
+    },
 
-// --- SOBRE NÓS ---
+    // --- SOBRE NÓS ---
     {
       path: '/sobreNos',
       name: 'sobreNos',

@@ -1,8 +1,38 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
+
+const pacienteSelecionadoId = ref('')
+const meusPacientes = ref([])
+
+onMounted(() => {
+  carregarUsuario()
+
+  if (!isProfissional.value) {
+    router.push('/receitas-recomendadas')
+    return
+  }
+
+  const agendamentos = JSON.parse(localStorage.getItem('dadosAgendamento') || '[]')
+  const lista = Array.isArray(agendamentos) ? agendamentos : [agendamentos]
+
+  const doProfissional = lista.filter(
+    (item) => item.profissional?.id === usuarioLogado.value.id,
+  )
+
+  const vistos = new Set()
+  meusPacientes.value = doProfissional
+    .filter((item) => {
+      if (!item.usuario?.id || vistos.has(item.usuario.id)) return false
+      vistos.add(item.usuario.id)
+      return true
+    })
+    .map((item) => item.usuario)
+})
 
 const fotoInputRef = ref(null)
 
@@ -63,8 +93,16 @@ function validarFormulario() {
 function salvar() {
   if (!validarFormulario()) return
 
+  if (!pacienteSelecionadoId.value) {
+    alert('Escolha para qual paciente é essa receita.')
+    return
+  }
+
   try {
     const dados = agendamento.value.profissional
+    const pacienteEscolhido = meusPacientes.value.find(
+      (p) => p.id === pacienteSelecionadoId.value,
+    )
 
     const listaIngredientes = dados.ingredientes
       .split('\n')
@@ -73,7 +111,11 @@ function salvar() {
     const novoPrato = {
       id: Date.now(),
       nome: dados.nome,
-      profissional: 'Profissional Cadastrado',
+      profissional: {
+        id: usuarioLogado.value.id,
+        nome: usuarioLogado.value.nome,
+      },
+      usuario: pacienteEscolhido,
       data: dados.data,
       calorias: dados.calorias.includes('Kcal') ? dados.calorias : `${dados.calorias} Kcal`,
       foto: dados.foto,
@@ -86,7 +128,7 @@ function salvar() {
 
     localStorage.setItem('listaPratos', JSON.stringify(listaAtual))
 
-    router.push('/pratos/buscar')
+    router.push('/receitas-recomendadas')
   } catch (error) {
     alert('Erro ao salvar o prato. Tente utilizar fotos menores.')
     console.error(error)
@@ -117,10 +159,9 @@ function cancelar() {
 
     <section class="conteudo-formulario">
       <div class="linha-superior">
-        <!-- Avatar Redondo de Foto com Ícone de Câmera -->
         <div class="avatar-container" @click="triggerInputFoto" title="Adicionar Foto">
-          <div 
-            class="avatar-circle" 
+          <div
+            class="avatar-circle"
             :style="agendamento.profissional.foto ? { backgroundImage: `url(${agendamento.profissional.foto})` } : {}"
           >
             <span v-if="!agendamento.profissional.foto" class="pattern-bg"></span>
@@ -128,22 +169,35 @@ function cancelar() {
           <button type="button" class="btn-camera" aria-label="Tirar foto ou anexar">
             <span class="mdi mdi-camera"></span>
           </button>
-          <input 
-            ref="fotoInputRef" 
-            id="usr-foto" 
-            type="file" 
-            accept="image/*" 
-            class="input-hidden" 
-            @change="aoSelecionarFotoPrato" 
+          <input
+            ref="fotoInputRef"
+            id="usr-foto"
+            type="file"
+            accept="image/*"
+            class="input-hidden"
+            @change="aoSelecionarFotoPrato"
           />
         </div>
 
-        <!-- Nome do Prato ao lado do Avatar -->
         <div class="input-card flex-1">
           <label for="usr-nome">Nome do Prato:</label>
           <input id="usr-nome" type="text" v-model="agendamento.profissional.nome" />
         </div>
+
+        <!-- NOVO: seletor de paciente -->
+        <div class="input-card flex-1">
+          <label for="paciente">Paciente:</label>
+          <select id="paciente" v-model="pacienteSelecionadoId">
+            <option value="" disabled>Selecione um paciente</option>
+            <option v-for="p in meusPacientes" :key="p.id" :value="p.id">{{ p.nome }}</option>
+          </select>
+        </div>
       </div>
+
+      <!-- NOVO: aviso se não tem paciente -->
+      <p v-if="meusPacientes.length === 0" class="aviso-sem-pacientes">
+        Você ainda não tem pacientes com consultas agendadas.
+      </p>
 
       <div class="grid-form">
         <div class="input-card">
@@ -163,8 +217,8 @@ function cancelar() {
 
         <div class="input-grande">
           <span class="label-titulo">Ingredientes</span>
-          <textarea 
-            id="ingredientes" 
+          <textarea
+            id="ingredientes"
             v-model="agendamento.profissional.ingredientes"
           ></textarea>
         </div>
@@ -282,7 +336,8 @@ h1 {
   white-space: nowrap;
 }
 
-.input-card input {
+.input-card input,
+.input-card select {
   width: 100%;
   background: transparent;
   border: none;
@@ -290,6 +345,13 @@ h1 {
   color: #4a5435;
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.aviso-sem-pacientes {
+  color: #a13d3d;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: -10px;
 }
 
 .input-grande {
@@ -308,83 +370,5 @@ h1 {
   display: block;
   text-align: center;
   color: #4a5435;
-  font-weight: 700;
-  font-size: 1.35rem;
-  margin-bottom: 8px;
-}
-
-.input-grande textarea {
-  width: 100%;
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #4a5435;
-  font-size: 1.05rem;
-  font-weight: 600;
-  font-family: inherit;
-  resize: none;
-  scrollbar-color: #536236 #333f34;
-  scrollbar-width: thin;
-}
-
-/* Barra de rolagem personalizada (Webkit - Chrome, Edge, Safari) */
-.input-grande textarea::-webkit-scrollbar {
-  width: 10px;
-}
-
-.input-grande textarea::-webkit-scrollbar-track {
-  background-color: #333f34;
-  border-radius: 10px;
-}
-
-.input-grande textarea::-webkit-scrollbar-thumb {
-  background-color: #536236;
-  border-radius: 10px;
-  border: 2px solid #333f34;
-}
-
-.input-grande textarea::-webkit-scrollbar-thumb:hover {
-  background-color: #9a9e70;
-}
-
-/* Botões Inferiores */
-.botao-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-  gap: 24px;
-}
-
-.button {
-  flex: 1;
-  background-color: #536236;
-  color: #f1ebd9;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 28px;
-  font-size: 1.25rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.35);
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.button:hover {
-  background-color: #43502a;
-  transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-  .linha-superior,
-  .grid-form {
-    grid-template-columns: 1fr;
-    flex-direction: column;
-  }
-
-  .botao-container {
-    flex-direction: column;
-    gap: 16px;
-  }
 }
 </style>

@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
 
 const prato = ref({
   id: null,
@@ -15,6 +17,8 @@ const prato = ref({
 })
 
 onMounted(() => {
+  carregarUsuario()
+
   const idSelecionado = localStorage.getItem('pratoSelecionadoId')
   const listaSalva = localStorage.getItem('listaPratos')
 
@@ -23,12 +27,19 @@ onMounted(() => {
     const encontrado = lista.find((item) => item.id === Number(idSelecionado))
     if (encontrado) {
       prato.value = encontrado
-      return
     }
   }
-  const salvo = localStorage.getItem('pratoSelecionado')
-  if (salvo) {
-    prato.value = JSON.parse(salvo)
+
+  if (!prato.value.id) {
+    const salvo = localStorage.getItem('pratoSelecionado')
+    if (salvo) {
+      prato.value = JSON.parse(salvo)
+    }
+  }
+
+  const souDono = isProfissional.value && prato.value.profissional?.id === usuarioLogado.value?.id
+  if (!souDono) {
+    router.push('/receitas-recomendadas')
   }
 })
 
@@ -44,7 +55,7 @@ function excluirPrato() {
   localStorage.removeItem('pratoSelecionado')
   localStorage.removeItem('pratoSelecionadoId')
 
-  router.push('/pratos/buscar')
+  router.push('/receitas-recomendadas')
 }
 
 function cancelarExclusao() {
