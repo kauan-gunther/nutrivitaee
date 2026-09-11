@@ -1,14 +1,29 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
 const { usuarioLogado, carregarUsuario } = useAuth()
-carregarUsuario()
+
+onMounted(() => {
+  carregarUsuario()
+  window.addEventListener('storage', carregarUsuario)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', carregarUsuario)
+})
 
 const destinoNutricionistas = computed(() =>
   usuarioLogado.value?.tag === 'nutricionista' ? '/cadastro-profissional' : '/profissionais',
 )
+
+const rotaPerfilProfissional = computed(() => {
+  if (usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/perfil'
+})
 </script>
 
 <template>
@@ -54,7 +69,13 @@ const destinoNutricionistas = computed(() =>
             <li>
               <RouterLink to="/perfil">
                 <i class="mdi mdi-account-circle"></i>
-                Meu Perfil
+                Perfil Paciente
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="rotaPerfilProfissional">
+                <i class="mdi mdi-account-circle"></i>
+                Perfil Profissional
               </RouterLink>
             </li>
             <li>
@@ -64,13 +85,12 @@ const destinoNutricionistas = computed(() =>
               </RouterLink>
             </li>
 
-            
-          <li>
-            <RouterLink to="/login">
-              <i class="mdi mdi-login-variant"></i>
-              Login
-            </RouterLink>
-          </li>
+            <li>
+              <RouterLink to="/login">
+                <i class="mdi mdi-login-variant"></i>
+                Login
+              </RouterLink>
+            </li>
           </div>
           <li>
             <RouterLink to="/sobreNos">
@@ -84,7 +104,6 @@ const destinoNutricionistas = computed(() =>
           <RouterLink to="/">
             <img src="/logo.png" alt="logo" class="logo" />
           </RouterLink>
-          
         </div>
       </nav>
     </div>
@@ -92,9 +111,7 @@ const destinoNutricionistas = computed(() =>
       <RouterLink to="/">
         <img src="/logo.png" alt="logo" />
       </RouterLink>
-      
     </h1>
-    
   </header>
 </template>
 
@@ -209,14 +226,13 @@ div.linha {
       ESTILO MOBILE (Até 768px)
 =====================================*/
 @media (max-width: 768px) {
+  .menu-hamburguer {
+    order: 2;
+  }
 
-.menu-hamburguer {
-  order: 2;
-}
-
-h1.logo {
-  order: 1;
-}
+  h1.logo {
+    order: 1;
+  }
 
   .menu-icon {
     display: block;
@@ -229,7 +245,6 @@ h1.logo {
     height: 48px;
   }
 
-  /* Menu Drawer Transição */
   .overlay {
     position: fixed;
     top: 0;
@@ -249,7 +264,6 @@ h1.logo {
     right: 0;
   }
 
-  /* Backdrop Escuro */
   #menu-toggle:checked ~ .backdrop {
     display: block;
     position: fixed;

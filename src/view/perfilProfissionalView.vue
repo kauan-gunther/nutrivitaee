@@ -1,34 +1,63 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { profissionais } from '@/data/profissionais'
 
+const props = defineProps({
+  idProp: {
+    type: [String, Number],
+    default: null,
+  },
+})
+
 const route = useRoute()
+const router = useRouter()
 
-const profissionaisCadastrados = JSON.parse(localStorage.getItem('cadastros') || '[]').filter(
-  (cadastro) => cadastro.tag === 'nutricionista',
-)
+const profissional = computed(() => {
+  const targetId = props.idProp || route.params.id
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
 
-const profissional = [...profissionais, ...profissionaisCadastrados].find(
-  (item) => String(item.id) === String(route.params.id),
-)
+  const listaCompleta = [...profissionais, ...cadastros]
+  if (usuarioLogado) {
+    listaCompleta.push(usuarioLogado)
+  }
+
+  return listaCompleta.find((item) => String(item.id) === String(targetId))
+})
+
+function sair() {
+  localStorage.removeItem('usuarioLogado')
+  router.push('/login')
+}
 </script>
 
 <template>
   <main v-if="profissional" class="perfil-container">
-    <RouterLink
-      :to="`/profissional/${profissional.id}/delete`"
-      class="btn-icone btn-deletar"
-      title="Excluir"
-    >
-      <i class="mdi mdi-delete-outline"></i>
-    </RouterLink>
+    <div class="acoes-topo">
+      <button class="btn-sair" @click="sair">
+        <i class="mdi mdi-logout"></i> Sair
+      </button>
+
+      <RouterLink
+        :to="`/profissional/${profissional.id}/delete`"
+        class="btn-icone btn-deletar"
+        title="Excluir"
+      >
+        <i class="mdi mdi-delete-outline"></i>
+      </RouterLink>
+    </div>
 
     <h1>Perfil do Profissional</h1>
 
     <div class="perfil-conteudo">
       <div class="dados-pessoais">
         <div class="linha-nome">
-          <img :src="profissional.foto" :alt="profissional.nome" class="foto-perfil" />
+          <img
+            :src="profissional.foto || 'https://via.placeholder.com/150'"
+            :alt="profissional.nome"
+            class="foto-perfil"
+          />
           <div class="campo-dado flex-grow">
             <span class="label">Nome:</span>
             <span class="valor">{{ profissional.nome }}</span>
@@ -50,6 +79,9 @@ const profissional = [...profissionais, ...profissionaisCadastrados].find(
         <div class="card-info">
           <h2>Formação Acadêmica</h2>
           <ul>
+            <li v-if="!profissional.formacoes?.length" class="sem-registro">
+              • Não registrada
+            </li>
             <li v-for="(formacao, index) in profissional.formacoes" :key="index">
               <span class="bullet">•</span>
               <span class="tipo">{{ formacao.tipo }}:</span>
@@ -61,6 +93,9 @@ const profissional = [...profissionais, ...profissionaisCadastrados].find(
         <div class="card-info">
           <h2>Especializações</h2>
           <ul>
+            <li v-if="!profissional.especializacoes?.length" class="sem-registro">
+              • Não registrada
+            </li>
             <li v-for="(especializacao, index) in profissional.especializacoes" :key="index">
               <span class="bullet">•</span>
               <span class="tipo">{{ especializacao.tipo }}:</span>
@@ -98,6 +133,35 @@ const profissional = [...profissionais, ...profissionaisCadastrados].find(
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.acoes-topo {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.btn-sair {
+  background-color: transparent;
+  border: 1.5px solid #536236;
+  color: #536236;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-sair:hover {
+  background-color: #536236;
+  color: #f1edd2;
 }
 
 h1 {
@@ -199,6 +263,11 @@ h1 {
   gap: 8px;
   font-size: 1.1rem;
   color: #333f34;
+}
+
+.sem-registro {
+  font-style: italic;
+  color: #8c7355;
 }
 
 .card-info .bullet {
