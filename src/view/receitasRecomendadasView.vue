@@ -38,22 +38,22 @@ const receitasFiltradas = computed(() => {
 })
 
 const textos = computed(() => {
-  if (!estaLogado.value) return { hero: 'Receitas Recomendadas' }
+  if (!estaLogado.value) return { hero: 'Pratos Personalizados' }
 
   if (isProfissional.value) {
     return {
-      hero: 'Suas Recomendações de Receitas',
-      semReceitasTitulo: 'Não há recomendações de receitas',
-      semReceitasSub: 'Cadastre receitas que você recomenda! Elas aparecerão aqui!',
+      hero: 'Seus Pratos Personalizados',
+      semReceitasTitulo: 'Não há recomendações de Pratos Personalizados',
+      semReceitasSub: 'Cadastre Pratos que você recomenda! Elas aparecerão aqui!',
       rotuloPessoa: 'Para o Paciente',
       botaoConversar: 'Conversar com Paciente',
       placeholderBusca: 'Buscar por prato ou paciente...',
     }
   }
   return {
-    hero: 'Receitas Recomendadas pelos Profissionais De Saúde',
-    semReceitasTitulo: 'Não há receitas recomendadas para você',
-    semReceitasSub: 'Converse com profissionais e eles recomendarão receitas para você, elas aparecerão aqui!',
+    hero: 'Pratos Personalizados Recomendados pelos Profissionais De Saúde',
+    semReceitasTitulo: 'Não há pratos personalizados recomendados para você',
+    semReceitasSub: 'Converse com profissionais e eles recomendarão pratos personalizados para você, elas aparecerão aqui!',
     rotuloPessoa: 'Recomendado Por',
     botaoConversar: 'Conversar com Profissional',
     placeholderBusca: 'Buscar por prato ou profissional...',
@@ -80,8 +80,8 @@ function conversar(prato) {
 
     <div class="content-body">
       <section v-if="!estaLogado" class="card-status-box dashed-border">
-        <h2 class="status-title">Não há receitas para você</h2>
-        <p class="status-sub">Você precisa estar logado para ver suas receitas recomendadas.</p>
+        <h2 class="status-title">Não há pratos personalizados para você</h2>
+        <p class="status-sub">Você precisa estar logado para ver seus pratos personalizados recomendados.</p>
         <RouterLink to="/login" class="btn-action">Fazer login</RouterLink>
       </section>
 
@@ -154,7 +154,7 @@ function conversar(prato) {
 <style scoped>
 .hero-banner {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-agendamentos.png');
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-receitasCliente.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -169,7 +169,7 @@ function conversar(prato) {
 
 .hero-banner h1 {
   color: #f1edd2;
-  font-size: 60px;
+  font-size: 80px;
   font-weight: normal;
   margin: 0;
   text-align: center;

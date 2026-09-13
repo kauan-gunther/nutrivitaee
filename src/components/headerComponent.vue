@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const { usuarioLogado, carregarUsuario } = useAuth()
+const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
 
 onMounted(() => {
   carregarUsuario()
@@ -14,9 +14,12 @@ onUnmounted(() => {
   window.removeEventListener('storage', carregarUsuario)
 })
 
-const destinoNutricionistas = computed(() =>
-  usuarioLogado.value?.tag === 'nutricionista' ? '/cadastro-profissional' : '/profissionais',
-)
+const destinoNutricionistas = computed(() => {
+  if (isProfissional.value && usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/nutricionistas'
+})
 
 const rotaPerfilProfissional = computed(() => {
   if (usuarioLogado.value?.id) {

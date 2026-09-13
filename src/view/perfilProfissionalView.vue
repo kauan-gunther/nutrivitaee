@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { profissionais } from '@/data/profissionais'
+import { useAuth } from '@/composables/useAuth'
 import AcademicCreate from '@/components/academic/AcademicCreate.vue'
 
 const props = defineProps({
@@ -13,21 +14,28 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
+const { usuarioLogado, isProfissional, carregarUsuario, login, logout } = useAuth()
+
+onMounted(() => {
+  carregarUsuario()
+})
 
 const exibirModalAcademic = ref(false)
 
 const profissional = computed(() => {
   const targetId = props.idProp || route.params.id
   const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
-  const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
 
   const listaCompleta = [...profissionais, ...cadastros]
-  if (usuarioLogado) {
-    listaCompleta.push(usuarioLogado)
-  }
-
   return listaCompleta.find((item) => String(item.id) === String(targetId))
 })
+
+const souDono = computed(
+  () =>
+    !!profissional.value &&
+    isProfissional.value &&
+    String(usuarioLogado.value?.id) === String(profissional.value.id),
+)
 
 function salvarFormacao(novaFormacao) {
   if (!profissional.value) return
@@ -42,7 +50,6 @@ function salvarFormacao(novaFormacao) {
     diplomaFoto: novaFormacao.diplomaFoto,
   })
 
-  // Atualiza LocalStorage
   const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
   const idx = cadastros.findIndex((c) => String(c.id) === String(profissional.value.id))
   if (idx !== -1) {
@@ -50,16 +57,15 @@ function salvarFormacao(novaFormacao) {
     localStorage.setItem('cadastros', JSON.stringify(cadastros))
   }
 
-  const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
-  if (usuarioLogado && String(usuarioLogado.id) === String(profissional.value.id)) {
-    localStorage.setItem('usuarioLogado', JSON.stringify(profissional.value))
+  if (souDono.value) {
+    login(profissional.value)
   }
 
   exibirModalAcademic.value = false
 }
 
 function sair() {
-  localStorage.removeItem('usuarioLogado')
+  logout()
   router.push('/login')
 }
 </script>
@@ -67,11 +73,12 @@ function sair() {
 <template>
   <main v-if="profissional" class="perfil-container">
     <div class="acoes-topo">
-      <button class="btn-sair" @click="sair">
+      <button v-if="souDono" class="btn-sair" @click="sair">
         <i class="mdi mdi-logout"></i> Sair
       </button>
 
       <RouterLink
+        v-if="souDono"
         :to="`/profissional/${profissional.id}/delete`"
         class="btn-icone btn-deletar"
         title="Excluir"
@@ -112,15 +119,15 @@ function sair() {
         <div class="card-info">
           <div class="card-header">
             <h2>Formação Acadêmica</h2>
-            <button class="btn-definir" @click="exibirModalAcademic = true">
-              Definir
-            </button>
+            <button v-if="souDono" class="btn-definir" @click="exibirModalAcademic = true">Definir</button>
           </div>
           <ul>
-            <li v-if="!profissional.formacoes?.length" class="sem-registro">
-              • Não registrada
-            </li>
-            <li v-for="(formacao, index) in profissional.formacoes" :key="index" class="item-formacao">
+            <li v-if="!profissional.formacoes?.length" class="sem-registro">• Não registrada</li>
+            <li
+              v-for="(formacao, index) in profissional.formacoes"
+              :key="index"
+              class="item-formacao"
+            >
               <div class="texto-formacao">
                 <span class="bullet">•</span>
                 <span class="tipo">{{ formacao.tipo }}:</span>
@@ -152,13 +159,14 @@ function sair() {
       </div>
     </div>
 
-    <RouterLink
-      :to="`/profissional/${profissional.id}/edit`"
-      class="btn-icone btn-editar"
-      title="Editar"
-    >
-      <i class="mdi mdi-pencil-outline"></i>
-    </RouterLink>
+   <RouterLink
+  v-if="souDono"
+  :to="`/profissional/${profissional.id}/edit`"
+  class="btn-icone btn-editar"
+  title="Editar"
+>
+  <i class="mdi mdi-pencil-outline"></i>
+</RouterLink>
 
     <!-- Modal do Formulário AcademicCreate -->
     <div v-if="exibirModalAcademic" class="modal-overlay">

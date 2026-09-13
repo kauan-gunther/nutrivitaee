@@ -1,14 +1,36 @@
 <script setup>
-import { ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { profissionais } from "@/data/profissionais"
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { profissionais } from '@/data/profissionais'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
-const profissional = profissionais.find(p => p.id === Number(route.params.id))
+const { usuarioLogado, isProfissional, carregarUsuario, logout } = useAuth()
+
+const targetId = route.params.id
+const profissional = ref(null)
 
 const confirmar = ref(false)
-const senhaConfirmacao = ref("")
+const senhaConfirmacao = ref('')
+const erroSenha = ref('')
+
+onMounted(() => {
+  carregarUsuario()
+
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const listaCompleta = [...profissionais, ...cadastros]
+  profissional.value = listaCompleta.find((item) => String(item.id) === String(targetId))
+
+  const souDono =
+    profissional.value &&
+    isProfissional.value &&
+    String(usuarioLogado.value?.id) === String(profissional.value.id)
+
+  if (!souDono) {
+    router.push(profissional.value ? `/profissional/${targetId}` : '/profissionais')
+  }
+})
 
 function abrirConfirmacao() {
   confirmar.value = true
@@ -16,24 +38,28 @@ function abrirConfirmacao() {
 
 function fecharConfirmacao() {
   confirmar.value = false
-  senhaConfirmacao.value = ""
+  senhaConfirmacao.value = ''
+  erroSenha.value = ''
 }
 
 function cancelar() {
-  router.push(`/profissional/${profissional.id}`)
+  router.push(`/profissional/${profissional.value.id}`)
 }
 
 function excluir() {
-  // Valida se a senha foi preenchida
-  if (!senhaConfirmacao.value) return
-
-  const index = profissionais.findIndex(p => p.id === profissional.id)
-
-  if (index !== -1) {
-    profissionais.splice(index, 1)
+  if (senhaConfirmacao.value !== profissional.value.senha) {
+    erroSenha.value = 'Senha incorreta.'
+    return
   }
 
-  router.push("/profissionais")
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const cadastrosAtualizados = cadastros.filter(
+    (c) => String(c.id) !== String(profissional.value.id),
+  )
+  localStorage.setItem('cadastros', JSON.stringify(cadastrosAtualizados))
+
+  logout()
+  router.push('/')
 }
 </script>
 
@@ -106,9 +132,7 @@ function excluir() {
           <button type="button" class="btn-excluir" @click="abrirConfirmacao">
             Excluir Perfil
           </button>
-          <button type="button" class="btn-cancelar" @click="cancelar">
-            Cancelar a Exclusão
-          </button>
+          <button type="button" class="btn-cancelar" @click="cancelar">Cancelar a Exclusão</button>
         </div>
       </div>
     </div>
@@ -125,6 +149,7 @@ function excluir() {
             type="password"
             placeholder="Digite sua senha para confirmar exclusão:"
           />
+          <p v-if="erroSenha" class="erro-senha">{{ erroSenha }}</p>
         </div>
 
         <div class="modal-acoes">
@@ -164,6 +189,12 @@ function excluir() {
   font-family: inherit;
 }
 
+.erro-senha {
+  color: #a13d3d;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
 .conteudo-principal {
   width: 100%;
   max-width: 820px;
@@ -173,7 +204,7 @@ function excluir() {
 }
 
 h1 {
-  font-family: "Italiana", serif, sans-serif;
+  font-family: 'Italiana', serif, sans-serif;
   font-size: clamp(2.2rem, 4vw, 3.2rem);
   color: #705335;
   font-weight: 400;
@@ -381,7 +412,7 @@ h1 {
 }
 
 .modal-card h2 {
-  font-family: "Italiana", serif, sans-serif;
+  font-family: 'Italiana', serif, sans-serif;
   font-size: 2.4rem;
   color: #111111;
   font-weight: 400;

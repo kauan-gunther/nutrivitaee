@@ -38,6 +38,11 @@ const router = createRouter({
 
     // --- PROFISSIONAIS ---
     {
+      path: '/nutricionistas',
+      name: 'nutricionistas',
+      component: () => import('@/view/nutricionistasView.vue'),
+    },
+    {
       path: '/cadastro-profissional',
       name: 'cadastro-profissional',
       component: () => import('@/components/profissional/cadastroProfissional.vue'),
