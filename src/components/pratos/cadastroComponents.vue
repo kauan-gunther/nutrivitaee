@@ -184,7 +184,6 @@ function cancelar() {
           <input id="usr-nome" type="text" v-model="agendamento.profissional.nome" />
         </div>
 
-        <!-- NOVO: seletor de paciente -->
         <div class="input-card flex-1">
           <label for="paciente">Paciente:</label>
           <select id="paciente" v-model="pacienteSelecionadoId">
@@ -194,7 +193,6 @@ function cancelar() {
         </div>
       </div>
 
-      <!-- NOVO: aviso se não tem paciente -->
       <p v-if="meusPacientes.length === 0" class="aviso-sem-pacientes">
         Você ainda não tem pacientes com consultas agendadas.
       </p>
@@ -234,15 +232,17 @@ function cancelar() {
 
 <style scoped>
 .resumo-container {
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 30px 40px;
+  box-sizing: border-box;
 }
 
 h1 {
   color: #705335;
   text-align: center;
-  font-size: 3.5rem;
+  font-size: 90px;
   margin-bottom: 30px;
   font-weight: 400;
 }
@@ -251,12 +251,14 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
 .linha-superior {
   display: flex;
   align-items: center;
   gap: 20px;
+  width: 100%;
 }
 
 .avatar-container {
@@ -316,6 +318,7 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  width: 100%;
 }
 
 .input-card {
@@ -326,6 +329,8 @@ h1 {
   border-radius: 14px;
   padding: 10px 18px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .input-card label {
@@ -362,13 +367,51 @@ h1 {
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  height: 200px;
+  height: 220px;
   box-sizing: border-box;
+  width: 100%;
+}
+
+.input-grande textarea {
+  width: 100%;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: #4a5435;
+  font-size: 1.1rem;
+  font-family: inherit;
+  margin-top: 8px;
 }
 
 .label-titulo {
   display: block;
   text-align: center;
   color: #4a5435;
+  font-weight: 700;
+}
+
+.botao-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.button {
+  background-color: #536236;
+  color: #f1edd2;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.button:hover {
+  opacity: 0.9;
 }
 </style>

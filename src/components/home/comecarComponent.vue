@@ -29,7 +29,8 @@
   align-items: center;
   width: 100%;
   padding: 0 20px 60px;
-  margin-top: 55px; 
+  margin-top: 55px;
+  scroll-margin-top: 100px; 
 }
 
 .users {
@@ -53,16 +54,16 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 18px 32px; 
+  padding: 12px 10px; 
   border-radius: 50px;
 }
 
 .user i {
-  font-size: 2rem; 
+  font-size: 1rem; 
 }
 
 .user span {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -78,9 +79,13 @@
 }
 
 .btn-card.primary:hover {
-  background: #414e2a;
+  background: #F1EDD2;
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(83, 98, 54, 0.3);
+}
+
+.btn-card.primary:hover .user {
+  color: #536236;
 }
 
 .btn-card.secondary {

@@ -1,24 +1,25 @@
 <template>
   <section id="secao-diferencial" class="diferencial">
     <h2>Comida de Verdade, do Seu Jeito</h2>
-    <p class="intro">Chega de dietas de gaveta. Nossos planos alimentares levam em conta:</p>
 
-    <div class="diferencial-conteudo">
-      <div class="grid-pratos">
-        <img src="/img/nutricionista/pratos/prato1.png" alt="Prato 1" />
-        <img src="/img/nutricionista/pratos/prato2.png" alt="Prato 2" />
-        <img src="/img/nutricionista/pratos/prato3.png" alt="Prato 3" />
-        <img src="/img/nutricionista/pratos/prato4.png" alt="Prato 4" />
-        <img src="/img/nutricionista/pratos/prato5.png" alt="Prato 5" />
-        <img src="/img/nutricionista/pratos/prato6.png" alt="Prato 6" />
+    <div class="diferencial-box">
+      <p class="intro">Chega de dietas de gaveta. Nossos planos alimentares levam em conta:</p>
+
+      <div class="diferencial-conteudo">
+        <div class="grid-pratos">
+          <img src="/img/nutricionista/pratos/prato1.png" alt="Prato 1" />
+          <img src="/img/nutricionista/pratos/prato2.png" alt="Prato 2" />
+          <img src="/img/nutricionista/pratos/prato3.png" alt="Prato 3" />
+          <img src="/img/nutricionista/pratos/prato4.png" alt="Prato 4" />
+        </div>
+
+        <ul class="lista-diferenciais">
+          <li>Suas preferências de sabor</li>
+          <li>Alergias e intolerâncias alimentares</li>
+          <li>Sua rotina financeira e de tempo</li>
+          <li>A alegria de comer o que você gosta</li>
+        </ul>
       </div>
-
-      <ul class="lista-diferenciais">
-        <li>Suas preferências de sabor</li>
-        <li>Alergias e intolerâncias alimentares</li>
-        <li>Sua rotina financeira e de tempo</li>
-        <li>A alegria de comer o que você gosta</li>
-      </ul>
     </div>
   </section>
 </template>
@@ -27,16 +28,21 @@
 .diferencial {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 50px 20px;
+  padding: 50px 20px 0 20px;
   text-align: center;
-  border: #73441B 1.5px solid;
 }
 
 .diferencial h2 {
   color: #333F34;
   font-size: 2.3rem;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 24px;
+}
+
+.diferencial-box {
+  border: #73441B 1.5px solid;
+  border-radius: 24px;
+  padding: 30px;
 }
 
 .intro {
@@ -53,16 +59,16 @@
 
 .grid-pratos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
   flex-shrink: 0;
-  max-width: 320px;
+  max-width: 220px;
 }
 
 .grid-pratos img {
-  width: 95px;
-  height: 95px;
-  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -87,7 +93,6 @@
   font-size: 0.95rem;
 }
 
-/* Bolinha indicativa simulando o ícone do figma */
 .lista-diferenciais li::before {
   content: "•";
   color: #705335;
