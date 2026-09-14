@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
+const { usuarioLogado, isPaciente, isProfissional, carregarUsuario } = useAuth()
 
 onMounted(() => {
   carregarUsuario()
@@ -69,13 +69,13 @@ const rotaPerfilProfissional = computed(() => {
           </li>
 
           <div class="user">
-            <li>
+            <li v-if="isPaciente">
               <RouterLink to="/perfil">
                 <i class="mdi mdi-account-circle"></i>
                 Perfil Paciente
               </RouterLink>
             </li>
-            <li>
+            <li v-if="isProfissional">
               <RouterLink :to="rotaPerfilProfissional">
                 <i class="mdi mdi-account-circle"></i>
                 Perfil Profissional
