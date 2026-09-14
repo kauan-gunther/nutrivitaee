@@ -25,7 +25,7 @@ function rolarParaDiferencial() {
   background-position: center;
   background-repeat: no-repeat;
   width: 100%;
-  min-height: 85vh;
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,6 +33,7 @@ function rolarParaDiferencial() {
   text-align: center;
   padding: 60px 20px;
   box-sizing: border-box;
+  margin: 0; 
 }
 
 .hero-nutricionistas h1 {

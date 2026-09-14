@@ -1,8 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-
 import { profissionais } from '@/data/profissionais'
-
 import ListaProfissionais from './listagemProficionais.vue'
 import FiltroProfissionais from './barraDePesquisaProfissionais.vue'
 
@@ -21,8 +19,8 @@ const profissionaisFiltrados = computed(() => {
     return (
       profissional.nome.toLowerCase().includes(termo) ||
       profissional.id.toString().includes(termo) ||
-      profissional.formacoes.some((formacao) => formacao.nome.toLowerCase().includes(termo)) ||
-      profissional.especializacoes.some((especializacao) =>
+      profissional.formacoes?.some((formacao) => formacao.nome.toLowerCase().includes(termo)) ||
+      profissional.especializacoes?.some((especializacao) =>
         especializacao.nome.toLowerCase().includes(termo),
       )
     )
@@ -31,7 +29,17 @@ const profissionaisFiltrados = computed(() => {
 </script>
 
 <template>
-  <FiltroProfissionais v-model="pesquisa" />
-
-  <ListaProfissionais :profissionais="profissionaisFiltrados" />
+  <div class="container-busca">
+    <FiltroProfissionais v-model="pesquisa" />
+    <ListaProfissionais :profissionais="profissionaisFiltrados" />
+  </div>
 </template>
+
+<style scoped>
+.container-busca {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+</style>

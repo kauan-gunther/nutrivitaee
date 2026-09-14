@@ -41,7 +41,6 @@ const rotaPerfilProfissional = computed(() => {
 
       <label for="menu-toggle" class="backdrop"></label>
 
-      <!-- Menu lateral -->
       <nav class="overlay">
         <ul class="menu-list">
           <li>
@@ -110,6 +109,7 @@ const rotaPerfilProfissional = computed(() => {
         </div>
       </nav>
     </div>
+
     <h1 class="logo">
       <RouterLink to="/">
         <img src="/logo.png" alt="logo" />
@@ -120,7 +120,7 @@ const rotaPerfilProfissional = computed(() => {
 
 <style scoped>
 /*====================================
-      HEADER (DESKTOP - PADRÃO)
+     HEADER (DESKTOP - PADRÃO)
 =====================================*/
 header {
   position: fixed;
@@ -133,24 +133,25 @@ header {
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 15px 40px;
+  padding: 8px 30px; 
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 header h1 {
   margin: 0;
+  order: 2; 
 }
 
 header h1 img {
-  width: 120px;
+  width: 100px;
   height: auto;
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1));
 }
 
 header a {
   text-decoration: none;
-  font-size: 16px;
+  font-size: 17px;
   color: #f1edd2;
   transition: all 0.3s ease;
   display: flex;
@@ -185,7 +186,6 @@ div.linha {
   background: #9a9e70;
 }
 
-/*============ Overlay / Menu Interno (Desktop) ===========*/
 .overlay {
   position: static;
   background-color: transparent;
@@ -194,6 +194,7 @@ div.linha {
   display: flex;
   align-items: center;
   gap: 20px;
+  order: 1;
 }
 
 .overlay .logo {
@@ -204,7 +205,7 @@ div.linha {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -217,7 +218,7 @@ div.linha {
 
 .user {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.2rem;
 }
 
 .menu-list a:hover {
@@ -226,15 +227,19 @@ div.linha {
 }
 
 /*====================================
-      ESTILO MOBILE (Até 768px)
+     ESTILO MOBILE (Até 768px)
 =====================================*/
 @media (max-width: 768px) {
+  header {
+    padding: 10px 20px;
+  }
+
   .menu-hamburguer {
-    order: 2;
+    order: 1; 
   }
 
   h1.logo {
-    order: 1;
+    order: 2; 
   }
 
   .menu-icon {
@@ -251,20 +256,21 @@ div.linha {
   .overlay {
     position: fixed;
     top: 0;
-    right: -100%;
+    left: -100%;
+    right: auto;
     width: 220px;
     height: 100vh;
     background-color: #536236;
     flex-direction: column;
     justify-content: space-between;
     padding: 28px 16px;
-    transition: right 0.4s ease-in-out;
-    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
+    transition: left 0.4s ease-in-out;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
   }
 
   #menu-toggle:checked ~ .overlay {
-    right: 0;
+    left: 0;
   }
 
   #menu-toggle:checked ~ .backdrop {

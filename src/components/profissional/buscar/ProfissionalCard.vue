@@ -11,10 +11,8 @@ defineProps({
   <div class="profissional-card">
     <div class="perfil">
       <RouterLink :to="`/profissional/${profissional.id}`">
-
-
-      <img :src="profissional.foto" :alt="profissional.nome" class="profissional-image" />
-      <button class="perfil-button">Ver Perfil</button>
+        <img :src="profissional.foto" :alt="profissional.nome" class="profissional-image" />
+        <button class="perfil-button">Ver Perfil</button>
       </RouterLink>
     </div>
     <div class="dados">
@@ -46,71 +44,76 @@ defineProps({
     </div>
   </div>
 </template>
+
 <style>
 .profissional-card {
-  background-color: #D1BFA5;
-  whidth: 80%;
-  margin: 50px;
-  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.30);
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #73441B;
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+  box-shadow: none; 
+  padding: 30px;
+  border-radius: 20px;
+  border: 1.5px solid #BF945A;
   display: flex;
   flex-direction: row;
+  align-items: center;
 
-  & .perfil{
-    width: 20%;
+  & .perfil {
+    width: 25%;
+    display: flex;
+    justify-content: center;
 
-    & a{
+    & a {
       display: flex;
-    flex-direction: column;
-    align-items: center;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
 
+      & img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: none; 
+        border: 1px solid #BF945A;
+      }
 
-
-    & img {
-      width: 40%;
-      height: auto;
-      margin-bottom: 10px;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    & .perfil-button {
-      background-color: #9A9E70;
-      color: #333F34;
-      border: #536236 1px solid;
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-family: "Italiana", serif;
-      -webkit-text-stroke: 1px #333F34;
-      cursor: pointer;
-      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+      & .perfil-button {
+        color: #536236;
+        border: #BF945A 1px solid;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: none; 
+      }
     }
   }
-}
 
   & .dados {
-    width: 80%;
-    padding-left: 20px;
+    width: 75%;
+    padding-left: 30px;
     display: flex;
     flex-direction: column;
 
     & .texto {
       display: flex;
       flex-wrap: wrap;
-      wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
 
       & p {
         color: #536236;
         font-weight: bold;
-        margin: 10px;
-        font-size: 25px;
+        margin: 0;
+        font-size: 1.2rem;
 
         & span {
           color: #BF945A;
-          -webkit-text-stroke: 1px #BF945A;
+          font-weight: bold;
+          -webkit-text-stroke: 0px;
         }
       }
     }
@@ -119,13 +122,14 @@ defineProps({
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      gap: 20px;
 
       & .formacao,
       & .especializacao {
-        width: 45%;
+        width: 48%;
 
         & h4 {
-          font-size: 30px;
+          font-size: 1.5rem;
           margin-bottom: 10px;
           color: #333F34;
           font-weight: bold;
@@ -134,20 +138,24 @@ defineProps({
         & ul {
           list-style-type: none;
           padding-left: 0;
+          margin: 0;
 
           & li {
-            margin: 5px;
-            -webkit-text-stroke: 1px #BF945A;
+            margin: 6px 0;
             color: #BF945A;
-            font-size: 20px;
+            font-size: 1rem;
+            -webkit-text-stroke: 0px;
 
             & .tipo {
               color: #536236;
-              -webkit-text-stroke: 1px #536236;
+              font-weight: bold;
+              margin-right: 5px;
+              -webkit-text-stroke: 0px;
             }
 
             & .nome {
-              margin: 5px;
+              color: #BF945A;
+              font-weight: bold;
             }
           }
         }
