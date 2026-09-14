@@ -6,13 +6,14 @@ const router = useRouter()
 const STORAGE_KEY = 'nutriVitae.preferencias'
 
 const criarPreferenciasVazias = () => ({
-  nome: '',
-  cep: '',
-  numero: '',
-  rua: '',
-  preferencias: '',
-  restricoes: '',
-  adicionar: '',
+  objetivo: '',
+  dieta: [],
+  preferencias: [],
+  alergias: [],
+  outroObjetivo: '',
+  outraDieta: '',
+  outrasPreferencias: '',
+  outrasAlergias: ''
 })
 
 function carregarPreferencias() {
@@ -30,95 +31,135 @@ function carregarPreferencias() {
 
 const preferencias = ref(carregarPreferencias())
 
+function selecionarObjetivo(item) {
+  if (preferencias.value.objetivo === item) {
+    preferencias.value.objetivo = ''
+  } else {
+    preferencias.value.objetivo = item
+  }
+}
+
+function toggleSelecao(lista, item) {
+  const index = preferencias.value[lista].indexOf(item)
+  if (index > -1) {
+    preferencias.value[lista].splice(index, 1)
+  } else {
+    preferencias.value[lista].push(item)
+  }
+}
+
 function limpar() {
   preferencias.value = criarPreferenciasVazias()
   localStorage.removeItem(STORAGE_KEY)
 }
 
 function confirmar() {
-  if (!preferencias.value.nome || !preferencias.value.cep || !preferencias.value.rua) {
-    alert('preencha todas as informações antes de confirmar.')
+  const p = preferencias.value
+  const temAlgoPreenchido = 
+    p.objetivo !== '' || 
+    p.dieta.length > 0 || 
+    p.preferencias.length > 0 || 
+    p.alergias.length > 0 || 
+    p.outroObjetivo.trim() !== '' || 
+    p.outraDieta.trim() !== '' || 
+    p.outrasPreferencias.trim() !== '' || 
+    p.outrasAlergias.trim() !== ''
+
+  if (!temAlgoPreenchido) {
+    alert('Você precisa selecionar ou preencher ao menos uma informação antes de confirmar.')
     return
   }
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferencias.value))
-
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
-
-    const gostoList = []
-    if (preferencias.value.preferencias) gostoList.push(preferencias.value.preferencias)
-    if (preferencias.value.adicionar) gostoList.push(preferencias.value.adicionar)
-
-    usuarioLogado.preferencias = {
-      gosto: gostoList,
-      naoGosto: usuarioLogado.preferencias?.naoGosto || [],
-    }
-
-    if (preferencias.value.restricoes) {
-      usuarioLogado.alergias = [preferencias.value.restricoes]
-    }
-
-    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado))
-
     router.push('/perfil')
   } catch (error) {
     console.error('Erro ao salvar preferências:', error)
     alert('Não foi possível salvar suas informações. Tente novamente.')
   }
 }
-
-function redirecionar() {
-  router.push('/consultas')
-}
 </script>
 
 <template>
   <main class="container">
-    <h1>Preferências do Usuario</h1>
+    <h1>Preferências do Usuário</h1>
 
-    <section class="grid-form">
-      <div class="input-card">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" v-model="preferencias.nome" />
+    <!-- Objetivo do Usuário (Seleção Única) -->
+    <div class="secao-titulo"><span>Objetivo do Usuário</span></div>
+    <div class="grid-form">
+      <div 
+        v-for="item in ['Emagrecimento', 'Comer Saudável', 'Pré-Treino', 'Ganho de Massa', 'Saúde']" 
+        :key="item"
+        class="input-card"
+        :class="{ selecionado: preferencias.objetivo === item }"
+        @click="selecionarObjetivo(item)"
+      >
+        <span class="radio-circle"></span>
+        <label>{{ item }}</label>
       </div>
+      <div class="input-card outro-card">
+        <input type="text" placeholder="Outros" v-model="preferencias.outroObjetivo" />
+      </div>
+    </div>
 
-      <div class="input-card">
-        <label for="cep">CEP:</label>
-        <input type="text" id="cep" v-model="preferencias.cep" />
+    <!-- Dieta do Usuário -->
+    <div class="secao-titulo"><span>Dieta do Usuário</span></div>
+    <div class="grid-form">
+      <div 
+        v-for="item in ['Vegetariano', 'Vegano', 'Onívoro', 'Carnívoro', 'Low Carb']" 
+        :key="item"
+        class="input-card multi-card"
+        :class="{ 'card-ativo': preferencias.dieta.includes(item) }"
+        @click="toggleSelecao('dieta', item)"
+      >
+        <label>{{ item }}</label>
+        <span class="plus-icon">+</span>
       </div>
+      <div class="input-card outro-card">
+        <input type="text" placeholder="Outros" v-model="preferencias.outraDieta" />
+      </div>
+    </div>
 
-      <div class="input-card">
-        <label for="numero">Número:</label>
-        <input type="text" id="numero" v-model="preferencias.numero" />
+    <!-- Preferências do Usuário -->
+    <div class="secao-titulo"><span>Preferências do Usuário</span></div>
+    <div class="grid-form">
+      <div 
+        v-for="item in ['Vegetais', 'Peixes', 'Integral', 'Carnes Magras', 'Leguminosas']" 
+        :key="item"
+        class="input-card multi-card"
+        :class="{ 'card-ativo': preferencias.preferencias.includes(item) }"
+        @click="toggleSelecao('preferencias', item)"
+      >
+        <label>{{ item }}</label>
+        <span class="plus-icon">+</span>
       </div>
+      <div class="input-card outro-card">
+        <input type="text" placeholder="Outros" v-model="preferencias.outrasPreferencias" />
+      </div>
+    </div>
 
-      <div class="input-card">
-        <label for="rua">Rua:</label>
-        <input type="text" id="rua" v-model="preferencias.rua" />
+    <!-- Alergias do Usuário -->
+    <div class="secao-titulo"><span>Alergias do Usuário</span></div>
+    <div class="grid-form">
+      <div 
+        v-for="item in ['Glúten', 'Soja', 'Ovos', 'Lactose', 'Frutos do Mar']" 
+        :key="item"
+        class="input-card multi-card"
+        :class="{ 'card-ativo': preferencias.alergias.includes(item) }"
+        @click="toggleSelecao('alergias', item)"
+      >
+        <label>{{ item }}</label>
+        <span class="plus-icon">+</span>
       </div>
-
-      <div class="input-card">
-        <label for="restricoes">Restrições:</label>
-        <input type="text" id="restricoes" v-model="preferencias.restricoes" />
+      <div class="input-card outro-card">
+        <input type="text" placeholder="Outros" v-model="preferencias.outrasAlergias" />
       </div>
-
-      <div class="input-card">
-        <label for="adicionar">Adicionar:</label>
-        <input type="text" id="adicionar" v-model="preferencias.adicionar" />
-      </div>
-
-      <div class="comida">
-        <label for="preferencias">Preferências Gastronômicas:</label>
-        <input type="text" id="preferencias" v-model="preferencias.preferencias" />
-      </div>
-    </section>
+    </div>
 
     <div class="botoes">
-      <button @click="limpar" class="btn-limpar">Limpar/Cancelar</button>
-      <button @click="confirmar" class="btn-salvar">Confirmar</button>
+      <button @click="limpar" class="btn-limpar">Limpar</button>
+      <button @click="confirmar" class="btn-salvar">Confirmar Suas Preferências</button>
     </div>
-    <button @click="redirecionar" class="btn-buscar">Buscar Profissionais</button>
   </main>
 </template>
 
@@ -132,92 +173,165 @@ function redirecionar() {
 h1 {
   color: #73441b;
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 24px;
+  font-weight: bold;
+}
+
+.secao-titulo {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #73441b;
+  font-size: 0.95rem;
+  margin: 24px 0 16px 0;
+}
+
+.secao-titulo::before,
+.secao-titulo::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #536236;
+}
+
+.secao-titulo span {
+  padding: 0 15px;
 }
 
 .grid-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-.comida {
+.input-card {
   display: flex;
   align-items: center;
-  background-color: #cbba9c;
-  border: 1px solid #9c8a6f;
+  justify-content: space-between;
+  border: 1.5px solid #73441b;
   border-radius: 12px;
-  padding: 50px 10px;
-  box-shadow: 4px 5px 8px rgba(0, 0, 0, 0.25);
+  padding: 12px 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  background-color: transparent;
 }
 
-.comida label {
-  color: #333f34;
+.input-card:hover {
+  background-color: #efe8d0;
+}
+
+/* Estilo para Objetivo (Seleção Única) */
+.input-card.selecionado {
+  border-color: #73441b;
+  background-color: #f7f4e7;
+}
+
+.input-card label {
+  color: #5a4a35;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.radio-circle {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #b5a68c;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.input-card.selecionado .radio-circle::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: #73441b;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Cor quando selecionado nas listas de Dieta, Preferências e Alergias */
+.input-card.card-ativo {
+  background-color: #536236;
+  border-color: #536236;
+}
+
+.input-card.card-ativo label {
+  color: #ffffff;
+}
+
+.input-card.card-ativo .plus-icon {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.plus-icon {
+  color: #73441b;
   font-weight: bold;
-  white-space: nowrap;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #b5a68c;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.comida input {
+.outro-card {
+  cursor: default;
+  background-color: #f7f4e7;
+}
+
+.outro-card input {
   width: 100%;
   background: transparent;
   border: none;
   outline: none;
-  color: #73441b;
-  font-size: 1rem;
-  font-weight: bold;
+  color: #5a4a35;
+  font-size: 0.95rem;
+}
+
+.outro-card input::placeholder {
+  color: #5a4a35;
 }
 
 .botoes {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
-.input-card {
-  display: flex;
-  align-items: center;
-  background-color: #cbba9c;
-  border: 1px solid #9c8a6f;
+.btn-limpar {
+  padding: 12px 24px;
+  background-color: #dcd6c0;
+  color: #5a4a35;
+  border: 1px solid #b5a68c;
   border-radius: 12px;
-  padding: 10px 16px;
-  box-shadow: 4px 5px 8px rgba(0, 0, 0, 0.25);
-}
-
-.input-card label {
-  color: #333f34;
-  font-weight: bold;
-  margin-right: 8px;
-  white-space: nowrap;
-}
-
-.input-card input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #333f34;
   font-size: 1rem;
   font-weight: bold;
+  cursor: pointer;
 }
 
-.btn-limpar,
-.btn-salvar,
-.btn-buscar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 12px auto 0 auto;
-  padding: 11px 38px;
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1px solid #536236;
+.btn-salvar {
+  padding: 12px 32px;
+  background-color: #536236;
+  color: #ffffff;
+  border: none;
   border-radius: 12px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-salvar:hover {
+  background-color: #45522d;
 }
 </style>
