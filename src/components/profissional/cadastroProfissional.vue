@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { carregarUsuario } = useAuth()
 
 const mostrarSenha = ref(false)
 const mostrarConfirmarSenha = ref(false)
@@ -17,7 +19,7 @@ const form = ref({
   confirmarSenha: '',
 })
 
-const somenteNumeros = (valor) => valor.replace(/\D/g, '')
+const somenteNumeros = (valor) => (valor ? String(valor).replace(/\D/g, '') : '')
 
 const dataValida = (data) => data && new Date(`${data}T00:00:00`) <= new Date()
 
@@ -32,17 +34,6 @@ function gerarIdCadastro(cadastros) {
   } while (cadastros.some((cadastro) => String(cadastro.id) === id))
 
   return id
-}
-
-function cadastroDuplicado(cpf, email) {
-  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
-  const atual = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
-  const registros = atual ? [...cadastros, atual] : cadastros
-  return registros.some(
-    (registro) =>
-      registro.tipo === 'profissional' &&
-      (registro.cpf === cpf || registro.email.toLowerCase() === email.toLowerCase()),
-  )
 }
 
 function validarFormulario() {
@@ -64,20 +55,13 @@ function validarFormulario() {
     return false
   }
 
-  const cpf = somenteNumeros(form.value.cpf)
-  const telefone = somenteNumeros(form.value.telefone)
-  const email = form.value.email.trim()
-
   if (!dataValida(form.value.dataNascimento)) {
     alert('Digite uma data de nascimento válida.')
     return false
   }
+
   if (form.value.senha.length < 6) {
     alert('A senha deve ter pelo menos 6 caracteres.')
-    return false
-  }
-  if (cadastroDuplicado(cpf, email)) {
-    alert('Já existe um profissional com este CPF ou e-mail.')
     return false
   }
 
@@ -87,29 +71,37 @@ function validarFormulario() {
 function cadastrar() {
   if (!validarFormulario()) return
 
-  const cpf = somenteNumeros(form.value.cpf)
-  const telefone = somenteNumeros(form.value.telefone)
-  const email = form.value.email.trim()
+  const cpfLimpo = somenteNumeros(form.value.cpf)
+  const telefoneLimpo = somenteNumeros(form.value.telefone)
+  const emailLimpo = form.value.email.trim().toLowerCase()
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
 
   const dadosProfissional = {
-    id: gerarIdCadastro(JSON.parse(localStorage.getItem('cadastros') || '[]')),
+    id: gerarIdCadastro(cadastros),
     tipo: 'profissional',
     tag: 'nutricionista',
-    nome: form.value.nome,
-    email,
-    cpf,
-    telefone,
+    nome: form.value.nome.trim(),
+    email: emailLimpo,
+    cpf: cpfLimpo,
+    telefone: telefoneLimpo,
     dataNascimento: form.value.dataNascimento,
     senha: form.value.senha,
     formacoes: [],
     especializacoes: [],
   }
 
-  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  // Atualiza o histórico de cadastros e substitui o usuário logado atual
   localStorage.setItem('cadastros', JSON.stringify([...cadastros, dadosProfissional]))
   localStorage.setItem('usuarioLogado', JSON.stringify(dadosProfissional))
+
+  // Força o recarregamento do estado de autenticação na aplicação
+  carregarUsuario()
+  window.dispatchEvent(new Event('storage'))
+
+  // Redireciona para o perfil do novo profissional cadastrado
   router.push(`/profissional/${dadosProfissional.id}`)
 }
+
 function limparCampos() {
   form.value = {
     nome: '',

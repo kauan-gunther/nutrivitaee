@@ -1,14 +1,32 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const { usuarioLogado, carregarUsuario } = useAuth()
-carregarUsuario()
+const { usuarioLogado, isPaciente, isProfissional, carregarUsuario } = useAuth()
 
-const destinoNutricionistas = computed(() =>
-  usuarioLogado.value?.tag === 'nutricionista' ? '/cadastro-profissional' : '/profissionais',
-)
+onMounted(() => {
+  carregarUsuario()
+  window.addEventListener('storage', carregarUsuario)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', carregarUsuario)
+})
+
+const destinoNutricionistas = computed(() => {
+  if (isProfissional.value && usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/nutricionistas'
+})
+
+const rotaPerfilProfissional = computed(() => {
+  if (usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/perfil'
+})
 </script>
 
 <template>
@@ -44,22 +62,36 @@ const destinoNutricionistas = computed(() =>
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="#">
+            <RouterLink to="/mensagens">
               <i class="mdi mdi-forum-outline"></i>
               Conversas
             </RouterLink>
           </li>
+
           <div class="user">
-            <li>
+            <li v-if="isPaciente">
               <RouterLink to="/perfil">
                 <i class="mdi mdi-account-circle"></i>
-                Meu Perfil
+                Perfil Paciente
+              </RouterLink>
+            </li>
+            <li v-if="isProfissional">
+              <RouterLink :to="rotaPerfilProfissional">
+                <i class="mdi mdi-account-circle"></i>
+                Perfil Profissional
               </RouterLink>
             </li>
             <li>
               <RouterLink to="/pratos/receitas">
                 <i class="mdi mdi-tag-heart"></i>
                 Receitas
+              </RouterLink>
+            </li>
+
+            <li>
+              <RouterLink to="/login">
+                <i class="mdi mdi-login-variant"></i>
+                Login
               </RouterLink>
             </li>
           </div>
@@ -132,7 +164,7 @@ header .div {
   gap: 15px;
 }
 
-/*============ Configurações do Hambúrguer e Mobile (Escondidos no Desktop) ===========*/
+/*============ Mobile ===========*/
 #menu-toggle,
 .menu-icon,
 .backdrop {
@@ -197,6 +229,14 @@ div.linha {
       ESTILO MOBILE (Até 768px)
 =====================================*/
 @media (max-width: 768px) {
+  .menu-hamburguer {
+    order: 2;
+  }
+
+  h1.logo {
+    order: 1;
+  }
+
   .menu-icon {
     display: block;
     cursor: pointer;
@@ -204,21 +244,20 @@ div.linha {
 
   .overlay .logo {
     display: block;
-    margin: 20px auto;
-    height: 60px;
+    margin: 14px auto;
+    height: 48px;
   }
 
-  /* Menu Drawer Transição */
   .overlay {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 260px;
+    width: 220px;
     height: 100vh;
     background-color: #536236;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 20px;
+    padding: 28px 16px;
     transition: right 0.4s ease-in-out;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -228,7 +267,6 @@ div.linha {
     right: 0;
   }
 
-  /* Backdrop Escuro */
   #menu-toggle:checked ~ .backdrop {
     display: block;
     position: fixed;
@@ -250,7 +288,7 @@ div.linha {
   }
 
   header a {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 </style>

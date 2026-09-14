@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
 
 const prato = ref({
   nome: '',
@@ -14,6 +16,8 @@ const prato = ref({
 })
 
 onMounted(() => {
+  carregarUsuario()
+
   const listaSalva = localStorage.getItem('listaPratos')
   const idSelecionado = localStorage.getItem('pratoSelecionadoId')
 
@@ -27,6 +31,10 @@ onMounted(() => {
   }
 })
 
+const souDono = computed(
+  () => isProfissional.value && prato.value.profissional?.id === usuarioLogado.value?.id,
+)
+
 function irParaEditar() {
   router.push('/pratos/editar')
 }
@@ -38,7 +46,7 @@ function irParaExcluir() {
 
 <template>
   <main class="visualizar-prato">
-    <button class="btn-excluir-topo" @click="irParaExcluir" title="Excluir">
+    <button v-if="souDono" class="btn-excluir-topo" @click="irParaExcluir" title="Excluir">
       🗑️
     </button>
 
@@ -52,6 +60,11 @@ function irParaExcluir() {
       <div class="campo flex-1">
         <span class="label">Nome do Prato:</span>
         <span class="valor">{{ prato.nome }}</span>
+      </div>
+
+      <div class="campo flex-1">
+        <span class="label">{{ isProfissional ? 'Para o Paciente:' : 'Recomendado Por:' }}</span>
+        <span class="valor">{{ isProfissional ? prato.usuario?.nome : prato.profissional?.nome }}</span>
       </div>
     </div>
 
@@ -84,7 +97,7 @@ function irParaExcluir() {
       </div>
     </div>
 
-    <button class="btn-editar" @click="irParaEditar" title="Editar">
+    <button v-if="souDono" class="btn-editar" @click="irParaEditar" title="Editar">
       ✏️
     </button>
   </main>

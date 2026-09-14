@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
 
 const prato = ref({
   nome: '',
@@ -16,10 +18,17 @@ const prato = ref({
 const ingredientesTexto = ref('')
 
 onMounted(() => {
+  carregarUsuario()
+
   const salvo = localStorage.getItem('pratoSelecionado')
   if (salvo) {
     prato.value = JSON.parse(salvo)
     ingredientesTexto.value = prato.value.ingredientes.join('\n')
+  }
+
+  const souDono = isProfissional.value && prato.value.profissional?.id === usuarioLogado.value?.id
+  if (!souDono) {
+    router.push('/receitas-recomendadas')
   }
 })
 
@@ -29,6 +38,16 @@ function salvar() {
     .filter((item) => item.trim() !== '')
 
   localStorage.setItem('pratoSelecionado', JSON.stringify(prato.value))
+
+  const listaSalva = localStorage.getItem('listaPratos')
+  if (listaSalva) {
+    const lista = JSON.parse(listaSalva)
+    const listaAtualizada = lista.map((item) =>
+      item.id === prato.value.id ? prato.value : item,
+    )
+    localStorage.setItem('listaPratos', JSON.stringify(listaAtualizada))
+  }
+
   router.push('/pratos/ver-prato')
 }
 
