@@ -32,7 +32,7 @@
       <div class="form-col">
         <div class="input-pill">
           <span class="label-text">E-mail:</span>
-          <input type="email" v-model="form.email" required />
+          <input type="text" v-model="form.email" required />
         </div>
 
         <div class="input-pill">
@@ -112,6 +112,10 @@ const submitCadastro = () => {
   const telefone = somenteNumeros(form.telefone)
   const email = form.email.trim()
 
+  if (!email || !email.includes('@')) {
+    alert('Digite um e-mail válido com @.')
+    return
+  }
   if (!dataValida(form.dataNascimento)) {
     alert('Digite uma data de nascimento válida.')
     return
