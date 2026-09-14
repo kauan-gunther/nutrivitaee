@@ -1,7 +1,7 @@
 <script setup>
 
 function rolarParaEscolha() {
-  const el = document.getElementById('secao-escolha')
+  const el = document.getElementById('beneficios')
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
   }

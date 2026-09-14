@@ -10,7 +10,7 @@
         Encontre nutricionistas, agende consultas e receba receitas personalizadas de acordo com seus gostos e objetivos.
       </p>
 
-      <ul class="beneficios">
+      <ul id="beneficios" class="beneficios">
         <li>
           <i class="mdi mdi-check-circle-outline"></i>
           Atendimento online e presencial
