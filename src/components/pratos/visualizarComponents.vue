@@ -284,11 +284,48 @@ function irParaExcluir() {
   font-size: 1.1rem;
 }
 
+/* Responsividade para Celulares */
 @media (max-width: 768px) {
-  .linha-superior,
+  .visualizar-prato {
+    padding: 15px;
+    margin: 10px auto;
+    width: 95%;
+  }
+
+  .titulo {
+    font-size: 2.5rem;
+    margin-top: 30px; /* Dá espaço para o botão de excluir no topo */
+  }
+
+  .linha-superior {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .foto-wrapper {
+    margin: 0 auto;
+  }
+
+  .campo {
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
   .linha-dupla {
     grid-template-columns: 1fr;
-    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn-editar {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    margin: 15px auto 0 auto;
+    display: flex;
   }
 }
 </style>

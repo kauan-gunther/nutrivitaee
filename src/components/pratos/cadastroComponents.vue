@@ -232,7 +232,7 @@ function cancelar() {
 
 <style scoped>
 .resumo-container {
-  width: 80%;
+  width: 90%;
   max-width: 900px;
   margin: 40px auto; 
   padding: 30px 40px;
@@ -240,11 +240,11 @@ function cancelar() {
 }
 
 h1 {
-  color: #705335;
+  color: #73441b;
   text-align: center;
-  font-size: 60px; 
+  font-size: 2.8rem;
   margin-bottom: 30px;
-  font-weight: 400;
+  font-weight: normal;
 }
 
 .conteudo-formulario {
@@ -275,7 +275,7 @@ h1 {
   border-radius: 50%;
   overflow: hidden;
   background-color: #e5ded0;
-  border: 1px solid #8c7355;
+  border: 1.5px solid #8c5322;
   background-size: cover;
   background-position: center;
 }
@@ -297,8 +297,8 @@ h1 {
   height: 28px;
   background: transparent;
   border: none;
-  font-size: 1.2rem;
-  color: #000;
+  font-size: 1.1rem;
+  color: #4a2e16;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,8 +324,7 @@ h1 {
 .input-card {
   display: flex;
   align-items: center;
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
+  border: 1px solid #8c5322;
   border-radius: 14px;
   padding: 10px 18px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -334,9 +333,9 @@ h1 {
 }
 
 .input-card label {
-  color: #4a5435;
-  font-weight: 700;
-  font-size: 1.15rem;
+  color: #333f34;
+  font-weight: bold;
+  font-size: 0.95rem;
   margin-right: 8px;
   white-space: nowrap;
 }
@@ -347,9 +346,9 @@ h1 {
   background: transparent;
   border: none;
   outline: none;
-  color: #4a5435;
-  font-size: 1.1rem;
-  font-weight: 600;
+  color: #536236;
+  font-size: 0.95rem;
+  font-weight: bold;
 }
 
 .aviso-sem-pacientes {
@@ -357,13 +356,13 @@ h1 {
   font-size: 0.9rem;
   text-align: center;
   margin-top: -10px;
+  font-weight: bold;
 }
 
 .input-grande {
   display: flex;
   flex-direction: column;
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
+  border: 1px solid #8c5322;
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -379,37 +378,33 @@ h1 {
   border: none;
   outline: none;
   resize: none;
-  color: #4a5435;
-  font-size: 1.1rem;
+  color: #536236;
+  font-size: 0.9rem;
+  font-weight: bold;
   font-family: inherit;
   margin-top: 8px;
 }
 
-/* Cores da barra de rolagem iguais à cor dos botões (#536236) */
 .input-grande textarea::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .input-grande textarea::-webkit-scrollbar-track {
-  background: rgba(83, 98, 54, 0.150);
-  border-radius: 8px;
+  background: #d8ceb0;
+  border-radius: 10px;
 }
 
 .input-grande textarea::-webkit-scrollbar-thumb {
-  background: #536236;
-  border-radius: 8px;
-}
-
-.input-grande textarea::-webkit-scrollbar-thumb:hover {
-  background: #3f4a28;
+  background: #69734d;
+  border-radius: 10px;
 }
 
 .label-titulo {
   display: block;
   text-align: center;
   color: #333f34;
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 .botao-container {
@@ -420,18 +415,54 @@ h1 {
 }
 
 .button {
-  background-color: #536236;
-  color: #f1edd2;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 20px;
+  background-color: #69734d;
+  color: #fff;
+  border: 1px solid #4a5235;
+  padding: 10px 30px;
+  border-radius: 12px;
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .button:hover {
-  opacity: 0.9;
+  background-color: #58613e;
+}
+
+/* Responsividade para Celulares */
+@media (max-width: 768px) {
+  .resumo-container {
+    width: 95%;
+    padding: 15px;
+    margin: 20px auto;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .linha-superior {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .avatar-container {
+    margin: 0 auto;
+  }
+
+  .grid-form {
+    grid-template-columns: 1fr;
+  }
+
+  .input-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .input-card label {
+    margin-right: 0;
+  }
 }
 </style>

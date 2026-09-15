@@ -4,7 +4,7 @@
       <header class="top-bar">
         <div class="user-info">
           <div class="avatar">{{ userInitial }}</div>
-          <span>{{ userData.nome || 'Usuário' }}</span>
+          <span class="user-name">{{ userData.nome || 'Usuário' }}</span>
           <button class="settings-btn" title="Perfil do Usuário" @click="toggleProfile">⚙️</button>
         </div>
 
@@ -211,7 +211,6 @@ const contextMenu = reactive({
   messageSender: null
 })
 
-// Estilo reativo para posicionamento do menu oposto ao canto mais próximo
 const contextMenuStyle = computed(() => {
   const style = { top: `${contextMenu.y}px` }
   if (contextMenu.alignLeft) {
@@ -282,9 +281,6 @@ const openContextMenu = (event, msg) => {
   if (messagesContainer.value) {
     const rect = messagesContainer.value.getBoundingClientRect()
     const containerCenterX = rect.left + rect.width / 2
-    
-    // Se a mensagem for pequena e estiver no canto direito, abre para a esquerda
-    // Se estiver no lado esquerdo, abre para a direita
     contextMenu.alignLeft = event.clientX > containerCenterX
   } else {
     contextMenu.alignLeft = event.clientX > window.innerWidth / 2
@@ -343,14 +339,14 @@ const cancelInlineEdit = () => {
 <style scoped>
 .chat-wrapper {
   width: 100%;
-  height: calc(100vh - 85px); 
+  height: calc(100vh - 70px); 
   background-color: #F1EDD2;
   display: flex;
   align-items: stretch;
   justify-content: center;
   padding: 0;
   box-sizing: border-box;
-  margin-top: 85px; 
+  margin-top: 70px; 
   overflow: hidden; 
 }
 
@@ -368,7 +364,7 @@ const cancelInlineEdit = () => {
 }
 
 .top-bar {
-  height: 56px;
+  height: 52px;
   background-color: #333F34;
   color: #F1EDD2;
   display: flex;
@@ -394,8 +390,8 @@ const cancelInlineEdit = () => {
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background-color: #D1BFA5;
   color: #333F34;
@@ -403,13 +399,14 @@ const cancelInlineEdit = () => {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 .settings-btn {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 17px;
   cursor: pointer;
   color: #F1EDD2;
   padding: 2px 6px;
@@ -425,7 +422,7 @@ const cancelInlineEdit = () => {
 .chat-view {
   display: flex;
   flex: 1;
-  height: calc(100% - 56px); 
+  height: calc(100% - 52px); 
   overflow: hidden;
 }
 
@@ -441,7 +438,7 @@ const cancelInlineEdit = () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   color: #333F34;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -652,5 +649,53 @@ const cancelInlineEdit = () => {
   cursor: pointer;
   font-weight: bold;
   font-size: 0.92rem;
+}
+
+/* ====================================
+   ESTILOS PARA CELULAR (Responsividade)
+===================================== */
+@media (max-width: 768px) {
+  .chat-wrapper {
+    margin-top: 60px;
+    height: calc(100vh - 60px);
+  }
+
+  .sidebar {
+    width: 90px;
+  }
+
+  .contact-details {
+    display: none; /* Oculta o nome e cargo na lista lateral para caber em telas menores, mostrando só os avatares */
+  }
+
+  .contact-card {
+    justify-content: center;
+    padding: 12px 8px;
+  }
+
+  .top-bar {
+    padding: 0 10px;
+  }
+
+  .user-info span, 
+  .chat-target-info span {
+    font-size: 0.85rem;
+    max-width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .message {
+    max-width: 85%;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-view {
+    padding: 16px;
+  }
 }
 </style>

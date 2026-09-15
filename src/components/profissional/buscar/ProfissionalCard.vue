@@ -57,6 +57,7 @@ defineProps({
   display: flex;
   flex-direction: row;
   align-items: center;
+  box-sizing: border-box;
 
   & .perfil {
     width: 25%;
@@ -157,6 +158,61 @@ defineProps({
             & .nome {
               color: #BF945A;
               font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ====================================
+   ESTILOS PARA CELULAR (Responsividade)
+===================================== */
+@media (max-width: 768px) {
+  .profissional-card {
+    flex-direction: column;
+    padding: 20px 15px;
+    width: 95%;
+    margin: 15px auto;
+
+    & .perfil {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    & .dados {
+      width: 100%;
+      padding-left: 0;
+
+      & .texto {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+
+        & p {
+          font-size: 1.05rem;
+        }
+      }
+
+      & .listas {
+        flex-direction: column;
+        gap: 15px;
+
+        & .formacao,
+        & .especializacao {
+          width: 100%;
+          text-align: center;
+
+          & h4 {
+            font-size: 1.25rem;
+            margin-bottom: 6px;
+          }
+
+          & ul {
+            & li {
+              font-size: 0.95rem;
             }
           }
         }

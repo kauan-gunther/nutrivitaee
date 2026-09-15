@@ -133,7 +133,7 @@ header {
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 8px 30px; 
+  padding: 2px 30px; 
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }

@@ -283,4 +283,49 @@ function cancelarExclusao() {
 .btn-excluir:hover {
   background-color: #58613e;
 }
+
+/* Responsividade para Celulares */
+@media (max-width: 768px) {
+  .excluir-prato {
+    padding: 15px;
+    margin: 20px auto;
+    width: 95%;
+  }
+
+  .titulo {
+    font-size: 2.2rem;
+  }
+
+  .topo-formulario {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .foto-wrapper {
+    margin-bottom: 5px;
+  }
+
+  .campos-direita {
+    width: 100%;
+  }
+
+  .linha-dupla-topo {
+    grid-template-columns: 1fr;
+  }
+
+  .linha-dupla-baixo {
+    grid-template-columns: 1fr;
+  }
+
+  .botoes {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-cancelar,
+  .btn-excluir {
+    max-width: 100%;
+    width: 100%;
+  }
+}
 </style>
