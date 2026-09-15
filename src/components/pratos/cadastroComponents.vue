@@ -385,6 +385,25 @@ h1 {
   margin-top: 8px;
 }
 
+/* Cores da barra de rolagem iguais à cor dos botões (#536236) */
+.input-grande textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.input-grande textarea::-webkit-scrollbar-track {
+  background: rgba(83, 98, 54, 0.150);
+  border-radius: 8px;
+}
+
+.input-grande textarea::-webkit-scrollbar-thumb {
+  background: #536236;
+  border-radius: 8px;
+}
+
+.input-grande textarea::-webkit-scrollbar-thumb:hover {
+  background: #3f4a28;
+}
+
 .label-titulo {
   display: block;
   text-align: center;
