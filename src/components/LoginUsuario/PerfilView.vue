@@ -71,22 +71,41 @@
 
           <hr class="card-divider" />
 
-          <p class="section-subtitle">gosto:</p>
+          <div class="subsecao">
+            <span class="subtitulo">Objetivo do Usuário</span>
+          </div>
+          <ul>
+            <li v-if="!usuario.preferencias?.objetivo">• Não registrado</li>
+            <li v-else>• {{ usuario.preferencias.objetivo }}</li>
+          </ul>
+
+          <div class="subsecao">
+            <span class="subtitulo">Dieta do Usuário</span>
+          </div>
+          <ul>
+            <li v-if="!usuario.preferencias?.dieta?.length">• Não registrado</li>
+            <li v-for="(item, i) in usuario.preferencias?.dieta" :key="i">• {{ item }}</li>
+          </ul>
+
+          <div class="subsecao">
+            <span class="subtitulo">Preferências do Usuário</span>
+          </div>
           <ul>
             <li v-if="!usuario.preferencias?.gosto?.length">• Não registrado</li>
             <li v-for="(item, i) in usuario.preferencias?.gosto" :key="i">• {{ item }}</li>
           </ul>
-
-          <p class="section-subtitle mt-2">Não gosta:</p>
-          <ul>
-            <li v-if="!usuario.preferencias?.naoGosto?.length">• Não registrado</li>
-            <li v-for="(item, i) in usuario.preferencias?.naoGosto" :key="i">• {{ item }}</li>
-          </ul>
         </div>
 
         <div class="card-box light-card">
-          <h3 class="card-title">Alergias / Restrições</h3>
+          <div class="subsecao titulo-alergias">
+            <h3 class="card-title">Alergias / Restrições</h3>
+          </div>
           <hr class="card-divider" />
+
+          <div class="subsecao">
+            <span class="subtitulo">Alergias do Usuário</span>
+          </div>
+
           <ul>
             <li v-if="!usuario.alergias?.length">• Não registrado</li>
             <li v-for="(item, i) in usuario.alergias" :key="i">• {{ item }}</li>
@@ -125,9 +144,46 @@ const usuario = reactive({
   email: '',
   telefone: '',
   foto: '',
-  preferencias: { gosto: [], naoGosto: [] },
+  preferencias: { objetivo: '', dieta: [], gosto: [], naoGosto: [] },
   alergias: [],
 })
+
+const carregarPreferenciasDoCadastro = () => {
+  const prefsSalvas = localStorage.getItem('nutriVitae.preferencias')
+  if (!prefsSalvas) return
+
+  try {
+    const prefs = JSON.parse(prefsSalvas)
+
+    const objetivoSelecionado = prefs.objetivo || prefs.outroObjetivo || ''
+
+    const dietaSelecionada = [
+      ...(Array.isArray(prefs.dieta) ? prefs.dieta : []),
+      ...(prefs.outraDieta ? [prefs.outraDieta] : [])
+    ].filter(Boolean)
+
+    const preferenciasSelecionadas = [
+      ...(Array.isArray(prefs.preferencias) ? prefs.preferencias : []),
+      ...(prefs.outrasPreferencias ? [prefs.outrasPreferencias] : [])
+    ].filter(Boolean)
+
+    const alergiasSelecionadas = [
+      ...(Array.isArray(prefs.alergias) ? prefs.alergias : []),
+      ...(prefs.outrasAlergias ? [prefs.outrasAlergias] : [])
+    ].filter(Boolean)
+
+    usuario.preferencias = {
+      objetivo: objetivoSelecionado,
+      dieta: dietaSelecionada,
+      gosto: preferenciasSelecionadas,
+      naoGosto: []
+    }
+
+    usuario.alergias = alergiasSelecionadas
+  } catch (e) {
+    console.error('Erro ao ler preferências:', e)
+  }
+}
 
 onMounted(() => {
   const dadosSalvos = localStorage.getItem('usuarioLogado')
@@ -135,27 +191,7 @@ onMounted(() => {
     Object.assign(usuario, JSON.parse(dadosSalvos))
   }
 
-  const prefsSalvas = localStorage.getItem('nutriVitae.preferencias')
-  if (prefsSalvas) {
-    try {
-      const prefs = JSON.parse(prefsSalvas)
-
-      const gostoList = []
-      if (prefs.preferencias) gostoList.push(prefs.preferencias)
-      if (prefs.adicionar) gostoList.push(prefs.adicionar)
-
-      usuario.preferencias = {
-        gosto: gostoList.length > 0 ? gostoList : usuario.preferencias?.gosto || [],
-        naoGosto: usuario.preferencias?.naoGosto || [],
-      }
-
-      if (prefs.restricoes) {
-        usuario.alergias = [prefs.restricoes]
-      }
-    } catch (e) {
-      console.error('Erro ao ler preferências:', e)
-    }
-  }
+  carregarPreferenciasDoCadastro()
 })
 
 const persistirUsuario = (dadosUsuario) => {
@@ -384,6 +420,29 @@ const calcularIdade = (dataNasc) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.subsecao {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #73441b;
+  margin: 12px 0 8px;
+}
+
+.subsecao::before,
+.subsecao::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #536236;
+}
+
+.subtitulo {
+  padding: 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .card-title {
