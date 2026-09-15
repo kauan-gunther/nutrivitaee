@@ -89,94 +89,98 @@ function fecharModal() {
 
 <template>
   <div class="resumo-container">
-    <header class="header-banner">
-      <h1>Agendamento</h1>
-      <p>
-        {{ extrairPrimeiroNome(agendamento.profissional.nome, true) }} &
-        {{ extrairPrimeiroNome(agendamento.usuario.nome) }}
-      </p>
-    </header>
+    <div class="main-layout">
+      <!-- Coluna da Esquerda: Cards de Pessoas + Ações Footer -->
+      <div class="coluna-esquerda">
+        <div class="cards-coluna">
+          <!-- Card Profissional -->
+          <div class="person-card">
+            <img
+              :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'"
+              alt="Profissional"
+              class="avatar"
+            />
+            <div class="info">
+              <h2>
+                {{ agendamento.profissional.nome || 'Nome Profissional' }}
+              </h2>
 
-    <div class="resumo-content">
-      <div class="cards-coluna">
-        <!-- Card Profissional -->
-        <div class="person-card">
-          <img
-            :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'"
-            alt="Profissional"
-            class="avatar"
-          />
-          <div class="info">
-            <h2>
-              {{ agendamento.profissional.nome || 'Nome Profissional' }}
-            </h2>
+              <p>
+                <strong>Telefone:</strong>
+                {{ agendamento.profissional.telefone }}
+              </p>
 
-            <p>
-              <strong>Telefone:</strong>
-              {{ agendamento.profissional.telefone }}
-            </p>
-
-            <button class="bnt-perfil" @click="verPerfil('profissional')">Ver Perfil</button>
+              <button class="bnt-perfil" @click="verPerfil('profissional')">Ver Perfil</button>
+            </div>
+            <button class="bnt-chat">Conversar com profissional</button>
           </div>
-          <button class="bnt-chat">Conversar com profissional</button>
+
+          <!-- Card Usuário / Paciente -->
+          <div class="person-card">
+            <img
+              :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'"
+              alt="Usuário"
+              class="avatar"
+            />
+            <div class="info">
+              <h2>
+                {{ agendamento.usuario.nome || 'Nome Usuário' }}
+              </h2>
+
+              <p>
+                <strong>Telefone:</strong>
+                {{ agendamento.usuario.telefone }}
+              </p>
+
+              <button class="bnt-perfil" @click="verPerfil('paciente')">Ver Perfil</button>
+            </div>
+            <button class="bnt-chat">Conversar com o paciente</button>
+          </div>
         </div>
 
-        <!-- Card Usuário / Paciente -->
-        <div class="person-card">
-          <img
-            :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'"
-            alt="Usuário"
-            class="avatar"
-          />
-          <div class="info">
-            <h2>
-              {{ agendamento.usuario.nome || 'Nome Usuário' }}
-            </h2>
-
-            <p>
-              <strong>Telefone:</strong>
-              {{ agendamento.usuario.telefone }}
-            </p>
-
-            <button class="bnt-perfil" @click="verPerfil('paciente')">Ver Perfil</button>
-          </div>
-          <button class="bnt-chat">Conversar com o paciente</button>
+        <!-- Ações (Editar, Excluir, Buscar) -->
+        <div class="actions-footer">
+          <button class="btn-lapis" title="Editar" @click="router.push('/editar')">✏️</button>
+          <button class="btn-lapis" title="Excluir" @click="router.push('/excluir')">🗑️</button>
+          <button class="btn-buscar" @click="router.push('/buscar')">
+            Buscar Agendamentos
+          </button>
         </div>
       </div>
 
-      <div class="details-coluna">
-        <div class="detail-item">
-          <span class="icon">📅</span>
-          <div class="info-item">
-            <span class="label">Data:</span>
-            <span class="value">{{ formatarData(agendamento.consulta.data) }}</span>
-          </div>
-        </div>
+      <!-- Coluna da Direita: Título + Detalhes da Consulta -->
+      <div class="coluna-direita">
+        <header class="header-banner">
+          <h1>Agendamento</h1>
+          <p>
+            {{ extrairPrimeiroNome(agendamento.profissional.nome, true) }} &
+            {{ extrairPrimeiroNome(agendamento.usuario.nome) }}
+          </p>
+        </header>
 
-        <div class="detail-item">
-          <span class="icon">🕒</span>
-          <div class="info-item">
-            <span class="label">Horario:</span>
-            <span class="value">{{ agendamento.consulta.horario }}</span>
+        <div class="details-coluna">
+          <div class="detail-item">
+            <span class="icon">📅</span>
+            <div class="info-item">
+              <span class="label">Data:</span>
+              <span class="value">{{ formatarData(agendamento.consulta.data) }}</span>
+            </div>
           </div>
-        </div>
 
-        <div class="detail-item full">
-          <span class="label">Tipo de agendamento:</span>
-          <span class="value">{{ agendamento.consulta.tipo }}</span>
+          <div class="detail-item">
+            <span class="icon">🕒</span>
+            <div class="info-item">
+              <span class="label">Horario:</span>
+              <span class="value">{{ agendamento.consulta.horario }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item tipo-bloco">
+            <span class="label">Tipo de agendamento:</span>
+            <span class="value">{{ agendamento.consulta.tipo }}</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Ações (Editar, Excluir, Buscar) -->
-    <div class="actions-footer">
-      <button class="btn-icon" title="Editar" @click="router.push('/editar')">✏️</button>
-
-      <button class="btn-icon" title="Excluir" @click="router.push('/excluir')">🗑️</button>
-
-      <button class="btn-buscar" @click="router.push('/buscar')">
-        Buscar Agendamentos
-      </button>
     </div>
   </div>
 
@@ -208,41 +212,63 @@ function fecharModal() {
 <style scoped>
 .resumo-container {
   position: relative;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 50px 20px;
   min-height: 500px;
+}
+
+.main-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.coluna-esquerda {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  max-width: 480px;
+}
+
+.coluna-direita {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
 }
 
 .header-banner {
   text-align: left;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .header-banner h1 {
-  color: #73441b;
-  font-size: 3rem; 
+  color: #705335;
+  font-size: 4rem; 
   font-family: serif;
-  font-weight: normal;
+  font-weight: 400;
   margin: 0;
+  line-height: 1;
 }
 
-.resumo-content {
-  display: flex;
-  gap: 50px;
-  align-items: flex-start;
-  margin-top: 20px;
+.header-banner p {
+  color: #705335;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 10px 0 0 0;
 }
 
 .cards-coluna {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  flex: 1.1;
 }
 
 .person-card {
-  border: 1.5px solid #73441b;
+  border: 1.5px solid #705335;
   border-radius: 20px;
   padding: 16px; 
   display: grid;
@@ -255,7 +281,7 @@ function fecharModal() {
 .avatar {
   width: 80px; 
   height: 80px; 
-  border-radius: 50%;
+  border-radius: 20px;
   object-fit: cover;
 }
 
@@ -267,7 +293,7 @@ function fecharModal() {
 }
 
 .info p {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   color: #333f34;
   font-size: 0.88rem;
   font-weight: bold;
@@ -275,8 +301,8 @@ function fecharModal() {
 
 .bnt-perfil {
   background-color: transparent;
-  border: 1px solid #73441b;
-  color: #73441b;
+  border: 1px solid #705335;
+  color: #705335;
   font-weight: bold;
   border-radius: 12px;
   padding: 2px 16px;
@@ -287,27 +313,25 @@ function fecharModal() {
 .bnt-chat {
   grid-column: span 2;
   background-color: transparent;
-  border: 1px dashed #73441b;
+  border: 1px dashed #705335;
   border-radius: 14px;
   padding: 6px;
-  color: #73441b;
+  color: #705335;
   font-size: 0.8rem;
   cursor: pointer;
   text-align: center;
 }
 
 .details-coluna {
-  flex: 0.9;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-top: 10px;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .info-item {
@@ -321,67 +345,66 @@ function fecharModal() {
 }
 
 .detail-item .label {
-  color: #586937;
+  color: #536236;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .detail-item .value {
-  color: #586937;
+  color: #536236;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
-.edit-input,
-.edit-select {
-  border: 1.5px solid #586937;
-  border-radius: 8px;
-  padding: 4px 8px;
-  background-color: #EFE8D3;
-  color: #586937;
-  font-weight: bold;
-  margin-left: 8px;
-  outline: none;
+.tipo-bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.actions-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .btn-lapis {
-  background-color: #EFE8D3;
-  border: 1.5px solid #586937;
+  background-color: #ebe2cc;
+  border: 1.5px solid #536236;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 0.85rem;
+  width: 42px;
+  height: 42px;
+  font-size: 1rem;
   cursor: pointer;
-  margin-left: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.1s, box-shadow 0.2s;
 }
 
 .btn-lapis:hover {
   transform: translateY(-1px);
-  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-confirmar {
-  margin-top: 20px;
-  background-color: #586937;
-  color: #EFE8D3;
+.btn-buscar {
+  background-color: #536236;
+  color: #f1edd2;
   border: none;
-  padding: 10px 24px;
-  border-radius: 12px;
+  padding: 10px 20px;
+  border-radius: 20px;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
-  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s;
 }
 
-.btn-confirmar:hover {
-  background-color: #435129;
-  transform: translateY(-1px);
+.btn-buscar:hover {
+  opacity: 0.9;
 }
 
 /* Modal Estilizado Compacto */
@@ -399,7 +422,7 @@ function fecharModal() {
 }
 
 .modal-card {
-  background-color: #EFE8D3;
+  background-color: #ebe2cc;
   border-radius: 22px;
   padding: 22px 20px 18px 20px;
   width: 100%;
@@ -407,69 +430,77 @@ function fecharModal() {
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
+  position: relative;
 }
 
-.modal-titulo {
-  color: #1a1a1a;
-  font-family: serif;
-  font-size: 1.6rem;
-  font-weight: normal;
-  line-height: 1.15;
-  margin: 0 0 16px 0;
-}
-
-.modal-input {
-  width: 100%;
-  height: 68px;
-  border-radius: 16px;
-  border: 1px solid #48542c;
-  background-color: transparent;
-  color: #48542c;
-  font-family: sans-serif;
-  font-size: 0.95rem;
-  font-weight: bold;
-  padding: 10px 14px;
-  box-sizing: border-box;
-  outline: none;
-  resize: none;
-  margin-bottom: 18px;
-}
-
-.modal-input::placeholder {
-  color: #48542c;
-  font-weight: bold;
-  opacity: 0.9;
-  line-height: 1.25;
-}
-
-.modal-botoes {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.btn-modal {
-  flex: 1;
-  background-color: #48542c;
-  color: #EFE8D3;
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: transparent;
   border: none;
-  border-radius: 20px;
-  padding: 9px 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #705335;
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #705335;
+}
+
+.modal-header h2 {
+  font-size: 1.2rem;
+  color: #705335;
+  margin: 0;
+}
+
+.modal-body {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  color: #333f34;
+}
+
+.modal-value {
+  font-weight: normal;
+}
+
+.btn-fechar {
+  background-color: #536236;
+  color: #f1edd2;
+  border: none;
+  border-radius: 16px;
+  padding: 8px 20px;
   font-weight: bold;
   cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.btn-modal:hover {
-  opacity: 0.9;
+  width: 100%;
 }
 
 /* --- Ajuste Responsivo para Mobile --- */
 @media (max-width: 768px) {
-  .resumo-content {
-    flex-direction: column;
+  .main-layout {
+    flex-direction: column-reverse;
     gap: 30px;
+  }
+
+  .coluna-esquerda, .coluna-direita {
+    width: 100%;
+    max-width: 100%;
   }
 
   .header-banner {
@@ -478,16 +509,7 @@ function fecharModal() {
   }
 
   .header-banner h1 {
-    font-size: 2.3rem;
-  }
-
-  .details-coluna {
-    padding-top: 0;
-    width: 100%;
-  }
-
-  .cards-coluna {
-    width: 100%;
+    font-size: 2.8rem;
   }
 }
 </style>
