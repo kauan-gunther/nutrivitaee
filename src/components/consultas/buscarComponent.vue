@@ -63,43 +63,75 @@ const agendamentosPadrao = [
 
 const agendamentos = ref([...agendamentosPadrao])
 
+const agendamentosFiltrados = computed(() => {
+  const termo = buscaTermo.value.trim().toLowerCase()
+
+  if (!termo) return agendamentos.value
+
+  return agendamentos.value.filter((card) => {
+    const textoPesquisa = [
+      card.profissional?.nome,
+      card.paciente?.nome,
+      card.data,
+      card.horario,
+      card.tipo,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+
+    return textoPesquisa.includes(termo)
+  })
+})
+
 onMounted(() => {
   const salvo = localStorage.getItem('dadosAgendamento')
   if (salvo) {
-    const dados = JSON.parse(salvo)
-    const lista = Array.isArray(dados) ? dados : [dados]
+    try {
+      const dados = JSON.parse(salvo)
+      const lista = Array.isArray(dados) ? dados : [dados]
 
-    const novosAgendamentos = lista.map((item, index) => ({
-      id: Date.now() + index,
-      profissional: {
-        nome: item.profissional?.nome || 'Profissional não informado',
-        foto: item.profissional?.foto || 'img/consulta/carolina.png',
-      },
-      paciente: {
-        nome: item.usuario?.nome || 'Paciente não informado',
-        foto: item.usuario?.foto || 'img/consulta/gabriel.png',
-      },
-      data: item.consulta?.data,
-      horario: item.consulta?.horario,
-      tipo: item.consulta?.tipo,
-    }))
+      const novosAgendamentos = lista.map((item, index) => {
+        let fotoProf = item.profissional?.foto || item.profissional?.imagem || ''
+        if (!fotoProf || fotoProf.includes('via.placeholder')) {
+          fotoProf = '/consulta/carolina.png'
+        }
+        if (!fotoProf.startsWith('/')) {
+          fotoProf = `/${fotoProf.replace(/^\/+/, '')}`
+        }
 
-    agendamentos.value = novosAgendamentos
-    return
+        let fotoPac = item.usuario?.foto || item.usuario?.imagem || ''
+        if (!fotoPac || fotoPac.length > 500000) {
+          fotoPac = '/consulta/gabriel.png'
+        }
+        if (!fotoPac.startsWith('/')) {
+          fotoPac = `/${fotoPac.replace(/^\/+/, '')}`
+        }
+
+        return {
+          id: Date.now() + index,
+          profissional: {
+            nome: item.profissional?.nome || 'Profissional não informado',
+            foto: fotoProf,
+          },
+          paciente: {
+            nome: item.usuario?.nome || 'Paciente não informado',
+            foto: fotoPac,
+          },
+          data: item.consulta?.data ? item.consulta.data.split('-').reverse().join('/') : '',
+          horario: item.consulta?.horario || '',
+          tipo: item.consulta?.tipo || 'Presencial',
+        }
+      })
+
+      agendamentos.value = novosAgendamentos.length ? novosAgendamentos : [...agendamentosPadrao]
+      return
+    } catch (e) {
+      console.error('Erro ao ler localStorage', e)
+    }
   }
 
   agendamentos.value = [...agendamentosPadrao]
-})
-
-const agendamentosFiltrados = computed(() => {
-  const termo = buscaTermo.value.trim().toLowerCase()
-  if (!termo) return agendamentos.value
-
-  return agendamentos.value.filter(
-    (item) =>
-      item.paciente.nome.toLowerCase().includes(termo) ||
-      item.profissional.nome.toLowerCase().includes(termo),
-  )
 })
 </script>
 

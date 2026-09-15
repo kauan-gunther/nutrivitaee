@@ -75,7 +75,6 @@ function verPrato(prato) {
       <template v-if="temPratos">
         <h1>Buscar Pratos Personalizados</h1>
 
-   
         <div class="search-bar">
           <input type="text" v-model="buscaTermo" placeholder="Pratos Personalizados..." />
           <span class="search-icon">🔍</span>
@@ -83,13 +82,15 @@ function verPrato(prato) {
 
         <div class="card-list">
           <div v-for="prato in pratosFiltrados" :key="prato.id" class="dish-card">
-      
+            
+            <!-- Coluna Esquerda: Foto e Botão Ver Prato -->
             <div class="left-col">
               <img v-if="prato.foto" :src="prato.foto" :alt="prato.nome" class="dish-img" />
               <div v-else class="dish-img placeholder">Sem imagem</div>
               <button class="btn-ver" @click="verPrato(prato)">Ver Prato</button>
             </div>
 
+            <!-- Coluna Central: Informações e Modo de Preparo com Scroll -->
             <div class="center-col">
               <p class="field">
                 <strong>Nome do Prato:</strong>
@@ -102,10 +103,13 @@ function verPrato(prato) {
 
               <div class="section-block">
                 <h3>Modo de Preparo</h3>
-                <p class="text-body">{{ prato.modoPreparo }}</p>
+                <div class="scroll-box">
+                  <p class="text-body">{{ prato.modoPreparo }}</p>
+                </div>
               </div>
             </div>
 
+            <!-- Coluna Direita: Informações e Ingredientes com Scroll -->
             <div class="right-col">
               <p class="field">
                 <strong>Data de Criação:</strong>
@@ -118,9 +122,11 @@ function verPrato(prato) {
 
               <div class="section-block">
                 <h3>Ingredientes</h3>
-                <ul>
-                  <li v-for="(ing, idx) in prato.ingredientes" :key="idx">• {{ ing }}</li>
-                </ul>
+                <div class="scroll-box">
+                  <ul>
+                    <li v-for="(ing, idx) in prato.ingredientes" :key="idx">• {{ ing }}</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -143,24 +149,28 @@ function verPrato(prato) {
 </template>
 
 <style scoped>
-
 .container {
-  max-width: 850px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
+
 h1 {
   color: #73441b;
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.8rem;
+  font-family: 'Cinzel', serif;
   margin-bottom: 24px;
+  font-weight: normal;
 }
+
 .search-bar {
   position: relative;
   width: 100%;
   max-width: 700px;
   margin: 0 auto 28px auto;
 }
+
 .search-bar input {
   width: 100%;
   padding: 12px 45px 12px 20px;
@@ -172,10 +182,12 @@ h1 {
   outline: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
+
 .search-bar input::placeholder {
   color: #2b3323;
   opacity: 0.8;
 }
+
 .search-icon {
   position: absolute;
   right: 16px;
@@ -183,37 +195,41 @@ h1 {
   transform: translateY(-50%);
   font-size: 1.1rem;
 }
+
 .card-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 850px;
-  margin: 0 auto;
 }
+
 .dish-card {
   display: grid;
   grid-template-columns: 140px 1fr 1fr;
   gap: 16px;
-  background-color: #d6caaf;
+  background-color: #e6dcbe;
   border: 1px solid #8c5322;
   border-radius: 20px;
-  padding: 18px;
+  padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   color: #4a2e16;
+  align-items: start;
 }
+
 .left-col {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
 }
+
 .dish-img {
   width: 100px;
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #8c5322;
+  border: 1.5px solid #8c5322;
 }
+
 .dish-img.placeholder {
   display: flex;
   align-items: center;
@@ -225,44 +241,79 @@ h1 {
   text-align: center;
   padding: 8px;
 }
+
 .btn-ver {
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1.5px solid #536236;
+  background-color: #69734d;
+  color: #fff;
+  border: 1px solid #4a5235;
   border-radius: 12px;
-  padding: 6px 16px;
+  padding: 8px 16px;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
 }
+
+.btn-ver:hover {
+  background-color: #58613e;
+}
+
 .field {
-  font-size: 0.95rem;
-  margin-bottom: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
   color: #333f34;
   font-weight: bold;
 }
+
 .highlight {
-  color: #bf945a;
+  color: #a8743c;
   margin-left: 4px;
   font-weight: bold;
 }
+
 .section-block h3 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #333f34;
   margin: 12px 0 6px 0;
   text-align: center;
   font-weight: bold;
 }
+
+/* Caixa com barra de rolagem customizada idêntica à referência */
+.scroll-box {
+  max-height: 110px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.scroll-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-box::-webkit-scrollbar-track {
+  background: #d8ceb0;
+  border-radius: 10px;
+}
+
+.scroll-box::-webkit-scrollbar-thumb {
+  background: #69734d;
+  border-radius: 10px;
+}
+
 .text-body {
   font-size: 0.8rem;
   line-height: 1.3;
   font-weight: bold;
   color: #536236;
+  margin: 0;
 }
+
 .right-col ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .right-col li {
   font-size: 0.8rem;
   line-height: 1.3;
@@ -270,13 +321,8 @@ h1 {
   color: #536236;
   font-weight: bold;
 }
-.no-results  {
-  color: #536236;
-  text-align: center;
-  font-weight: 500;
-  margin-top: 15px;
-}
 
+.no-results,
 .nao-logado,
 .sem-pratos {
   color: #536236;

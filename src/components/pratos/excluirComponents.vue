@@ -67,40 +67,54 @@ function cancelarExclusao() {
   <main class="excluir-prato">
     <h1 class="titulo">Deletar Prato Personalizado</h1>
 
-    <div class="foto-wrapper">
-      <img :src="prato.foto || 'https://via.placeholder.com/150'" class="foto-prato" />
-    </div>
-
-    <div class="campo full-width">
-      <span class="label">Nome do Prato:</span>
-      <span class="valor">{{ prato.nome }}</span>
-    </div>
-
-    <div class="linha-dupla">
-      <div class="campo">
-        <span class="label">Calorias:</span>
-        <span class="valor">{{ prato.calorias }}</span>
+    <!-- Seção Superior: Foto alinhada ao lado dos campos -->
+    <div class="topo-formulario">
+      <div class="foto-wrapper">
+        <img :src="prato.foto || 'https://via.placeholder.com/150'" class="foto-prato" />
       </div>
-      <div class="campo">
-        <span class="label">Data de Criação:</span>
-        <span class="valor">{{ prato.data }} 📅</span>
+
+      <div class="campos-direita">
+        <div class="campo full-width">
+          <span class="label">Nome do Prato:</span>
+          <span class="valor">{{ prato.nome }}</span>
+         
+        </div>
+
+        <div class="linha-dupla-topo">
+          <div class="campo">
+            <span class="label">Calorias:</span>
+            <span class="valor">{{ prato.calorias }}</span>
+     
+          </div>
+          <div class="campo">
+            <span class="label">Data de Criação:</span>
+            <span class="valor">{{ prato.data }}</span>
+            <span class="icone-input">📅</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="linha-dupla">
+    <!-- Seção Inferior: Textareas de Modo de Preparo e Ingredientes -->
+    <div class="linha-dupla-baixo">
       <div class="box-texto">
-        <h3>Modo de Preparo</h3>
+        <div class="box-header">
+          <h3>Modo de Preparo</h3>
+        </div>
         <p>{{ prato.modoPreparo }}</p>
       </div>
 
       <div class="box-texto">
-        <h3>Ingredientes</h3>
+        <div class="box-header">
+          <h3>Ingredientes</h3>
+        </div>
         <ul>
           <li v-for="(ing, idx) in prato.ingredientes" :key="idx">• {{ ing }}</li>
         </ul>
       </div>
     </div>
 
+    <!-- Botões de Ação -->
     <div class="botoes">
       <button class="btn-cancelar" @click="cancelarExclusao">Cancelar Exclusão</button>
       <button class="btn-excluir" @click="excluirPrato">Excluir Prato</button>
@@ -112,23 +126,30 @@ function cancelarExclusao() {
 .excluir-prato {
   max-width: 850px;
   margin: 40px auto;
-  padding: 24px;
-  background-color: #f1edd2;
-  border: 1px solid #73441b;
+  padding: 30px;
   border-radius: 20px;
+  font-weight: bold;
 }
 
 .titulo {
   color: #73441b;
   text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 20px;
+  font-size: 50px;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+/* Layout do Topo (Foto + Campos) */
+.topo-formulario {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
 }
 
 .foto-wrapper {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 16px;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .foto-prato {
@@ -136,15 +157,30 @@ function cancelarExclusao() {
   height: 90px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #73441b;
+  border: 1.5px solid #73441b;
 }
 
+.campos-direita {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linha-dupla-topo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Estilização dos Campos */
 .campo {
-  background-color: #cbba9c;
-  border: 1px solid #9c8a6f;
-  border-radius: 12px;
+  position: relative;
+  border: 1px solid #73441b;
+  border-radius: 16px;
   padding: 10px 16px;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .full-width {
@@ -155,34 +191,55 @@ function cancelarExclusao() {
 .label {
   color: #536236;
   font-weight: bold;
-  margin-right: 8px;
+  font-size: 0.95rem;
+  margin-right: 6px;
+  white-space: nowrap;
 }
 
 .valor {
-  color: #333f34;
+  color: #73441b;
   font-weight: bold;
+  font-size: 0.95rem;
+  flex: 1;
 }
 
-.linha-dupla {
+.icone-input {
+  margin-left: 8px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Layout Inferior (Modo de preparo e Ingredientes) */
+.linha-dupla-baixo {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .box-texto {
-  background-color: #cbba9c;
-  border: 1px solid #9c8a6f;
-  border-radius: 12px;
-  padding: 12px;
+  border: 1px solid #73441b;
+  border-radius: 16px;
+  padding: 14px 16px;
   max-height: 160px;
   overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .box-texto h3 {
   text-align: center;
   color: #333f34;
-  margin: 0 0 8px 0;
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  flex: 1;
 }
 
 .box-texto p,
@@ -198,21 +255,32 @@ function cancelarExclusao() {
   margin: 0;
 }
 
+/* Botões */
 .botoes {
   display: flex;
   justify-content: space-between;
-  margin-top: 24px;
+  gap: 20px;
 }
 
 .btn-cancelar,
 .btn-excluir {
-  min-width: 160px;
-  padding: 10px 20px;
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1px solid #536236;
+  flex: 1;
+  max-width: 220px;
+  padding: 12px 24px;
+  background-color: #69734d;
+  color: #f1f1e6;
+  border: 1px solid #4a5235;
   border-radius: 20px;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background-color 0.2s;
+}
+
+.btn-cancelar:hover,
+.btn-excluir:hover {
+  background-color: #58613e;
 }
 </style>
