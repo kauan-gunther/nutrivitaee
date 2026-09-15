@@ -676,11 +676,11 @@ const cancelInlineEdit = () => {
 /* RESPONSIVIDADE MOBILE (Telas menores que 768px) */
 @media (max-width: 768px) {
   .sidebar {
-    width: 90px; /* Deixa a sidebar bem compacta só com os avatares no mobile */
+    width: 90px; 
   }
 
   .contact-details {
-    display: none; /* Oculta o texto do nome e papel na sidebar estreita do mobile */
+    display: none; 
   }
 
   .contact-card {
@@ -689,7 +689,7 @@ const cancelInlineEdit = () => {
   }
 
   .profile-grid {
-    grid-template-columns: 1fr; /* Transforma o perfil em uma coluna única */
+    grid-template-columns: 1fr; 
   }
 
   .top-bar {
@@ -697,7 +697,7 @@ const cancelInlineEdit = () => {
   }
 
   .user-info span, .chat-target-info span {
-    font-size: 0.8rem; /* Nomes menores no cabeçalho se necessário */
+    font-size: 0.8rem; 
   }
 }
 </style>

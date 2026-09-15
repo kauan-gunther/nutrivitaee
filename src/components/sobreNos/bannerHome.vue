@@ -5,7 +5,6 @@ import MembrosEquipe from './membrosEquipe.vue'
 
 <template>
   <section class="banner">
-
     <h1>Equipe NutriVitae</h1>
   </section>
 
@@ -37,12 +36,21 @@ import MembrosEquipe from './membrosEquipe.vue'
 }
 
 @media (max-width: 700px) {
+  .banner {
+    min-height: 78vh; 
+    width: 100vw; 
+    background-size: cover; 
+    background-position: center;
+    margin-left: calc(-50vw + 50%); 
+  }
+
   .navBanner ul {
     display: none;
   }
 
   .banner h1 {
     margin: 0 16px;
+    font-size: 40px;
   }
 }
 </style>

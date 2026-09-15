@@ -310,4 +310,20 @@ function conversar(prato) {
   font-weight: bold;
   font-size: 0.8rem;
 }
+
+
+@media (max-width: 700px) {
+  .hero-banner {
+    min-height: 100vh; 
+    width: 100%;
+    background-size: cover; 
+    background-position: center;
+    padding: 20px 16px;
+  }
+
+  .hero-banner h1 {
+    font-size: 65px;
+    line-height: 1.2;
+  }
+}
 </style>
