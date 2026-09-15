@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 const buscaTermo = ref('')
-const agendamentos = ref([
+const agendamentosPadrao = [
   {
     id: 1,
     profissional: {
@@ -59,17 +59,16 @@ const agendamentos = ref([
     horario: '10h00 / 10h00 am',
     tipo: 'Presencial',
   },
-])
+]
+
+const agendamentos = ref([...agendamentosPadrao])
 
 onMounted(() => {
   const salvo = localStorage.getItem('dadosAgendamento')
   if (salvo) {
     const dados = JSON.parse(salvo)
-    // Se ainda for um objeto antigo (de antes da mudança), envolve num array.
     const lista = Array.isArray(dados) ? dados : [dados]
 
-    // Transforma CADA agendamento salvo no mesmo formato usado pelos
-    // cards mockados acima, e insere todos no início da lista exibida.
     const novosAgendamentos = lista.map((item, index) => ({
       id: Date.now() + index,
       profissional: {
@@ -85,8 +84,11 @@ onMounted(() => {
       tipo: item.consulta?.tipo,
     }))
 
-    agendamentos.value.unshift(...novosAgendamentos)
+    agendamentos.value = novosAgendamentos
+    return
   }
+
+  agendamentos.value = [...agendamentosPadrao]
 })
 
 const agendamentosFiltrados = computed(() => {

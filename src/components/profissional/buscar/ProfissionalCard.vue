@@ -53,7 +53,7 @@ defineProps({
   box-shadow: none; 
   padding: 30px;
   border-radius: 20px;
-  border: 1.5px solid #BF945A;
+  border: 2px solid #BF945A;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -81,8 +81,9 @@ defineProps({
       }
 
       & .perfil-button {
+        background: #F1EDD2;
         color: #536236;
-        border: #BF945A 1px solid;
+        border: #BF945A 1.5px solid;
         padding: 8px 20px;
         border-radius: 20px;
         font-weight: bold;

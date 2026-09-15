@@ -35,7 +35,9 @@ const agendamento = ref({
 onMounted(() => {
   const dadosSalvos = localStorage.getItem('dadosAgendamento')
   if (dadosSalvos) {
-    agendamento.value = JSON.parse(dadosSalvos)
+    const dados = JSON.parse(dadosSalvos)
+    const lista = Array.isArray(dados) ? dados : [dados]
+    agendamento.value = lista[lista.length - 1]
   }
 })
 
@@ -63,9 +65,14 @@ function meConfirmarEdicao() {
     return
   }
 
-  localStorage.setItem('dadosAgendamento', JSON.stringify(agendamento.value))
-  mostrarModalSenha.value = false
+  // Pega a lista atual, substitui o último item pelo editado, salva a lista de novo
+  const dadosSalvos = localStorage.getItem('dadosAgendamento')
+  const dados = dadosSalvos ? JSON.parse(dadosSalvos) : []
+  const lista = Array.isArray(dados) ? dados : [dados]
+  lista[lista.length - 1] = agendamento.value
+  localStorage.setItem('dadosAgendamento', JSON.stringify(lista))
 
+  mostrarModalSenha.value = false
   editandoData.value = false
   editandoHorario.value = false
   editandoTipo.value = false
@@ -226,26 +233,18 @@ function fecharModal() {
   position: relative;
   max-width: 900px;
   margin: 0 auto;
-  padding: 80px 20px 40px 20px;
+  padding: 40px 20px;
   min-height: 500px;
 }
 
 .header-banner {
-  position: fixed;
-  top: 0;
-  right: 0;
-  background-color: #73441b;
-  color: #EFE8D3;
-  padding: 20px 50px 20px 40px;
-  border-radius: 0 0 0 90px;
-  box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.15);
-  text-align: center;
-  z-index: 10;
+  text-align: left;
+  margin-bottom: 30px;
 }
 
 .header-banner h1 {
-  color: #EFE8D3;
-  font-size: 2.2rem; 
+  color: #73441b;
+  font-size: 3rem; 
   font-family: serif;
   font-weight: normal;
   margin: 0;
@@ -487,5 +486,31 @@ function fecharModal() {
 
 .btn-modal:hover {
   opacity: 0.9;
+}
+
+/* --- Ajuste Responsivo para Mobile --- */
+@media (max-width: 768px) {
+  .resumo-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .header-banner {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .header-banner h1 {
+    font-size: 2.3rem;
+  }
+
+  .details-coluna {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .cards-coluna {
+    width: 100%;
+  }
 }
 </style>

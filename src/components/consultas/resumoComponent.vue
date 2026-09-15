@@ -30,10 +30,7 @@ onMounted(() => {
   const dadosSalvos = localStorage.getItem('dadosAgendamento')
   if (dadosSalvos) {
     const dados = JSON.parse(dadosSalvos)
-    // Se ainda for um objeto antigo (de antes da mudança), envolve num array.
     const lista = Array.isArray(dados) ? dados : [dados]
-    // O resumo é sempre do agendamento que acabou de ser feito,
-    // ou seja, o último item da lista.
     agendamento.value = lista[lista.length - 1]
   }
 })
@@ -218,26 +215,23 @@ function fecharModal() {
 }
 
 .header-banner {
-  text-align: right;
-  margin-bottom: 20px;
+  text-align: left;
+  margin-bottom: 30px;
 }
 
 .header-banner h1 {
   color: #73441b;
-  font-size: 3.5rem; 
+  font-size: 3rem; 
+  font-family: serif;
+  font-weight: normal;
   margin: 0;
-}
-
-.header-banner p {
-  margin: 0;
-  color: #73441b;
-  font-size: 1.5rem;
 }
 
 .resumo-content {
   display: flex;
   gap: 50px;
   align-items: flex-start;
+  margin-top: 20px;
 }
 
 .cards-coluna {
@@ -281,8 +275,8 @@ function fecharModal() {
 
 .bnt-perfil {
   background-color: transparent;
-  border: 1px solid #586937;
-  color: #333f34;
+  border: 1px solid #73441b;
+  color: #73441b;
   font-weight: bold;
   border-radius: 12px;
   padding: 2px 16px;
@@ -307,7 +301,7 @@ function fecharModal() {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-top: 30px;
+  padding-top: 10px;
 }
 
 .detail-item {
@@ -329,161 +323,171 @@ function fecharModal() {
 .detail-item .label {
   color: #586937;
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .detail-item .value {
-  color: #73441b;
+  color: #586937;
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
-.actions-footer {
-  display: flex;
-  gap: 12px;
-  margin-top: 40px;
-  align-items: center;
-}
-
-.btn-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
+.edit-input,
+.edit-select {
   border: 1.5px solid #586937;
-  background-color: #EFE8D3; 
+  border-radius: 8px;
+  padding: 4px 8px;
+  background-color: #EFE8D3;
+  color: #586937;
+  font-weight: bold;
+  margin-left: 8px;
+  outline: none;
+}
+
+.btn-lapis {
+  background-color: #EFE8D3;
+  border: 1.5px solid #586937;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
   cursor: pointer;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-  display: flex;
+  margin-left: 8px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.1s, box-shadow 0.2s;
 }
 
-.btn-icon:hover {
+.btn-lapis:hover {
   transform: translateY(-1px);
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.25);
 }
 
-.btn-buscar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.btn-confirmar {
+  margin-top: 20px;
   background-color: #586937;
   color: #EFE8D3;
   border: none;
+  padding: 10px 24px;
   border-radius: 12px;
-  padding: 10px 22px;
-  font-size: 0.95rem;
+  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); 
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s, transform 0.1s;
 }
 
-.btn-buscar:hover {
+.btn-confirmar:hover {
   background-color: #435129;
   transform: translateY(-1px);
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Modal Estilizado Compacto */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .modal-card {
-  background-color: #EFE8D3; 
-  border: 1.5px solid #586937;
-  border-radius: 24px;
-  padding: 32px 24px 24px 24px;
-  width: 90%;
-  max-width: 400px;
-  position: relative;
+  background-color: #EFE8D3;
+  border-radius: 22px;
+  padding: 22px 20px 18px 20px;
+  width: 100%;
+  max-width: 340px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
 }
 
-.modal-close {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  background: transparent;
-  border: none;
-  font-size: 1.4rem;
-  font-weight: 300;
-  color: #333f34;
-  cursor: pointer;
-}
-
-.modal-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.modal-avatar {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #73441b;
-  margin-bottom: 12px;
-}
-
-.modal-header h2 {
-  margin: 0;
-  color: #73441b;
-  font-size: 1.5rem;
+.modal-titulo {
+  color: #1a1a1a;
   font-family: serif;
+  font-size: 1.6rem;
   font-weight: normal;
+  line-height: 1.15;
+  margin: 0 0 16px 0;
 }
 
-.modal-body {
-  text-align: left;
+.modal-input {
+  width: 100%;
+  height: 68px;
+  border-radius: 16px;
+  border: 1px solid #48542c;
   background-color: transparent;
-  padding: 0 10px;
-  margin-bottom: 24px;
-}
-
-.modal-body p {
-  margin: 12px 0;
-  font-size: 1rem;
-}
-
-.modal-body strong {
-  color: #586937;
+  color: #48542c;
+  font-family: sans-serif;
+  font-size: 0.95rem;
   font-weight: bold;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  outline: none;
+  resize: none;
+  margin-bottom: 18px;
 }
 
-.modal-value {
-  color: #586937;
+.modal-input::placeholder {
+  color: #48542c;
   font-weight: bold;
-  margin-left: 4px;
+  opacity: 0.9;
+  line-height: 1.25;
 }
 
-.btn-fechar {
-  background-color: #586937;
+.modal-botoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-modal {
+  flex: 1;
+  background-color: #48542c;
   color: #EFE8D3;
   border: none;
-  border-radius: 12px;
-  padding: 8px 36px;
+  border-radius: 20px;
+  padding: 9px 0;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  transition: background 0.2s;
+  transition: opacity 0.2s;
 }
 
-.btn-fechar:hover {
-  background-color: #435129;
+.btn-modal:hover {
+  opacity: 0.9;
+}
+
+/* --- Ajuste Responsivo para Mobile --- */
+@media (max-width: 768px) {
+  .resumo-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .header-banner {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .header-banner h1 {
+    font-size: 2.3rem;
+  }
+
+  .details-coluna {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .cards-coluna {
+    width: 100%;
+  }
 }
 </style>

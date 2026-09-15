@@ -204,7 +204,7 @@ function excluir() {
 }
 
 h1 {
-  font-family: 'Italiana', serif, sans-serif;
+
   font-size: clamp(2.2rem, 4vw, 3.2rem);
   color: #705335;
   font-weight: 400;

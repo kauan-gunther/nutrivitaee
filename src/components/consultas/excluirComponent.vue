@@ -9,28 +9,37 @@ const senha = ref('')
 
 const agendamento = ref({
   usuario: {
-    nome: 'Gabriel Lima da Costa',
-    telefone: '(11) 93333-4444',
+    nome: '',
+    telefone: '',
     email: '',
     foto: null,
   },
   profissional: {
-    nome: 'Dra. Carolina Paz Alencar',
-    telefone: '(11) 94444-3333',
+    nome: '',
+    telefone: '',
     email: '',
     foto: null,
   },
   consulta: {
-    data: '2026-08-17',
-    horario: '14h30 / 02h30 pm',
-    tipo: 'Online (EAD)',
+    data: '',
+    horario: '',
+    tipo: 'Presencial',
   },
 })
 
 onMounted(() => {
   const dadosSalvos = localStorage.getItem('dadosAgendamento')
   if (dadosSalvos) {
-    agendamento.value = JSON.parse(dadosSalvos)
+    try {
+      const dados = JSON.parse(dadosSalvos)
+      const lista = Array.isArray(dados) ? dados : [dados]
+      const ultimoItem = lista[lista.length - 1]
+      if (ultimoItem) {
+        agendamento.value = ultimoItem
+      }
+    } catch (e) {
+      console.error('Erro ao carregar dados do agendamento', e)
+    }
   }
 })
 
@@ -50,6 +59,40 @@ function extrairPrimeiroNome(nomeCompleto, ehProfissional = false) {
   return partes[0]
 }
 
+const modalPerfilAberto = ref(false)
+const pessoaSelecionada = ref({
+  titulo: '',
+  nome: '',
+  telefone: '',
+  email: '',
+  foto: null
+})
+
+function verPerfil(tipo) {
+  if (tipo === 'profissional') {
+    pessoaSelecionada.value = {
+      titulo: 'Perfil do Profissional',
+      nome: agendamento.value.profissional.nome || 'Não informado',
+      telefone: agendamento.value.profissional.telefone || 'Não informado',
+      email: agendamento.value.profissional.email || 'Não informado',
+      foto: agendamento.value.profissional.foto
+    }
+  } else {
+    pessoaSelecionada.value = {
+      titulo: 'Perfil do Paciente',
+      nome: agendamento.value.usuario.nome || 'Não informado',
+      telefone: agendamento.value.usuario.telefone || 'Não informado',
+      email: agendamento.value.usuario.email || 'Não informado',
+      foto: agendamento.value.usuario.foto
+    }
+  }
+  modalPerfilAberto.value = true
+}
+
+function fecharModalPerfil() {
+  modalPerfilAberto.value = false
+}
+
 function abrirModalExclusao() {
   mostrarModalSenha.value = true
 }
@@ -61,14 +104,31 @@ function meConfirmarExclusao() {
   }
 
   const usuarioSessao = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
-  const senhaValida = usuarioSessao.senha || agendamento.value.usuario.senha || agendamento.value.profissional.senha
+  const senhaValida = usuarioSessao.senha || agendamento.value.usuario?.senha || agendamento.value.profissional?.senha
 
   if (senhaValida && senha.value !== senhaValida) {
     alert('Senha incorreta! Não foi possível excluir o agendamento.')
     return
   }
 
-  localStorage.removeItem('dadosAgendamento')
+  const dadosSalvos = localStorage.getItem('dadosAgendamento')
+  const dados = dadosSalvos ? JSON.parse(dadosSalvos) : []
+  const lista = Array.isArray(dados) ? dados : [dados]
+
+  const indiceAtual = lista.findIndex((item) => JSON.stringify(item) === JSON.stringify(agendamento.value))
+
+  if (indiceAtual >= 0) {
+    lista.splice(indiceAtual, 1)
+  } else if (lista.length > 0) {
+    lista.pop()
+  }
+
+  if (lista.length > 0) {
+    localStorage.setItem('dadosAgendamento', JSON.stringify(lista))
+  } else {
+    localStorage.removeItem('dadosAgendamento')
+  }
+
   mostrarModalSenha.value = false
   senha.value = ''
 
@@ -83,210 +143,198 @@ function fecharModal() {
 </script>
 
 <template>
-    <main class="main-content">
-      <header class="header-banner">
-        <h1>Agendamento</h1>
-        <p class="subtitle">
-          {{ extrairPrimeiroNome(agendamento.profissional.nome, true) }} & {{ extrairPrimeiroNome(agendamento.usuario.nome) }}
-        </p>
-      </header>
+  <main class="main-content">
+    <header class="header-banner">
+      <h1>Agendamento</h1>
+      <p class="subtitle">
+        {{ extrairPrimeiroNome(agendamento.profissional.nome, true) }} & {{ extrairPrimeiroNome(agendamento.usuario.nome) }}
+      </p>
+    </header>
 
-      <div class="resumo-content">
-      
-        <div class="cards-coluna">
-          <!-- Card Profissional -->
-          <div class="person-card">
-            <img
-              :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'"
-              alt="Profissional"
-              class="avatar"
-            />
-            <div class="info">
-              <h2>{{ agendamento.profissional.nome || 'Nome Profissional' }}</h2>
-              <p><strong>Telefone:</strong> {{ agendamento.profissional.telefone }}</p>
-              <button class="bnt-perfil">Ver Perfil</button>
-            </div>
-            <button class="bnt-chat">Conversar com profissional</button>
+    <div class="resumo-content">
+      <!-- Coluna de Cards -->
+      <div class="cards-coluna">
+        <!-- Card Profissional -->
+        <div class="person-card">
+          <img
+            :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'"
+            alt="Profissional"
+            class="avatar"
+          />
+          <div class="info">
+            <h2>{{ agendamento.profissional.nome || 'Nome Profissional' }}</h2>
+            <p><strong>Telefone:</strong> {{ agendamento.profissional.telefone }}</p>
+            <button class="bnt-perfil" @click="verPerfil('profissional')">Ver Perfil</button>
           </div>
-
-          <!-- Card Usuário -->
-          <div class="person-card">
-            <img
-              :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'"
-              alt="Usuário"
-              class="avatar"
-            />
-            <div class="info">
-              <h2>{{ agendamento.usuario.nome || 'Nome Usuário' }}</h2>
-              <p><strong>Telefone:</strong> {{ agendamento.usuario.telefone }}</p>
-              <button class="bnt-perfil">Ver Perfil</button>
-            </div>
-            <button class="bnt-chat">Conversar com o paciente</button>
-          </div>
+          <button class="bnt-chat">Conversar com profissional</button>
         </div>
 
-        <!-- Coluna de Detalhes -->
-        <div class="details-coluna">
-          <div class="detail-item">
-            <span class="icon">📅</span>
-            <div class="info-item">
-              <span class="label">Data:</span>
-              <span class="value">{{ formatarData(agendamento.consulta.data) }}</span>
-            </div>
+        <!-- Card Usuário -->
+        <div class="person-card">
+          <img
+            :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'"
+            alt="Usuário"
+            class="avatar"
+          />
+          <div class="info">
+            <h2>{{ agendamento.usuario.nome || 'Nome Usuário' }}</h2>
+            <p><strong>Telefone:</strong> {{ agendamento.usuario.telefone }}</p>
+            <button class="bnt-perfil" @click="verPerfil('paciente')">Ver Perfil</button>
           </div>
-
-          <div class="detail-item">
-            <span class="icon">🕒</span>
-            <div class="info-item">
-              <span class="label">Horario:</span>
-              <span class="value">{{ agendamento.consulta.horario }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item full">
-            <span class="label">Tipo de agendamento:</span>
-            <span class="value">{{ agendamento.consulta.tipo }}</span>
-          </div>
-
-          <!-- Botão Excluir Agendamento -->
-          <div class="action-container">
-            <button class="btn-excluir" @click="abrirModalExclusao">
-              Excluir agendamento
-            </button>
-          </div>
+          <button class="bnt-chat">Conversar com o paciente</button>
         </div>
       </div>
-    </main>
 
-    <!-- Modal de Senha -->
-    <div v-if="mostrarModalSenha" class="modal-overlay" @click.self="fecharModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <span class="trash-icon">🗑️</span>
-          <h2>Excluir<br>Agendamento</h2>
+      <!-- Coluna de Detalhes -->
+      <div class="details-coluna">
+        <div class="detail-item">
+          <span class="icon">📅</span>
+          <div class="info-item">
+            <span class="label">Data:</span>
+            <span class="value">{{ formatarData(agendamento.consulta.data) }}</span>
+          </div>
         </div>
 
-        <textarea
-          v-model="senha"
-          placeholder="Digite sua senha para&#10;confirmar exclusão:"
-          class="modal-input"
-          @keyup.enter.prevent="meConfirmarExclusao"
-        ></textarea>
+        <div class="detail-item">
+          <span class="icon">🕒</span>
+          <div class="info-item">
+            <span class="label">Horario:</span>
+            <span class="value">{{ agendamento.consulta.horario }}</span>
+          </div>
+        </div>
 
-        <div class="modal-botoes">
-          <button class="btn-modal btn-cancelar-modal" @click="fecharModal">
-            Cancelar
-          </button>
-          <button class="btn-modal btn-cancelar-modal" @click="meConfirmarExclusao">
-            Confirmar
+        <div class="detail-item full">
+          <span class="label">Tipo de agendamento:</span>
+          <span class="value">{{ agendamento.consulta.tipo }}</span>
+        </div>
+
+        <!-- Botão Excluir Agendamento -->
+        <div class="action-container">
+          <button class="btn-excluir" @click="abrirModalExclusao">
+            Excluir agendamento
           </button>
         </div>
       </div>
     </div>
+  </main>
+
+  <!-- Modal de Senha -->
+  <div v-if="mostrarModalSenha" class="modal-overlay" @click.self="fecharModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="trash-icon">🗑️</span>
+        <h2>Excluir<br>Agendamento</h2>
+      </div>
+
+      <textarea
+        v-model="senha"
+        placeholder="Digite sua senha para&#10;confirmar exclusão:"
+        class="modal-input"
+        @keyup.enter.prevent="meConfirmarExclusao"
+      ></textarea>
+
+      <div class="modal-botoes">
+        <button class="btn-modal btn-cancelar-modal" @click="fecharModal">
+          Cancelar
+        </button>
+        <button class="btn-modal btn-confirmar-modal" @click="meConfirmarExclusao">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Perfil -->
+  <div v-if="modalPerfilAberto" class="modal-overlay" @click.self="fecharModalPerfil">
+    <div class="modal-card">
+      <div class="modal-header">
+        <img
+          :src="pessoaSelecionada.foto || 'https://via.placeholder.com/150'"
+          alt="Foto de Perfil"
+          class="modal-avatar"
+        />
+        <h2>{{ pessoaSelecionada.titulo }}</h2>
+      </div>
+
+      <div class="modal-body-perfil">
+        <p><strong>Nome:</strong> {{ pessoaSelecionada.nome }}</p>
+        <p><strong>Telefone:</strong> {{ pessoaSelecionada.telefone }}</p>
+        <p><strong>E-mail:</strong> {{ pessoaSelecionada.email }}</p>
+      </div>
+
+      <div class="modal-botoes">
+        <button class="btn-modal" @click="fecharModalPerfil">Fechar</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.page-layout {
-  display: flex;
-  min-height: 100vh;
-  background-color: #ECE5CB;
-  font-family: serif;
-}
-
-.menu-icon {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.menu-icon span {
-  width: 28px;
-  height: 2px;
-  background-color: #ECE5CB;
-  display: block;
-}
-
-.logo-text {
-  color: #889660;
-  font-family: serif;
-  font-size: 0.8rem;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-.main-content {
-  flex: 1;
-  padding: 30px 60px;
+.resumo-container {
   position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 500px;
 }
 
 .header-banner {
-  text-align: right;
-  margin-bottom: 20px;
+  text-align: left;
+  margin-bottom: 30px;
 }
 
 .header-banner h1 {
   color: #73441b;
-  font-size: 3.8rem; 
+  font-size: 3rem; 
   font-family: serif;
   font-weight: normal;
   margin: 0;
-  line-height: 1;
-}
-
-.header-banner .subtitle {
-  margin: 4px 0 0 0;
-  color: #73441b;
-  font-size: 1.8rem;
-  font-family: serif;
 }
 
 .resumo-content {
   display: flex;
-  gap: 60px;
+  gap: 50px;
   align-items: flex-start;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .cards-coluna {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  width: 290px;
+  gap: 20px;
+  flex: 1.1;
 }
 
 .person-card {
   border: 1.5px solid #73441b;
   border-radius: 20px;
-  padding: 12px; 
+  padding: 16px; 
   display: grid;
-  grid-template-columns: 75px 1fr;
-  gap: 10px; 
+  grid-template-columns: 80px 1fr;
+  gap: 12px; 
   align-items: center;
   background-color: transparent;
 }
 
 .avatar {
-  width: 75px; 
-  height: 75px; 
+  width: 80px; 
+  height: 80px; 
   border-radius: 50%;
   object-fit: cover;
 }
 
 .info h2 {
   margin: 0 0 4px 0;
-  color: #1a1a1a;
-  font-size: 0.9rem; 
+  color: #333f34;
+  font-size: 1.1rem; 
   font-weight: bold;
-  font-family: sans-serif;
 }
 
 .info p {
   margin: 0 0 6px 0;
-  color: #1a1a1a;
-  font-size: 0.75rem;
-  font-family: sans-serif;
+  color: #333f34;
+  font-size: 0.88rem;
+  font-weight: bold;
 }
 
 .bnt-perfil {
@@ -295,10 +343,9 @@ function fecharModal() {
   color: #73441b;
   font-weight: bold;
   border-radius: 12px;
-  padding: 2px 10px;
-  font-size: 0.7rem;
+  padding: 2px 16px;
+  font-size: 0.8rem;
   cursor: pointer;
-  font-family: sans-serif;
 }
 
 .bnt-chat {
@@ -306,20 +353,19 @@ function fecharModal() {
   background-color: transparent;
   border: 1px dashed #73441b;
   border-radius: 14px;
-  padding: 4px;
+  padding: 6px;
   color: #73441b;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   cursor: pointer;
   text-align: center;
-  font-family: sans-serif;
 }
 
 .details-coluna {
-  flex: 1;
+  flex: 0.9;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding-top: 25px;
+  gap: 24px;
+  padding-top: 10px;
 }
 
 .detail-item {
@@ -339,119 +385,173 @@ function fecharModal() {
 }
 
 .detail-item .label {
-  color: #333333;
-  font-size: 1.4rem;
-  font-family: serif;
+  color: #586937;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .detail-item .value {
-  color: #73441b;
-  font-size: 1.4rem;
-  font-family: serif;
+  color: #586937;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
-.detail-item.full .label {
-  display: block;
-}
-
-.detail-item.full .value {
-  display: block;
-}
-
-.action-container {
-  margin-top: 15px;
-}
-
-.btn-excluir {
-  background-color: #556238;
-  color: #f1edd2;
-  border: none;
+.edit-input,
+.edit-select {
+  border: 1.5px solid #586937;
   border-radius: 8px;
-  padding: 12px 36px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  background-color: #EFE8D3;
+  color: #586937;
+  font-weight: bold;
+  margin-left: 8px;
+  outline: none;
 }
 
+.btn-lapis {
+  background-color: #EFE8D3;
+  border: 1.5px solid #586937;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-lapis:hover {
+  transform: translateY(-1px);
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btn-confirmar {
+  margin-top: 20px;
+  background-color: #586937;
+  color: #EFE8D3;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-confirmar:hover {
+  background-color: #435129;
+  transform: translateY(-1px);
+}
+
+/* Modal Estilizado Compacto */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 25px;
   z-index: 1000;
 }
 
 .modal-card {
-  background-color: #ECE5CB;
-  border-radius: 18px;
-  padding: 12px 16px;
+  background-color: #EFE8D3;
+  border-radius: 22px;
+  padding: 22px 20px 18px 20px;
   width: 100%;
-  max-width: 290px;
+  max-width: 340px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
 }
 
-.trash-icon {
-  font-size: 1.1rem;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.modal-header h2 {
+.modal-titulo {
   color: #1a1a1a;
   font-family: serif;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   font-weight: normal;
-  line-height: 1.1;
-  margin: 0 0 8px 0;
+  line-height: 1.15;
+  margin: 0 0 16px 0;
 }
 
 .modal-input {
   width: 100%;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid #556238;
+  height: 68px;
+  border-radius: 16px;
+  border: 1px solid #48542c;
   background-color: transparent;
-  color: #556238;
+  color: #48542c;
   font-family: sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   font-weight: bold;
-  padding: 6px 10px;
+  padding: 10px 14px;
   box-sizing: border-box;
   outline: none;
   resize: none;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .modal-input::placeholder {
-  color: #556238;
+  color: #48542c;
   font-weight: bold;
-  opacity: 0.85;
-  line-height: 1.2;
+  opacity: 0.9;
+  line-height: 1.25;
 }
 
 .modal-botoes {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
 }
 
 .btn-modal {
   flex: 1;
-  background-color: #556238;
-  color: #ECE5CB;
+  background-color: #48542c;
+  color: #EFE8D3;
   border: none;
-  border-radius: 16px;
-  padding: 6px 0;
-  font-size: 0.8rem;
-  font-family: sans-serif;
+  border-radius: 20px;
+  padding: 9px 0;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-modal:hover {
+  opacity: 0.9;
+}
+
+/* --- Ajuste Responsivo para Mobile --- */
+@media (max-width: 768px) {
+  .resumo-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .header-banner {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .header-banner h1 {
+    font-size: 2.3rem;
+  }
+
+  .details-coluna {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .cards-coluna {
+    width: 100%;
+  }
 }
 </style>
