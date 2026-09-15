@@ -23,6 +23,11 @@
             :alt="usuario.nome"
             class="avatar-img"
           />
+
+          <label class="upload-foto" title="Adicionar foto de perfil">
+            <input type="file" accept="image/*" @change="selecionarFoto" />
+            <i class="mdi mdi-camera-plus-outline"></i>
+          </label>
         </div>
         <h1 class="user-name">{{ usuario.nome }}</h1>
         <button class="btn-sair" @click="sair">Sair</button>
@@ -153,9 +158,42 @@ onMounted(() => {
   }
 })
 
+const persistirUsuario = (dadosUsuario) => {
+  const dados = { ...dadosUsuario }
+  localStorage.setItem('usuarioLogado', JSON.stringify(dados))
+
+  if (dados.id) {
+    const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+    const listaAtualizada = cadastros.filter((cadastro) => String(cadastro.id) !== String(dados.id))
+    listaAtualizada.push(dados)
+    localStorage.setItem('cadastros', JSON.stringify(listaAtualizada))
+  }
+}
+
+const selecionarFoto = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    alert('Selecione uma imagem válida.')
+    event.target.value = ''
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    const fotoBase64 = reader.result
+    usuario.foto = fotoBase64
+    persistirUsuario({ ...usuario, foto: fotoBase64 })
+  }
+
+  reader.readAsDataURL(file)
+  event.target.value = ''
+}
+
 const salvarAlteracoes = (novosDados) => {
   Object.assign(usuario, novosDados)
-  localStorage.setItem('usuarioLogado', JSON.stringify(novosDados))
+  persistirUsuario(novosDados)
   editando.value = false
 }
 
@@ -232,6 +270,7 @@ const calcularIdade = (dataNasc) => {
 }
 
 .avatar-wrapper {
+  position: relative;
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -244,6 +283,44 @@ const calcularIdade = (dataNasc) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.upload-foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: #f1edd2;
+  cursor: pointer;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.avatar-wrapper:hover .upload-foto {
+  opacity: 1;
+}
+
+.upload-foto input {
+  display: none;
+}
+
+.upload-foto i {
+  font-size: 1.3rem;
+  background: #536236;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #f1edd2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-name {

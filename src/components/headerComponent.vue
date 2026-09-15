@@ -133,7 +133,7 @@ header {
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 2px 30px; 
+  padding: 4px 22px; 
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
@@ -144,25 +144,25 @@ header h1 {
 }
 
 header h1 img {
-  width: 100px;
+  width: 82px;
   height: auto;
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1));
 }
 
 header a {
   text-decoration: none;
-  font-size: 17px;
+  font-size: 14px;
   color: #f1edd2;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 header .div {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 /*============ Mobile ===========*/
@@ -205,7 +205,7 @@ div.linha {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1.2rem;
+  gap: 0.9rem;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -218,7 +218,7 @@ div.linha {
 
 .user {
   display: flex;
-  gap: 1.2rem;
+  gap: 0.9rem;
 }
 
 .menu-list a:hover {
@@ -258,12 +258,12 @@ div.linha {
     top: 0;
     left: -100%;
     right: auto;
-    width: 220px;
+    width: 190px;
     height: 100vh;
     background-color: #536236;
     flex-direction: column;
     justify-content: space-between;
-    padding: 28px 16px;
+    padding: 22px 14px;
     transition: left 0.4s ease-in-out;
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -294,7 +294,7 @@ div.linha {
   }
 
   header a {
-    font-size: 16px;
+    font-size: 13px;
   }
 }
 </style>

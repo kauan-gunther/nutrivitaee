@@ -110,12 +110,16 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuth } from '@/composables/useAuth';
 
 const router = useRouter();
+const { logout } = useAuth();
 const abrirModal = ref(false);
 const senhaConfirmacao = ref('');
 
 const usuario = reactive({
+  id: '',
+  tipo: 'paciente',
   nome: '',
   peso: '',
   telefone: '',
@@ -146,7 +150,7 @@ const calcularIdade = (dataNasc) => {
 };
 
 const confirmarExclusao = () => {
-  if (!senhaConfirmacao.value) {
+  if (!senhaConfirmacao.value.trim()) {
     alert('Por favor, digite sua senha.');
     return;
   }
@@ -156,9 +160,25 @@ const confirmarExclusao = () => {
     return;
   }
 
-  localStorage.removeItem('usuarioLogado');
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]');
+  const usuarioAtualId = usuario.id ? String(usuario.id) : '';
+  const usuarioAtualTipo = usuario.tipo || 'paciente';
+
+  const cadastrosAtualizados = cadastros.filter((cadastro) => {
+    const mesmoId = usuarioAtualId && String(cadastro.id) === usuarioAtualId;
+    const mesmoUsuario =
+      !mesmoId &&
+      String(cadastro.tipo || 'paciente') === usuarioAtualTipo &&
+      String(cadastro.cpf || '') === String(usuario.cpf || '') &&
+      String(cadastro.email || '').toLowerCase() === String(usuario.email || '').toLowerCase();
+
+    return !mesmoId && !mesmoUsuario;
+  });
+
+  localStorage.setItem('cadastros', JSON.stringify(cadastrosAtualizados));
+  logout();
   alert('Conta excluída com sucesso.');
-  router.push('/cadastro');
+  router.push('/login');
 };
 </script>
 

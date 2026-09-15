@@ -4,7 +4,7 @@
       <header class="top-bar">
         <div class="user-info">
           <div class="avatar">{{ userInitial }}</div>
-          <span class="user-name">{{ userData.nome || 'Usuário' }}</span>
+          <span>{{ userData.nome || 'Usuário' }}</span>
           <button class="settings-btn" title="Perfil do Usuário" @click="toggleProfile">⚙️</button>
         </div>
 
@@ -211,6 +211,7 @@ const contextMenu = reactive({
   messageSender: null
 })
 
+// Estilo reativo para posicionamento do menu oposto ao canto mais próximo
 const contextMenuStyle = computed(() => {
   const style = { top: `${contextMenu.y}px` }
   if (contextMenu.alignLeft) {
@@ -281,6 +282,9 @@ const openContextMenu = (event, msg) => {
   if (messagesContainer.value) {
     const rect = messagesContainer.value.getBoundingClientRect()
     const containerCenterX = rect.left + rect.width / 2
+    
+    // Se a mensagem for pequena e estiver no canto direito, abre para a esquerda
+    // Se estiver no lado esquerdo, abre para a direita
     contextMenu.alignLeft = event.clientX > containerCenterX
   } else {
     contextMenu.alignLeft = event.clientX > window.innerWidth / 2
@@ -338,15 +342,23 @@ const cancelInlineEdit = () => {
 
 <style scoped>
 .chat-wrapper {
+  --chat-background: #f1edd2;
+  --chat-surface: #ebe2cc;
+  --chat-border: #8c7355;
+  --chat-green: #536236;
+  --chat-green-dark: #43502a;
+  --chat-text: #4a5435;
+  --chat-heading: #705335;
+  --chat-accent: #b86b4b;
   width: 100%;
-  height: calc(100vh - 70px); 
-  background-color: #F1EDD2;
+  height: calc(100vh - 85px); 
+  background-color: var(--chat-background);
   display: flex;
   align-items: stretch;
   justify-content: center;
   padding: 0;
   box-sizing: border-box;
-  margin-top: 70px; 
+  margin-top: 85px; 
   overflow: hidden; 
 }
 
@@ -354,7 +366,7 @@ const cancelInlineEdit = () => {
   width: 100%;
   max-width: 100%;
   height: 100%; 
-  background-color: #F1EDD2;
+  background-color: var(--chat-background);
   border-radius: 0;
   box-shadow: none;
   position: relative;
@@ -364,9 +376,9 @@ const cancelInlineEdit = () => {
 }
 
 .top-bar {
-  height: 52px;
-  background-color: #333F34;
-  color: #F1EDD2;
+  height: 56px;
+  background-color: var(--chat-green);
+  color: #f1ebd9;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -390,25 +402,24 @@ const cancelInlineEdit = () => {
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #D1BFA5;
-  color: #333F34;
+  background-color: var(--chat-surface);
+  color: var(--chat-text);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.9rem;
-  flex-shrink: 0;
+  font-size: 0.95rem;
 }
 
 .settings-btn {
   background: none;
   border: none;
-  font-size: 17px;
+  font-size: 18px;
   cursor: pointer;
-  color: #F1EDD2;
+  color: #f1ebd9;
   padding: 2px 6px;
   border-radius: 4px;
   transition: background-color 0.2s;
@@ -422,14 +433,14 @@ const cancelInlineEdit = () => {
 .chat-view {
   display: flex;
   flex: 1;
-  height: calc(100% - 52px); 
+  height: calc(100% - 56px); 
   overflow: hidden;
 }
 
 .sidebar {
   width: 270px;
-  background-color: #D1BFA5;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: var(--chat-surface);
+  border-right: 1.5px solid var(--chat-border);
   overflow-y: auto;
   flex-shrink: 0;
 }
@@ -438,14 +449,14 @@ const cancelInlineEdit = () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   cursor: pointer;
-  color: #333F34;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--chat-text);
+  border-bottom: 1px solid rgba(140, 115, 85, 0.22);
 }
 
 .contact-card:hover, .contact-card.active {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.46);
 }
 
 .contact-details {
@@ -467,9 +478,9 @@ const cancelInlineEdit = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 10px 16px; /* Reduzido o padding vertical para evitar o corte embaixo */
+  padding: 16px;
   justify-content: space-between;
-  background-color: #F1EDD2;
+  background-color: var(--chat-background);
   overflow: hidden; 
 }
 
@@ -485,9 +496,10 @@ const cancelInlineEdit = () => {
 .message {
   max-width: 68%;
   padding: 11px 16px;
-  border-radius: 10px;
-  background-color: #9A9E70;
-  color: #333F34;
+  border-radius: 14px;
+  background-color: var(--chat-surface);
+  border: 1.5px solid var(--chat-border);
+  color: var(--chat-text);
   font-size: 0.92rem;
   line-height: 1.4;
   word-wrap: break-word;
@@ -495,6 +507,9 @@ const cancelInlineEdit = () => {
 
 .message.sent {
   align-self: flex-end;
+  background-color: #9A9E70;
+  border-color: #9A9E70;
+  color: #F1EDD2;
 }
 
 .message.received {
@@ -517,10 +532,10 @@ const cancelInlineEdit = () => {
 .inline-edit-input {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #333F34;
-  border-radius: 4px;
-  background-color: #F1EDD2;
-  color: #333F34;
+  border: 1.5px solid var(--chat-border);
+  border-radius: 10px;
+  background-color: var(--chat-background);
+  color: var(--chat-text);
   font-size: 0.92rem;
   outline: none;
   box-sizing: border-box;
@@ -529,47 +544,51 @@ const cancelInlineEdit = () => {
 .edit-hint {
   font-size: 0.7rem;
   opacity: 0.8;
-  color: #333F34;
+  color: var(--chat-text);
 }
 
 .input-container {
   display: flex;
   gap: 12px;
-  margin-top: 8px; /* Reduzido de 14px para 8px para subir a barra de mensagem */
+  margin-top: 14px;
   flex-shrink: 0; 
 }
 
 .input-container input {
   flex: 1;
-  padding: 10px 14px; /* Diminuído levemente o padding do input */
-  border: none;
-  border-radius: 6px;
-  background-color: #D1BFA5;
-  color: #73441B;
+  padding: 12px 14px;
+  border: 1.5px solid var(--chat-border);
+  border-radius: 14px;
+  background-color: var(--chat-surface);
+  color: var(--chat-text);
   font-size: 0.92rem;
   outline: none;
 }
 
 .input-container input::placeholder {
-  color: #73441B;
+  color: var(--chat-heading);
   opacity: 0.7;
 }
 
 .input-container button {
   padding: 0 22px;
-  background-color: #9A9E70;
-  color: #333F34;
+  background-color: var(--chat-green);
+  color: #f1ebd9;
   border: none;
-  border-radius: 6px;
+  border-radius: 50px;
   font-weight: bold;
   font-size: 0.92rem;
   cursor: pointer;
 }
 
+.input-container button:hover {
+  background-color: var(--chat-green-dark);
+}
+
 .context-menu {
   position: fixed;
-  background-color: #333F34;
-  border-radius: 6px;
+  background-color: var(--chat-green);
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   z-index: 1000;
   overflow: hidden;
@@ -582,29 +601,29 @@ const cancelInlineEdit = () => {
   padding: 8px 16px;
   background: none;
   border: none;
-  color: #F1EDD2;
+  color: #f1ebd9;
   text-align: left;
   cursor: pointer;
   font-size: 0.85rem;
 }
 
 .context-menu button:hover {
-  background-color: #9A9E70;
-  color: #333F34;
+  background-color: var(--chat-accent);
+  color: #fff8ef;
 }
 
 .profile-view {
   flex: 1;
   padding: 28px;
-  background-color: #F1EDD2;
-  color: #73441B;
+  background-color: var(--chat-background);
+  color: var(--chat-text);
   overflow-y: auto;
 }
 
 .profile-header h2 {
   font-size: 1.35rem;
   margin-bottom: 20px;
-  color: #73441B;
+  color: var(--chat-heading);
 }
 
 .profile-grid {
@@ -614,9 +633,10 @@ const cancelInlineEdit = () => {
 }
 
 .profile-card {
-  background-color: #9A9E70;
+  background-color: var(--chat-surface);
+  border: 1.5px solid var(--chat-border);
   padding: 14px;
-  border-radius: 6px;
+  border-radius: 14px;
 }
 
 .profile-card label {
@@ -625,13 +645,13 @@ const cancelInlineEdit = () => {
   font-size: 0.8rem;
   margin-bottom: 4px;
   text-transform: uppercase;
-  color: #333F34;
+  color: var(--chat-text);
 }
 
 .profile-card p {
   font-size: 0.92rem;
   margin: 0;
-  color: #333F34;
+  color: var(--chat-text);
 }
 
 .profile-actions {
@@ -642,60 +662,18 @@ const cancelInlineEdit = () => {
 
 .btn-cancel {
   padding: 10px 24px;
-  background-color: #D1BFA5;
-  color: #73441B;
+  background-color: var(--chat-surface);
+  border: 1.5px solid var(--chat-border);
+  color: var(--chat-heading);
   border: none;
-  border-radius: 6px;
+  border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
   font-size: 0.92rem;
 }
 
-/* ====================================
-    ESTILOS PARA CELULAR (Responsividade)
-===================================== */
-@media (max-width: 768px) {
-  .chat-wrapper {
-    margin-top: 60px;
-    height: calc(100vh - 60px);
-  }
-
-  .sidebar {
-    width: 90px;
-  }
-
-  .contact-details {
-    display: none;
-  }
-
-  .contact-card {
-    justify-content: center;
-    padding: 12px 8px;
-  }
-
-  .top-bar {
-    padding: 0 10px;
-  }
-
-  .user-info span, 
-  .chat-target-info span {
-    font-size: 0.85rem;
-    max-width: 90px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .message {
-    max-width: 85%;
-  }
-
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-view {
-    padding: 16px;
-  }
+.btn-cancel:hover {
+  background-color: var(--chat-border);
+  color: #fff8ef;
 }
 </style>
