@@ -467,7 +467,7 @@ const cancelInlineEdit = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 10px 16px; /* Reduzido o padding vertical para evitar o corte embaixo */
   justify-content: space-between;
   background-color: #F1EDD2;
   overflow: hidden; 
@@ -535,13 +535,13 @@ const cancelInlineEdit = () => {
 .input-container {
   display: flex;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 8px; /* Reduzido de 14px para 8px para subir a barra de mensagem */
   flex-shrink: 0; 
 }
 
 .input-container input {
   flex: 1;
-  padding: 12px 14px;
+  padding: 10px 14px; /* Diminuído levemente o padding do input */
   border: none;
   border-radius: 6px;
   background-color: #D1BFA5;
@@ -652,7 +652,7 @@ const cancelInlineEdit = () => {
 }
 
 /* ====================================
-   ESTILOS PARA CELULAR (Responsividade)
+    ESTILOS PARA CELULAR (Responsividade)
 ===================================== */
 @media (max-width: 768px) {
   .chat-wrapper {
@@ -665,7 +665,7 @@ const cancelInlineEdit = () => {
   }
 
   .contact-details {
-    display: none; /* Oculta o nome e cargo na lista lateral para caber em telas menores, mostrando só os avatares */
+    display: none;
   }
 
   .contact-card {

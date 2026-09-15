@@ -72,19 +72,22 @@ function sair() {
 
 <template>
   <main v-if="profissional" class="perfil-container">
+    <!-- Topo unificado: Botões de controle de Ações + Título -->
     <div class="acoes-topo">
-      <button v-if="souDono" class="btn-sair" @click="sair">
-        <i class="mdi mdi-logout"></i> Sair
-      </button>
+      <div class="acoes-esquerda">
+        <RouterLink v-if="souDono" :to="`/profissional/${profissional.id}/edit`" class="btn-acao-topo" title="Editar Perfil">
+          <i class="mdi mdi-pencil-outline"></i> Editar
+        </RouterLink>
+      </div>
 
-      <RouterLink
-        v-if="souDono"
-        :to="`/profissional/${profissional.id}/delete`"
-        class="btn-icone btn-deletar"
-        title="Excluir"
-      >
-        <i class="mdi mdi-delete-outline"></i>
-      </RouterLink>
+      <div class="acoes-direita">
+        <RouterLink v-if="souDono" :to="`/profissional/${profissional.id}/delete`" class="btn-acao-topo btn-deletar-topo" title="Excluir Perfil">
+          <i class="mdi mdi-delete-outline"></i> Excluir
+        </RouterLink>
+        <button v-if="souDono" class="btn-sair" @click="sair">
+          <i class="mdi mdi-logout"></i> Sair
+        </button>
+      </div>
     </div>
 
     <h1>Perfil do Profissional</h1>
@@ -143,6 +146,7 @@ function sair() {
           </ul>
         </div>
 
+        <!-- Box Especializações -->
         <div class="card-info">
           <h2>Especializações</h2>
           <ul>
@@ -158,15 +162,6 @@ function sair() {
         </div>
       </div>
     </div>
-
-   <RouterLink
-  v-if="souDono"
-  :to="`/profissional/${profissional.id}/edit`"
-  class="btn-icone btn-editar"
-  title="Editar"
->
-  <i class="mdi mdi-pencil-outline"></i>
-</RouterLink>
 
     <!-- Modal do Formulário AcademicCreate -->
     <div v-if="exibirModalAcademic" class="modal-overlay">
@@ -194,6 +189,7 @@ function sair() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .acoes-topo {
@@ -202,13 +198,23 @@ function sair() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.btn-sair {
-  background-color: transparent;
+.acoes-esquerda,
+.acoes-direita {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-sair,
+.btn-acao-topo {
+  background-color: #536236;
   border: 1.5px solid #536236;
-  color: #536236;
+  color: #efe8d3;
   border-radius: 20px;
   padding: 8px 20px;
   font-size: 1rem;
@@ -217,19 +223,33 @@ function sair() {
   display: flex;
   align-items: center;
   gap: 6px;
+  text-decoration: none;
   transition: all 0.2s ease;
 }
 
-.btn-sair:hover {
-  background-color: #536236;
+.btn-sair:hover,
+.btn-acao-topo:hover {
+  background-color: #414e2a;
+  border-color: #414e2a;
   color: #f1edd2;
 }
 
+.btn-deletar-topo {
+  background-color: transparent;
+  color: #536236;
+  border-color: #536236;
+}
+
+.btn-deletar-topo:hover {
+  background-color: #536236;
+  color: #efe8d3;
+}
+
 h1 {
-  font-size: clamp(2.8rem, 4.5vw, 4rem);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
   color: #536236;
   font-weight: 400;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   text-align: center;
 }
 
@@ -259,6 +279,7 @@ h1 {
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid #8c7355;
 }
 
 .campo-dado {
@@ -271,6 +292,7 @@ h1 {
   align-items: center;
   gap: 20px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
 }
 
 .flex-grow {
@@ -281,6 +303,7 @@ h1 {
   font-size: 1.25rem;
   color: #536236;
   min-width: 80px;
+  font-weight: bold;
 }
 
 .campo-dado .valor {
@@ -317,20 +340,19 @@ h1 {
 }
 
 .btn-definir {
-  background-color: #9a9e70;
+  background-color: #536236;
   border: 2px solid #536236;
-  color: #333f34;
+  color: #efe8d3;
   border-radius: 20px;
-  padding: 6px 24px;
-  font-size: 1.1rem;
+  padding: 6px 20px;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-definir:hover {
-  background-color: #536236;
-  color: #efe8d3;
+  background-color: #414e2a;
 }
 
 .card-info ul {
@@ -384,39 +406,6 @@ h1 {
   color: #536236;
 }
 
-.btn-icone {
-  position: absolute;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background-color: #efe8d3;
-  border: 1px solid rgba(140, 115, 85, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-  font-size: 1.5rem;
-  color: #333f34;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn-icone:hover {
-  transform: scale(1.08);
-  background-color: #e6dfc9;
-}
-
-.btn-deletar {
-  top: 30px;
-  right: 40px;
-}
-
-.btn-editar {
-  bottom: 30px;
-  left: 40px;
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -462,7 +451,7 @@ h1 {
   align-items: center;
   gap: 10px;
   background-color: #536236;
-  color: #f1edd2;
+  color: #efe8d3;
   padding: 14px 28px;
   border-radius: 50px;
   font-size: 1.2rem;
@@ -478,7 +467,7 @@ h1 {
 
 @media (max-width: 850px) {
   .perfil-container {
-    padding: 30px 20px;
+    padding: 20px 15px;
   }
 
   .cards-informacoes {
@@ -487,16 +476,30 @@ h1 {
 
   .linha-nome {
     flex-direction: column;
+    text-align: center;
   }
 
-  .btn-deletar {
-    top: 15px;
-    right: 15px;
+  .campo-dado {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+    padding: 12px 16px;
   }
 
-  .btn-editar {
-    bottom: 15px;
-    left: 15px;
+  .campo-dado .label {
+    min-width: auto;
+  }
+
+  .acoes-topo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acoes-esquerda,
+  .acoes-direita {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 </style>
