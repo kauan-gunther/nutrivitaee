@@ -64,15 +64,13 @@ const textos = computed(() => {
 
     <div class="content-body">
       <!-- ESTADO 1: Deslogado -> Redireciona para /cadastro -->
-    <section v-if="!estaLogado" class="card-status-box dashed-border">
-  <h2 class="status-title">Não há agendamentos para você</h2>
-  <p class="status-sub">
-    Você precisa estar logado para visualizar seus agendamentos. Eles aparecerão aqui!
-  </p>
-
-  <RouterLink to="/login" class="btn-action">Fazer login</RouterLink>
-</section>
-      
+      <section v-if="!estaLogado" class="card-status-box dashed-border">
+        <h2 class="status-title">Não há agendamentos para você</h2>
+        <p class="status-sub">
+          Você precisa estar logado para visualizar seus agendamentos. Eles aparecerão aqui!
+        </p>
+        <RouterLink to="/login" class="btn-action">Fazer login</RouterLink>
+      </section>
 
       <!-- ESTADO 2: Logada, mas ainda sem nenhum agendamento -->
       <section v-else-if="!temAgendamentos" class="card-status-box dashed-border">
@@ -107,6 +105,11 @@ const textos = computed(() => {
 </template>
 
 <style scoped>
+.agendamentos-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 .hero-banner {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-agendamentos.png');
@@ -115,33 +118,38 @@ const textos = computed(() => {
   background-repeat: no-repeat;
   width: 100%;
   min-height: calc(100vh - 80px);
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
   box-sizing: border-box;
 }
 
 .hero-banner h1 {
   color: #f1edd2;
-  font-size: 80px;
+  font-size: clamp(2.2rem, 5vw, 4.5rem); /* Ajuste responsivo fluido */
   font-weight: normal;
   margin: 0;
   text-align: center;
+  line-height: 1.2;
+  max-width: 900px;
 }
 
 .content-body {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
 .card-status-box {
   background-color: transparent;
-  padding: 40px 30px;
+  padding: 30px 20px;
   text-align: center;
   max-width: 500px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .dashed-border {
@@ -151,7 +159,7 @@ const textos = computed(() => {
 
 .status-title {
   color: #536236;
-  font-size: 1.4rem;
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
   font-weight: bold;
   margin: 0 0 12px 0;
 }
@@ -197,7 +205,7 @@ const textos = computed(() => {
 
 .status-title-alt {
   color: #536236;
-  font-size: 30px;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
   font-weight: bold;
   margin: 0;
 }
@@ -227,6 +235,7 @@ const textos = computed(() => {
   border-radius: 20px;
   padding: 20px;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .agendamento-info p {
@@ -251,5 +260,24 @@ const textos = computed(() => {
   font-size: 0.95rem;
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* Ajustes específicos para telas bem pequenas */
+@media (max-width: 600px) {
+  .agendamento-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-detalhe {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lista-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

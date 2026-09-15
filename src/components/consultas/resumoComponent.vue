@@ -489,10 +489,14 @@ function fecharModal() {
   width: 100%;
 }
 
-/* --- Ajuste Responsivo para Mobile --- */
+/* --- Ajuste Responsivo Exclusivo para Mobile --- */
 @media (max-width: 768px) {
+  .resumo-container {
+    padding: 30px 16px;
+  }
+
   .main-layout {
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 30px;
   }
 
@@ -501,13 +505,57 @@ function fecharModal() {
     max-width: 100%;
   }
 
+  /* Mantém os detalhes da consulta (Título + Data + Horário) no topo no mobile */
+  .coluna-direita {
+    order: 1;
+  }
+
+  /* Joga os cards de perfil e botões para baixo no mobile */
+  .coluna-esquerda {
+    order: 2;
+  }
+
   .header-banner {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .header-banner h1 {
     font-size: 2.8rem;
+  }
+
+  .header-banner p {
+    font-size: 1.25rem;
+  }
+
+  /* Centraliza os itens de data/horário/tipo e remove o deslocamento lateral */
+  .details-coluna {
+    margin-left: 0;
+    margin-top: 0;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .detail-item {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .tipo-bloco {
+    align-items: center !important;
+  }
+
+  /* Ajusta o rodapé de ações para ocupar bem a largura no celular */
+  .actions-footer {
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .btn-buscar {
+    flex: 1;
+    text-align: center;
+    padding: 12px 16px;
   }
 }
 </style>

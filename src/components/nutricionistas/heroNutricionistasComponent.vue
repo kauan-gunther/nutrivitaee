@@ -9,11 +9,13 @@ function rolarParaDiferencial() {
 
 <template>
   <section class="hero-nutricionistas">
-    <h1>"O que você acharia de uma consulta onde o medo não tem lugar?"</h1>
-    <p class="subtitulo">
-      Nós acreditamos que cuidar da saúde deve ser um ato de amor-próprio, e não uma obrigação baseada em números frios.
-    </p>
-    <button class="btn-diferencial" @click="rolarParaDiferencial">Descubra Nosso Diferencial</button>
+    <div class="hero-content">
+      <h1>"O que você acharia de uma consulta onde o medo não tem lugar?"</h1>
+      <p class="subtitulo">
+        Nós acreditamos que cuidar da saúde deve ser um ato de amor-próprio, e não uma obrigação baseada em números frios.
+      </p>
+      <button class="btn-diferencial" @click="rolarParaDiferencial">Descubra Nosso Diferencial</button>
+    </div>
   </section>
 </template>
 
@@ -25,21 +27,36 @@ function rolarParaDiferencial() {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  width: 100%;
-  min-height: 72vh;
+  width: 100vw;
+  min-height: 100vh; /* Ocupa 100% da altura da tela inteira */
+  height: 100dvh; /* Garante ajuste perfeito em celulares */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 72px 20px 60px;
+  padding: 80px 20px 40px; /* Compensa o header fixo no topo */
   box-sizing: border-box;
   margin: 0;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 900px;
+  width: 100%;
 }
 
 .hero-nutricionistas h1 {
   color: #f5f0dc;
-  font-size: clamp(2rem, 3vw, 3.1rem);
+  font-size: clamp(1.8rem, 3.2vw, 3.1rem);
   font-weight: 400;
   line-height: 1.2;
   max-width: 880px;
@@ -75,8 +92,9 @@ function rolarParaDiferencial() {
 
 @media (max-width: 768px) {
   .hero-nutricionistas {
-    min-height: 58vh;
-    padding: 56px 18px 46px;
+    min-height: 100vh;
+    height: 100dvh;
+    padding: 70px 16px 30px;
   }
 
   .hero-nutricionistas h1 {
@@ -90,24 +108,19 @@ function rolarParaDiferencial() {
 }
 
 @media (max-width: 480px) {
-  .hero-nutricionistas {
-    min-height: 52vh;
-    padding: 48px 16px 36px;
-  }
-
   .hero-nutricionistas h1 {
-    font-size: clamp(1.7rem, 8vw, 2.3rem);
+    font-size: clamp(1.6rem, 7vw, 2.2rem);
   }
 
   .subtitulo {
-    font-size: 0.92rem;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   .btn-diferencial {
     width: 100%;
-    max-width: 280px;
-    padding: 13px 18px;
+    max-width: 260px;
+    padding: 12px 16px;
   }
 }
 </style>

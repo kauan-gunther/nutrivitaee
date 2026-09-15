@@ -1,3 +1,218 @@
+<script setup>
+import { ref, computed, nextTick, reactive, onMounted, watch } from 'vue'
+
+const showProfile = ref(false)
+const activeContactId = ref(1)
+const newMessage = ref('')
+const messagesContainer = ref(null)
+
+const editingMessageId = ref(null)
+const editingText = ref('')
+const inlineInput = ref(null)
+
+const userData = reactive({
+  nome: '',
+  cpf: '',
+  peso: '',
+  dataNascimento: '',
+  email: '',
+  telefone: ''
+})
+
+const defaultHistory = {
+  1: [
+    { id: 101, sender: 'sent', text: 'Olá, nutricionista! Gostaria de melhorar minha alimentação.' },
+    { id: 102, sender: 'received', text: 'Olá! O primeiro passo é organizar sua rotina diária.' }
+  ],
+  2: [
+    { id: 201, sender: 'received', text: 'Olá! Como foram suas refeições essa semana?' }
+  ],
+  3: [],
+  4: []
+}
+
+const conversationHistory = reactive({})
+
+onMounted(() => {
+  const savedData = localStorage.getItem('usuarioLogado')
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData)
+      Object.assign(userData, parsed)
+    } catch (e) {
+      console.error('Erro ao carregar dados do usuário:', e)
+    }
+  }
+
+  const savedMessages = localStorage.getItem('chat_historico_mensagens')
+  if (savedMessages) {
+    try {
+      const parsedHistory = JSON.parse(savedMessages)
+      Object.assign(conversationHistory, parsedHistory)
+    } catch (e) {
+      Object.assign(conversationHistory, defaultHistory)
+    }
+  } else {
+    Object.assign(conversationHistory, defaultHistory)
+  }
+
+  nextTick(() => {
+    scrollToBottom()
+  })
+})
+
+watch(
+  conversationHistory,
+  (newHistory) => {
+    localStorage.setItem('chat_historico_mensagens', JSON.stringify(newHistory))
+  },
+  { deep: true }
+)
+
+const userInitial = computed(() => {
+  return userData.nome ? userData.nome.charAt(0).toUpperCase() : 'U'
+})
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'Não informado'
+  const [year, month, day] = dateStr.split('-')
+  return day && month && year ? `${day}/${month}/${year}` : dateStr
+}
+
+const contextMenu = reactive({
+  visible: false,
+  x: 0,
+  y: 0,
+  alignLeft: false,
+  messageId: null,
+  messageSender: null
+})
+
+const contextMenuStyle = computed(() => {
+  const style = { top: `${contextMenu.y}px` }
+  if (contextMenu.alignLeft) {
+    style.right = `${window.innerWidth - contextMenu.x}px`
+  } else {
+    style.left = `${contextMenu.x}px`
+  }
+  return style
+})
+
+const contacts = ref([
+  { id: 1, name: 'Juliana', role: 'Nutricionista', avatar: 'J' },
+  { id: 2, name: 'Carlos', role: 'Nutricionista', avatar: 'C' },
+  { id: 3, name: 'Rafael', role: 'Nutricionista', avatar: 'R' },
+  { id: 4, name: 'Mariana', role: 'Nutricionista', avatar: 'M' }
+])
+
+const activeContact = computed(() => {
+  return contacts.value.find(c => c.id === activeContactId.value) || contacts.value[0]
+})
+
+const activeMessages = computed(() => {
+  return conversationHistory[activeContactId.value] || []
+})
+
+watch(activeContactId, () => {
+  cancelInlineEdit()
+  nextTick(() => {
+    scrollToBottom()
+  })
+})
+
+const toggleProfile = () => {
+  showProfile.value = !showProfile.value
+  closeContextMenu()
+}
+
+const sendMessage = async () => {
+  if (!newMessage.value.trim()) return
+
+  if (!conversationHistory[activeContactId.value]) {
+    conversationHistory[activeContactId.value] = []
+  }
+
+  conversationHistory[activeContactId.value].push({
+    id: Date.now(),
+    sender: 'sent',
+    text: newMessage.value.trim()
+  })
+
+  newMessage.value = ''
+  await nextTick()
+  scrollToBottom()
+}
+
+const scrollToBottom = () => {
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
+
+const openContextMenu = (event, msg) => {
+  contextMenu.visible = true
+  contextMenu.y = event.clientY
+  contextMenu.messageId = msg.id
+  contextMenu.messageSender = msg.sender
+
+  if (messagesContainer.value) {
+    const rect = messagesContainer.value.getBoundingClientRect()
+    const containerCenterX = rect.left + rect.width / 2
+    contextMenu.alignLeft = event.clientX > containerCenterX
+  } else {
+    contextMenu.alignLeft = event.clientX > window.innerWidth / 2
+  }
+
+  contextMenu.x = event.clientX
+}
+
+const closeContextMenu = () => {
+  contextMenu.visible = false
+  contextMenu.messageSender = null
+}
+
+const deleteMessage = () => {
+  const list = conversationHistory[activeContactId.value]
+  if (list) {
+    conversationHistory[activeContactId.value] = list.filter(m => m.id !== contextMenu.messageId)
+  }
+  closeContextMenu()
+}
+
+const startEditing = () => {
+  const list = conversationHistory[activeContactId.value]
+  const msg = list?.find(m => m.id === contextMenu.messageId)
+
+  if (msg) {
+    editingMessageId.value = msg.id
+    editingText.value = msg.text
+    
+    nextTick(() => {
+      if (inlineInput.value) {
+        const inputEl = Array.isArray(inlineInput.value) ? inlineInput.value[0] : inlineInput.value
+        inputEl?.focus()
+      }
+    })
+  }
+  closeContextMenu()
+}
+
+const saveInlineEdit = (msg) => {
+  if (editingText.value.trim() !== '') {
+    if (editingText.value.trim() !== msg.text) {
+      msg.text = editingText.value.trim()
+      msg.edited = true
+    }
+    cancelInlineEdit()
+  }
+}
+
+const cancelInlineEdit = () => {
+  editingMessageId.value = null
+  editingText.value = ''
+}
+</script>
+
 <template>
   <div class="chat-wrapper">
     <div class="app-container">
@@ -121,225 +336,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, nextTick, reactive, onMounted, watch } from 'vue'
-
-const showProfile = ref(false)
-const activeContactId = ref(1)
-const newMessage = ref('')
-const messagesContainer = ref(null)
-
-const editingMessageId = ref(null)
-const editingText = ref('')
-const inlineInput = ref(null)
-
-const userData = reactive({
-  nome: '',
-  cpf: '',
-  peso: '',
-  dataNascimento: '',
-  email: '',
-  telefone: ''
-})
-
-const defaultHistory = {
-  1: [
-    { id: 101, sender: 'sent', text: 'Olá, nutricionista! Gostaria de melhorar minha alimentação.' },
-    { id: 102, sender: 'received', text: 'Olá! O primeiro passo é organizar sua rotina diária.' }
-  ],
-  2: [
-    { id: 201, sender: 'received', text: 'Olá! Como foram suas refeições essa semana?' }
-  ],
-  3: [],
-  4: []
-}
-
-const conversationHistory = reactive({})
-
-onMounted(() => {
-  const savedData = localStorage.getItem('usuarioLogado')
-  if (savedData) {
-    try {
-      const parsed = JSON.parse(savedData)
-      Object.assign(userData, parsed)
-    } catch (e) {
-      console.error('Erro ao carregar dados do usuário:', e)
-    }
-  }
-
-  const savedMessages = localStorage.getItem('chat_historico_mensagens')
-  if (savedMessages) {
-    try {
-      const parsedHistory = JSON.parse(savedMessages)
-      Object.assign(conversationHistory, parsedHistory)
-    } catch (e) {
-      Object.assign(conversationHistory, defaultHistory)
-    }
-  } else {
-    Object.assign(conversationHistory, defaultHistory)
-  }
-
-  nextTick(() => {
-    scrollToBottom()
-  })
-})
-
-watch(
-  conversationHistory,
-  (newHistory) => {
-    localStorage.setItem('chat_historico_mensagens', JSON.stringify(newHistory))
-  },
-  { deep: true }
-)
-
-const userInitial = computed(() => {
-  return userData.nome ? userData.nome.charAt(0).toUpperCase() : 'U'
-})
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return 'Não informado'
-  const [year, month, day] = dateStr.split('-')
-  return day && month && year ? `${day}/${month}/${year}` : dateStr
-}
-
-const contextMenu = reactive({
-  visible: false,
-  x: 0,
-  y: 0,
-  alignLeft: false,
-  messageId: null,
-  messageSender: null
-})
-
-// Estilo reativo para posicionamento do menu oposto ao canto mais próximo
-const contextMenuStyle = computed(() => {
-  const style = { top: `${contextMenu.y}px` }
-  if (contextMenu.alignLeft) {
-    style.right = `${window.innerWidth - contextMenu.x}px`
-  } else {
-    style.left = `${contextMenu.x}px`
-  }
-  return style
-})
-
-const contacts = ref([
-  { id: 1, name: 'Juliana', role: 'Nutricionista', avatar: 'J' },
-  { id: 2, name: 'Carlos', role: 'Nutricionista', avatar: 'C' },
-  { id: 3, name: 'Rafael', role: 'Nutricionista', avatar: 'R' },
-  { id: 4, name: 'Mariana', role: 'Nutricionista', avatar: 'M' }
-])
-
-const activeContact = computed(() => {
-  return contacts.value.find(c => c.id === activeContactId.value) || contacts.value[0]
-})
-
-const activeMessages = computed(() => {
-  return conversationHistory[activeContactId.value] || []
-})
-
-watch(activeContactId, () => {
-  cancelInlineEdit()
-  nextTick(() => {
-    scrollToBottom()
-  })
-})
-
-const toggleProfile = () => {
-  showProfile.value = !showProfile.value
-  closeContextMenu()
-}
-
-const sendMessage = async () => {
-  if (!newMessage.value.trim()) return
-
-  if (!conversationHistory[activeContactId.value]) {
-    conversationHistory[activeContactId.value] = []
-  }
-
-  conversationHistory[activeContactId.value].push({
-    id: Date.now(),
-    sender: 'sent',
-    text: newMessage.value.trim()
-  })
-
-  newMessage.value = ''
-  await nextTick()
-  scrollToBottom()
-}
-
-const scrollToBottom = () => {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-  }
-}
-
-const openContextMenu = (event, msg) => {
-  contextMenu.visible = true
-  contextMenu.y = event.clientY
-  contextMenu.messageId = msg.id
-  contextMenu.messageSender = msg.sender
-
-  if (messagesContainer.value) {
-    const rect = messagesContainer.value.getBoundingClientRect()
-    const containerCenterX = rect.left + rect.width / 2
-    
-    // Se a mensagem for pequena e estiver no canto direito, abre para a esquerda
-    // Se estiver no lado esquerdo, abre para a direita
-    contextMenu.alignLeft = event.clientX > containerCenterX
-  } else {
-    contextMenu.alignLeft = event.clientX > window.innerWidth / 2
-  }
-
-  contextMenu.x = event.clientX
-}
-
-const closeContextMenu = () => {
-  contextMenu.visible = false
-  contextMenu.messageSender = null
-}
-
-const deleteMessage = () => {
-  const list = conversationHistory[activeContactId.value]
-  if (list) {
-    conversationHistory[activeContactId.value] = list.filter(m => m.id !== contextMenu.messageId)
-  }
-  closeContextMenu()
-}
-
-const startEditing = () => {
-  const list = conversationHistory[activeContactId.value]
-  const msg = list?.find(m => m.id === contextMenu.messageId)
-
-  if (msg) {
-    editingMessageId.value = msg.id
-    editingText.value = msg.text
-    
-    nextTick(() => {
-      if (inlineInput.value) {
-        const inputEl = Array.isArray(inlineInput.value) ? inlineInput.value[0] : inlineInput.value
-        inputEl?.focus()
-      }
-    })
-  }
-  closeContextMenu()
-}
-
-const saveInlineEdit = (msg) => {
-  if (editingText.value.trim() !== '') {
-    if (editingText.value.trim() !== msg.text) {
-      msg.text = editingText.value.trim()
-      msg.edited = true
-    }
-    cancelInlineEdit()
-  }
-}
-
-const cancelInlineEdit = () => {
-  editingMessageId.value = null
-  editingText.value = ''
-}
-</script>
-
 <style scoped>
 .chat-wrapper {
   --chat-background: #f1edd2;
@@ -351,14 +347,14 @@ const cancelInlineEdit = () => {
   --chat-heading: #705335;
   --chat-accent: #b86b4b;
   width: 100%;
-  height: calc(100vh - 85px); 
+  height: calc(100vh - 120px);
   background-color: var(--chat-background);
   display: flex;
   align-items: stretch;
   justify-content: center;
   padding: 0;
   box-sizing: border-box;
-  margin-top: 85px; 
+  margin-top: 0;
   overflow: hidden; 
 }
 
@@ -382,7 +378,7 @@ const cancelInlineEdit = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 15px;
   z-index: 10;
   flex-shrink: 0; 
 }
@@ -390,20 +386,20 @@ const cancelInlineEdit = () => {
 .user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;
+  font-size: 0.9rem;
 }
 
 .chat-target-info {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;
+  font-size: 0.9rem;
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--chat-surface);
   color: var(--chat-text);
@@ -411,16 +407,17 @@ const cancelInlineEdit = () => {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 .settings-btn {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   color: #f1ebd9;
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 4px;
   transition: background-color 0.2s;
   margin-left: 2px;
@@ -478,7 +475,7 @@ const cancelInlineEdit = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 12px 12px 20px 12px;
   justify-content: space-between;
   background-color: var(--chat-background);
   overflow: hidden; 
@@ -490,17 +487,17 @@ const cancelInlineEdit = () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 8px;
+  padding-right: 4px;
 }
 
 .message {
-  max-width: 68%;
-  padding: 11px 16px;
+  max-width: 75%;
+  padding: 10px 14px;
   border-radius: 14px;
   background-color: var(--chat-surface);
   border: 1.5px solid var(--chat-border);
   color: var(--chat-text);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.4;
   word-wrap: break-word;
 }
@@ -536,7 +533,7 @@ const cancelInlineEdit = () => {
   border-radius: 10px;
   background-color: var(--chat-background);
   color: var(--chat-text);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   outline: none;
   box-sizing: border-box;
 }
@@ -549,19 +546,19 @@ const cancelInlineEdit = () => {
 
 .input-container {
   display: flex;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
   flex-shrink: 0; 
 }
 
 .input-container input {
   flex: 1;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1.5px solid var(--chat-border);
   border-radius: 14px;
   background-color: var(--chat-surface);
   color: var(--chat-text);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   outline: none;
 }
 
@@ -571,13 +568,13 @@ const cancelInlineEdit = () => {
 }
 
 .input-container button {
-  padding: 0 22px;
+  padding: 0 16px;
   background-color: var(--chat-green);
   color: #f1ebd9;
   border: none;
   border-radius: 50px;
   font-weight: bold;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
@@ -614,42 +611,42 @@ const cancelInlineEdit = () => {
 
 .profile-view {
   flex: 1;
-  padding: 28px;
+  padding: 20px;
   background-color: var(--chat-background);
   color: var(--chat-text);
   overflow-y: auto;
 }
 
 .profile-header h2 {
-  font-size: 1.35rem;
-  margin-bottom: 20px;
+  font-size: 1.25rem;
+  margin-bottom: 16px;
   color: var(--chat-heading);
 }
 
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 12px;
 }
 
 .profile-card {
   background-color: var(--chat-surface);
   border: 1.5px solid var(--chat-border);
-  padding: 14px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 12px;
 }
 
 .profile-card label {
   display: block;
   font-weight: bold;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   margin-bottom: 4px;
   text-transform: uppercase;
   color: var(--chat-text);
 }
 
 .profile-card p {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   margin: 0;
   color: var(--chat-text);
 }
@@ -657,23 +654,50 @@ const cancelInlineEdit = () => {
 .profile-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 .btn-cancel {
-  padding: 10px 24px;
+  padding: 10px 20px;
   background-color: var(--chat-surface);
   border: 1.5px solid var(--chat-border);
   color: var(--chat-heading);
-  border: none;
   border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 .btn-cancel:hover {
   background-color: var(--chat-border);
   color: #fff8ef;
+}
+
+/* RESPONSIVIDADE MOBILE (Telas menores que 768px) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 90px; /* Deixa a sidebar bem compacta só com os avatares no mobile */
+  }
+
+  .contact-details {
+    display: none; /* Oculta o texto do nome e papel na sidebar estreita do mobile */
+  }
+
+  .contact-card {
+    justify-content: center;
+    padding: 12px 8px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr; /* Transforma o perfil em uma coluna única */
+  }
+
+  .top-bar {
+    padding: 0 10px;
+  }
+
+  .user-info span, .chat-target-info span {
+    font-size: 0.8rem; /* Nomes menores no cabeçalho se necessário */
+  }
 }
 </style>

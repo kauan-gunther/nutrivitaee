@@ -133,9 +133,10 @@ header {
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 4px 22px; 
+  padding: 8px 22px; 
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
 header h1 {
@@ -231,7 +232,8 @@ div.linha {
 =====================================*/
 @media (max-width: 768px) {
   header {
-    padding: 10px 20px;
+    padding: 10px 16px;
+    width: 100vw;
   }
 
   .menu-hamburguer {
@@ -258,15 +260,16 @@ div.linha {
     top: 0;
     left: -100%;
     right: auto;
-    width: 190px;
-    height: 100vh;
+    width: 240px; /* Aumentado levemente para respiro lateral */
+    height: 100dvh; /* Usa altura dinâmica para evitar barras brancas no mobile */
     background-color: #536236;
     flex-direction: column;
     justify-content: space-between;
-    padding: 22px 14px;
+    padding: 22px 16px;
     transition: left 0.4s ease-in-out;
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    overflow-y: auto; /* Permite rolar caso o menu seja maior que a tela */
   }
 
   #menu-toggle:checked ~ .overlay {
@@ -284,13 +287,14 @@ div.linha {
   .menu-list {
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
-    gap: 1rem;
+      width: 100%;
+    gap: 0.8rem;
   }
 
   .user {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.8rem;
+    width: 100%;
   }
 
   header a {
