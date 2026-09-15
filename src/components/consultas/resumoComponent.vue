@@ -243,7 +243,6 @@ function fecharModal() {
 .header-banner {
   text-align: left;
   margin-bottom: 40px;
-  margin-left: 25px; /* Desloca o título e os nomes um pouquinho para a direita */
 }
 
 .header-banner h1 {
@@ -505,7 +504,6 @@ function fecharModal() {
   .header-banner {
     text-align: center;
     margin-bottom: 20px;
-    margin-left: 0;
   }
 
   .header-banner h1 {

@@ -7,11 +7,11 @@ const agendamentosPadrao = [
     id: 1,
     profissional: {
       nome: 'Dra. Carolina Paz Alencar',
-      foto: '/profissionais/ana.png',
+      foto: 'img/consulta/carolina.png',
     },
     paciente: {
       nome: 'Gabriel Lima da Costa',
-      foto: '/logo.png',
+      foto: 'img/consulta/gabriel.png',
     },
     data: '17/08/2026',
     horario: '14h30 / 02h30 pm',
@@ -21,11 +21,11 @@ const agendamentosPadrao = [
     id: 2,
     profissional: {
       nome: 'Dr. Alexandre Xavier',
-      foto: '/profissionais/marcos.png',
+      foto: 'img/consulta/alexsndre.png',
     },
     paciente: {
       nome: 'Amanda da sousa Lima',
-      foto: '/logo.png',
+      foto: 'img/consulta/amanda.png',
     },
     data: '25/09/2026',
     horario: '08h00 / 08h00 am',
@@ -35,11 +35,11 @@ const agendamentosPadrao = [
     id: 3,
     profissional: {
       nome: 'Dra. Fabiana Oliveira',
-      foto: '/profissionais/fernanda.png',
+      foto: 'img/consulta/fabiana.png',
     },
     paciente: {
       nome: 'Carlos Eduardo da Silva',
-      foto: '/logo.png',
+      foto: 'img/consulta/carlos.png',
     },
     data: '02/11/2026',
     horario: '16h30 / 04h30 pm',
@@ -48,12 +48,12 @@ const agendamentosPadrao = [
   {
     id: 4,
     profissional: {
-      nome: 'Dr. Marcos Vinicius',
-      foto: '/profissionais/gabriel.png',
+      nome: 'Dra. Fernanda Rocha',
+      foto: 'img/consulta/fernanda.png',
     },
     paciente: {
       nome: 'Bianca da Silva',
-      foto: '/logo.png',
+      foto: 'img/consulta/bianca.png',
     },
     data: '12/09/2026',
     horario: '10h00 / 10h00 am',
@@ -73,11 +73,11 @@ onMounted(() => {
       id: Date.now() + index,
       profissional: {
         nome: item.profissional?.nome || 'Profissional não informado',
-        foto: item.profissional?.foto || '/profissionais/ana.png',
+        foto: item.profissional?.foto || 'img/consulta/carolina.png',
       },
       paciente: {
         nome: item.usuario?.nome || 'Paciente não informado',
-        foto: item.usuario?.foto || '/logo.png',
+        foto: item.usuario?.foto || 'img/consulta/gabriel.png',
       },
       data: item.consulta?.data,
       horario: item.consulta?.horario,
@@ -130,13 +130,30 @@ const agendamentosFiltrados = computed(() => {
 
           <!-- Bloco de Informações -->
           <div class="info-block">
-            <p><span class="icon">📅</span><span class="label">Data:</span> <span class="val">{{ card.data }}</span></p>
-            <p><span class="icon">🕒</span><span class="label">Horario:</span> <span class="val">{{ card.horario }}</span></p>
-            <p class="tipo-row"><span class="label">Tipo de agendamento:</span> <span class="val">{{ card.tipo }}</span></p>
+            <div class="detail-item">
+              <span class="icon">📅</span>
+              <div class="info-item-content">
+                <span class="label">Data:</span>
+                <span class="val">{{ card.data }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="icon">🕒</span>
+              <div class="info-item-content">
+                <span class="label">Horario:</span>
+                <span class="val">{{ card.horario }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full">
+              <span class="label">Tipo de agendamento:</span>
+              <span class="val">{{ card.tipo }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Mensagem quando nenhum paciente for encontrado -->
+        <!-- Mensagem quando nenhum resultado for encontrado -->
         <p v-if="agendamentosFiltrados.length === 0" class="no-results">
           Nenhum agendamento encontrado para "{{ buscaTermo }}".
         </p>
@@ -145,7 +162,6 @@ const agendamentosFiltrados = computed(() => {
 </template>
 
 <style scoped>
-
 .main-content {
   flex: 1;
   padding: 40px 20px;
@@ -156,7 +172,7 @@ const agendamentosFiltrados = computed(() => {
 
 /* Título */
 .page-title {
-  color: #6a411d;
+  color: #73441b;
   text-align: center;
   font-size: 3.5rem;
   font-family: 'Cinzel', serif;
@@ -178,13 +194,12 @@ const agendamentosFiltrados = computed(() => {
   height: 48px;
   padding: 8px 45px 8px 24px;
   border-radius: 25px;
-  border: 1.5px solid #6a411d;
+  border: 1.5px solid #73441b;
   background-color: transparent;
-  color: #3b2817;
+  color: #73441b;
   font-size: 1rem;
   outline: none;
   box-sizing: border-box;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .search-icon {
@@ -193,7 +208,7 @@ const agendamentosFiltrados = computed(() => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.1rem;
-  color: #3b2817;
+  color: #73441b;
   pointer-events: none;
   opacity: 0.8;
 }
@@ -211,7 +226,7 @@ const agendamentosFiltrados = computed(() => {
   display: flex;
   align-items: center;
   background-color: transparent;
-  border: 2px solid #6a411d;
+  border: 1.5px solid #73441b;
   border-radius: 20px;
   padding: 20px;
   gap: 16px;
@@ -222,10 +237,10 @@ const agendamentosFiltrados = computed(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #e5dec9;
-  border: 1.5px solid #6a411d;
-  border-radius: 35px;
-  padding: 12px 18px;
+  background-color: transparent;
+  border: 1.5px solid #73441b;
+  border-radius: 20px;
+  padding: 12px 16px;
   flex: 1;
   min-height: 90px;
   box-sizing: border-box;
@@ -241,52 +256,56 @@ const agendamentosFiltrados = computed(() => {
 
 .name {
   font-size: 1rem;
-  font-weight: 700;
-  color: #2c3831;
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.25;
+  font-weight: bold;
+  color: #333f34;
 }
 
 /* Bloco de Informações */
 .info-block {
   flex: 1;
-  font-size: 1.05rem;
-  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding-left: 6px;
-  color: #2c3831;
 }
 
-.info-block p {
-  margin: 3px 0;
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-item-content {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Montserrat', sans-serif;
 }
 
-.info-block .icon {
+.detail-item.full {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.detail-item .icon {
   font-size: 1.2rem;
 }
 
-.info-block .label {
-  color: #2c3831;
-  font-weight: 700;
+.detail-item .label {
+  color: #586937; 
+  font-weight: bold;
+  font-size: 1.05rem;
 }
 
-.info-block .val {
-  color: #6a411d;
-  font-weight: 700;
-}
-
-.info-block .tipo-row {
-  display: block;
-  margin-top: 4px;
+.detail-item .val {
+  color: #73441b; 
+  font-weight: bold;
+  font-size: 1.05rem;
 }
 
 .no-results {
-  color: #6a411d;
+  color: #73441b;
   text-align: center;
-  font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   margin-top: 20px;
 }

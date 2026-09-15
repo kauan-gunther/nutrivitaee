@@ -7,15 +7,65 @@ const router = useRouter()
 const { usuarioLogado, isPaciente, isProfissional, carregarUsuario } = useAuth()
 
 const listaProfissionais = ref([
-  { id: 1, nome: 'Dra. Carolina Paz Alencar - Especialista em Nutrição Esportiva', telefone: '(47) 99999-1111', email: 'carolina@email.com', foto: '/profissionais/ana.png' },
-  { id: 2, nome: 'Dr. Alexandre Xavier - Especialista em Nutrição Clínica & Emagrecimento', telefone: '(47) 99999-2222', email: 'alexandre@email.com', foto: '/profissionais/marcos.png' },
-  { id: 3, nome: 'Dra. Fabiana Oliveira - Especialista em Nutrição Infantil', telefone: '(47) 99999-3333', email: 'fabiana@email.com', foto: '/profissionais/fernanda.png' }
+  {
+    id: 1,
+    nome: 'Dra. Carolina Paz Alencar - Especialista em Nutrição Esportiva',
+    telefone: '(47) 99999-1111',
+    email: 'carolina@email.com',
+    foto: '/consulta/carolina.png',
+  },
+  {
+    id: 2,
+    nome: 'Dr. Alexandre Xavier - Especialista em Nutrição Clínica & Emagrecimento',
+    telefone: '(47) 99999-2222',
+    email: 'alexandre@email.com',
+    foto: '/consulta/alexsndre.png',
+  },
+  {
+    id: 3,
+    nome: 'Dra. Fabiana Oliveira - Especialista em Nutrição Infantil',
+    telefone: '(47) 99999-3333',
+    email: 'fabiana@email.com',
+    foto: '/consulta/fabiana.png',
+  },
+  {
+    id: 4,
+    nome: 'Dra. Fernanda Rocha - Especialista em Nutrição Funcional',
+    telefone: '(47) 99999-4444',
+    email: 'fernanda@email.com',
+    foto: '/consulta/fernanda.png',
+  },
 ])
 
 const listaPacientes = ref([
-  { id: 101, nome: 'Gabriel Lima da Costa', telefone: '(47) 98888-1111', email: 'gabriel@email.com', foto: '/logo.png' },
-  { id: 102, nome: 'Amanda de Sousa Lima', telefone: '(47) 98888-2222', email: 'amanda@email.com', foto: '/logo.png' },
-  { id: 103, nome: 'Carlos Eduardo da Silva', telefone: '(47) 98888-3333', email: 'carlos@email.com', foto: '/logo.png' }
+  {
+    id: 101,
+    nome: 'Gabriel Lima da Costa',
+    telefone: '(47) 98888-1111',
+    email: 'gabriel@email.com',
+    foto: '/consulta/gabriel.png',
+  },
+  {
+    id: 102,
+    nome: 'Amanda de Sousa Lima',
+    telefone: '(47) 98888-2222',
+    email: 'amanda@email.com',
+    foto: '/consulta/amanda.png',
+  },
+  {
+    id: 103,
+    nome: 'Carlos Eduardo da Silva',
+    telefone: '(47) 98888-3333',
+    email: 'carlos@email.com',
+    foto: '/consulta/carlos.png',
+  },
+  {
+    id: 104,
+    nome: 'Bianca da Silva',
+    telefone: '(47) 98888-4444',
+    email: 'bianca@email.com',
+    foto: '/consulta/bianca.png',
+  },
 ])
 
 const profissionalSelecionadoId = ref('')
@@ -24,7 +74,7 @@ const pacienteSelecionadoId = ref('')
 const agendamento = ref({
   usuario: { nome: '', telefone: '', email: '', foto: null, senha: '' },
   profissional: { nome: '', telefone: '', email: '', foto: null, senha: '' },
-  consulta: { data: '', horario: '', tipo: 'Presencial' }
+  consulta: { data: '', horario: '', tipo: 'Presencial' },
 })
 
 onMounted(() => {
@@ -38,7 +88,7 @@ onMounted(() => {
         telefone: usuarioLogado.value.telefone || '',
         email: usuarioLogado.value.email || '',
         foto: usuarioLogado.value.foto || null,
-        senha: usuarioLogado.value.senha || ''
+        senha: usuarioLogado.value.senha || '',
       }
     } else if (isProfissional.value) {
       agendamento.value.profissional = {
@@ -47,7 +97,7 @@ onMounted(() => {
         telefone: usuarioLogado.value.telefone || '',
         email: usuarioLogado.value.email || '',
         foto: usuarioLogado.value.foto || null,
-        senha: usuarioLogado.value.senha || ''
+        senha: usuarioLogado.value.senha || '',
       }
     }
   }
@@ -117,8 +167,6 @@ function agendar() {
   if (!validarFormulario()) return
 
   try {
-    // 1) Pega o que já está salvo (pode não existir ainda, pode ser
-    //    um objeto antigo de uma versão anterior, ou já pode ser uma lista).
     const salvos = localStorage.getItem('dadosAgendamento')
     let lista = []
     if (salvos) {
@@ -126,11 +174,7 @@ function agendar() {
       lista = Array.isArray(dados) ? dados : [dados]
     }
 
-    // 2) Acrescenta o agendamento novo no FINAL da lista,
-    //    sem apagar os que já existiam.
     lista.push(agendamento.value)
-
-    // 3) Salva a lista inteira de volta (não mais um objeto sozinho).
     localStorage.setItem('dadosAgendamento', JSON.stringify(lista))
 
     router.push('/resumo')
@@ -160,7 +204,10 @@ function agendar() {
           </div>
 
           <div v-if="agendamento.profissional.nome" class="profile-preview full-width">
-            <img :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'" class="preview-avatar" />
+            <img
+              :src="agendamento.profissional.foto || 'https://via.placeholder.com/150'"
+              class="preview-avatar"
+            />
             <div>
               <p><strong>E-mail:</strong> {{ agendamento.profissional.email }}</p>
               <p><strong>Telefone:</strong> {{ agendamento.profissional.telefone }}</p>
@@ -210,7 +257,12 @@ function agendar() {
           </div>
           <div class="input-card">
             <label for="prof-foto">Sua Foto:</label>
-            <input id="prof-foto" type="file" accept="image/*" @change="aoSelecionarFotoProfissional" />
+            <input
+              id="prof-foto"
+              type="file"
+              accept="image/*"
+              @change="aoSelecionarFotoProfissional"
+            />
           </div>
         </div>
       </section>
@@ -228,7 +280,10 @@ function agendar() {
             </select>
           </div>
           <div v-if="agendamento.usuario.nome" class="profile-preview full-width">
-            <img :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'" class="preview-avatar" />
+            <img
+              :src="agendamento.usuario.foto || 'https://via.placeholder.com/150'"
+              class="preview-avatar"
+            />
             <div>
               <p><strong>E-mail:</strong> {{ agendamento.usuario.email }}</p>
               <p><strong>Telefone:</strong> {{ agendamento.usuario.telefone }}</p>
@@ -272,7 +327,7 @@ function agendar() {
 <style scoped>
 .agendamento-page {
   max-width: 800px;
-  margin: 40px auto; 
+  margin: 40px auto;
   padding: 30px;
   border-radius: 16px;
   box-sizing: border-box;
@@ -331,7 +386,7 @@ function agendar() {
   border: 1.5px solid #6a4e32;
   border-radius: 8px;
   padding: 8px 12px;
-  min-width: 0; 
+  min-width: 0;
 }
 
 .input-card label {
@@ -339,13 +394,13 @@ function agendar() {
   font-weight: bold;
   margin-right: 6px;
   white-space: nowrap;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .input-card input,
 .input-card select {
   width: 100%;
-  min-width: 0; 
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
@@ -354,8 +409,8 @@ function agendar() {
   font-weight: 600;
 }
 
-.input-card input[type="time"]::-webkit-calendar-picker-indicator,
-.input-card input[type="date"]::-webkit-calendar-picker-indicator {
+.input-card input[type='time']::-webkit-calendar-picker-indicator,
+.input-card input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
   filter: invert(30%) sepia(20%) saturate(1000%) hue-rotate(50deg);
   display: block !important;
@@ -397,15 +452,15 @@ function agendar() {
   background-color: #43522a;
 }
 
-.input-card input[type="file"] {
+.input-card input[type='file'] {
   font-size: 0.8rem;
   color: #3e4d27;
   padding: 0;
 }
 
-.input-card input[type="file"]::-webkit-file-upload-button {
-  background-color: #526335; 
-  color: #f1edd2;        
+.input-card input[type='file']::-webkit-file-upload-button {
+  background-color: #526335;
+  color: #f1edd2;
   border: none;
   border-radius: 6px;
   padding: 4px 8px;
@@ -417,7 +472,7 @@ function agendar() {
   transition: background-color 0.2s ease;
 }
 
-.input-card input[type="file"]::-webkit-file-upload-button:hover {
+.input-card input[type='file']::-webkit-file-upload-button:hover {
   background-color: #43522a;
 }
 
