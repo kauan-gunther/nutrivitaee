@@ -243,13 +243,12 @@ function fecharModal() {
 .header-banner {
   text-align: left;
   margin-bottom: 40px;
+  margin-left: 25px; /* Desloca o título e os nomes um pouquinho para a direita */
 }
 
 .header-banner h1 {
   color: #705335;
   font-size: 4rem; 
-  font-family: serif;
-  font-weight: 400;
   margin: 0;
   line-height: 1;
 }
@@ -257,7 +256,6 @@ function fecharModal() {
 .header-banner p {
   color: #705335;
   font-size: 1.5rem;
-  font-weight: 600;
   margin: 10px 0 0 0;
 }
 
@@ -326,6 +324,8 @@ function fecharModal() {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  margin-top: -10px; 
+  margin-left: 25px; 
 }
 
 .detail-item {
@@ -345,13 +345,13 @@ function fecharModal() {
 }
 
 .detail-item .label {
-  color: #536236;
+  color: #536236; 
   font-weight: bold;
   font-size: 1.25rem;
 }
 
 .detail-item .value {
-  color: #536236;
+  color: #705335; 
   font-weight: bold;
   font-size: 1.25rem;
 }
@@ -407,7 +407,6 @@ function fecharModal() {
   opacity: 0.9;
 }
 
-/* Modal Estilizado Compacto */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -506,6 +505,7 @@ function fecharModal() {
   .header-banner {
     text-align: center;
     margin-bottom: 20px;
+    margin-left: 0;
   }
 
   .header-banner h1 {

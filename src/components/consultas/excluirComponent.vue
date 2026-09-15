@@ -143,12 +143,9 @@ function fecharModal() {
 </script>
 
 <template>
-  <main class="main-content">
+  <main class="resumo-container">
     <header class="header-banner">
-      <h1>Agendamento</h1>
-      <p class="subtitle">
-        {{ extrairPrimeiroNome(agendamento.profissional.nome, true) }} & {{ extrairPrimeiroNome(agendamento.usuario.nome) }}
-      </p>
+      <h1>Excluir Agendamento</h1>
     </header>
 
     <div class="resumo-content">
@@ -285,10 +282,22 @@ function fecharModal() {
 
 .header-banner h1 {
   color: #73441b;
-  font-size: 3rem; 
-  font-family: serif;
+  font-size: 60px; 
   font-weight: normal;
   margin: 0;
+}
+
+.btn-excluir {
+  background-color: #586937; 
+  color: #EFE8D3;            
+  border: none;
+  padding: 10px 60px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s, transform 0.1s;
 }
 
 .resumo-content {

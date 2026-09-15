@@ -99,8 +99,8 @@ function enviarFormulario() {
 .page-title {
   font-family: 'Georgia', serif;
   font-size: 2.2rem;
-  color: #3a2b1f;
-  margin-bottom: 20px;
+  color: #553d2d;
+  margin-bottom: 25px;
   font-weight: normal;
   text-align: center;
 }
@@ -109,14 +109,14 @@ function enviarFormulario() {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  background: #dcd0bc;
+  background: transparent;
   margin: 0 auto 20px auto;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   overflow: hidden;
-  border: 3px solid #8c9c6d;
+  border: 2px solid #7c6c54;
 }
 
 .perfil-preview {
@@ -129,8 +129,8 @@ function enviarFormulario() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #6b5c4f;
-  font-size: 0.8rem;
+  color: #7c6c54;
+  font-size: 0.85rem;
 }
 
 .form-grid {
@@ -141,13 +141,18 @@ function enviarFormulario() {
 }
 
 .input-field {
-  background: #dcd0bc;
-  border: none;
+  background: transparent;
+  border: 2px solid #7c6c54;
   padding: 14px 20px;
-  border-radius: 15px;
+  border-radius: 12px;
   font-size: 1rem;
-  color: #3a2b1f;
+  color: #553d2d;
   outline: none;
+}
+
+.input-field::placeholder {
+  color: #7c6c54;
+  opacity: 1;
 }
 
 .input-field.full {
@@ -156,8 +161,8 @@ function enviarFormulario() {
 
 .upload-area {
   height: 180px;
-  border: 2px dashed #b8a892;
-  background: rgba(220, 208, 188, 0.3);
+  border: 2px solid #7c6c54;
+  background: transparent;
   border-radius: 12px;
   display: flex;
   justify-content: center;
@@ -175,12 +180,13 @@ function enviarFormulario() {
 
 .diploma-placeholder {
   text-align: center;
-  color: #8a7b6f;
+  color: #7c6c54;
 }
 
 .plus-icon {
-  font-size: 40px;
+  font-size: 45px;
   line-height: 1;
+  color: #9c8c74;
 }
 
 .actions {
@@ -196,17 +202,18 @@ function enviarFormulario() {
   font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-save,
 .btn-cancel {
-  background: #536236;
+  background: #596b42;
   color: #f1edd2;
   transition: all 0.2s ease;
 }
 
 .btn-save:hover,
 .btn-cancel:hover {
-  background-color: #414e2a;
+  background-color: #485635;
 }
 </style>

@@ -244,8 +244,7 @@ function fecharModal() {
 
 .header-banner h1 {
   color: #73441b;
-  font-size: 3rem; 
-  font-family: serif;
+  font-size: 60px; 
   font-weight: normal;
   margin: 0;
 }
