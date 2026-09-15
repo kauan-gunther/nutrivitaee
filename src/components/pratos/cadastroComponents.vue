@@ -232,9 +232,9 @@ function cancelar() {
 
 <style scoped>
 .resumo-container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
+  width: 80%;
+  max-width: 900px;
+  margin: 40px auto; 
   padding: 30px 40px;
   box-sizing: border-box;
 }
@@ -242,7 +242,7 @@ function cancelar() {
 h1 {
   color: #705335;
   text-align: center;
-  font-size: 90px;
+  font-size: 60px; 
   margin-bottom: 30px;
   font-weight: 400;
 }
@@ -388,13 +388,14 @@ h1 {
 .label-titulo {
   display: block;
   text-align: center;
-  color: #4a5435;
+  color: #333f34;
   font-weight: 700;
+  font-size: 1.25rem;
 }
 
 .botao-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 15px;
   margin-top: 10px;
 }
