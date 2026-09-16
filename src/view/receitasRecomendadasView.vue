@@ -9,7 +9,10 @@ const { usuarioLogado, isProfissional, carregarUsuario } = useAuth()
 const receitas = ref([])
 const buscaTermo = ref('')
 
-const estaLogado = computed(() => !!usuarioLogado.value)
+const estaLogado = computed(() => {
+  const usuario = usuarioLogado.value
+  return !!usuario && !!(usuario.email || usuario.id || usuario.nome || usuario.tipo || usuario._id)
+})
 const temReceitas = computed(() => receitas.value.length > 0)
 
 onMounted(() => {
@@ -182,11 +185,13 @@ function conversar(prato) {
 }
 
 .card-status-box {
-  background-color: transparent;
+  display: block;
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 40px 30px;
   text-align: center;
   max-width: 500px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .dashed-border {
@@ -209,16 +214,28 @@ function conversar(prato) {
 }
 
 .btn-action {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background-color: #536236;
-  color: #f1edd2;
+  color: #f1edd2 !important;
   border: none;
   padding: 12px 32px;
   border-radius: 25px;
   font-weight: bold;
   font-size: 1rem;
-  text-decoration: none;
+  text-decoration: none !important;
   cursor: pointer;
+  opacity: 1;
+  visibility: visible;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.btn-action:hover {
+  background-color: #43502a;
+  transform: translateY(-1px);
 }
 
 .search-bar {
