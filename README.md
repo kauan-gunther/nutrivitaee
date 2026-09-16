@@ -34,15 +34,25 @@ Nossa plataforma foi desenvolvida para ajudar cada paciente a encontrar um profi
 - login de profissional e usuário  tiveram algumas dificuldades.
 
 ## Divisão de Tarefas entre os Integrantes
+<<<<<<< HEAD
 * Felipe:* Responsável por: Chat, Login de usuário
 * Mizael:* Responsável por: Formação acadêmica, suporte.
 * Kauan:* Responsável por: Preferências, formação acadêmica.
 * Ruty:* Responsável por: Suporte, Preferências.
 * Bianca:* Responsável por: Pratos, agendamentos, Sobre nós.
 * Sara:* Responsável por: Home, Profissional.
+=======
+* Felipe:** Responsável por: Chat, Login de usuário
+* Mizael:** Responsável por: Formação acadêmica, suporte.
+* Kauan:** Responsável por: Preferências, formação acadêmica.
+* Ruty:** Responsável por: Suporte, Preferências.
+* Bianca:** Responsável por: Pratos, agendamentos, Sobre nós.
+* Sara:** Responsável por: Home, Profissional.
+>>>>>>> dev
 
 ## Autoavaliação do Grupo
 * **Nota do Grupo:**
   7,5
 * **Justificativa:**
  A ideal do nosso site é muito bom nos esforçamos para fazer o nosso melhor conseguimos superar nossas limitações mais poderíamos fazer mais ainda do que fizemos, não é o melhor site mais foi dado o melhor de cada um , perdemos uma integrante no meio do processo o que nos prejudicou muito mais nos esforçamos e estamos conseguindo se sobre sair, acredito que vamos conseguir melhorar cada vez mais.
+npm run dev
