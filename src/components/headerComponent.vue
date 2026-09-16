@@ -1,4 +1,32 @@
 <script setup>
+import { computed, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+
+const { usuarioLogado, isPaciente, isProfissional, carregarUsuario } = useAuth()
+
+onMounted(() => {
+  carregarUsuario()
+  window.addEventListener('storage', carregarUsuario)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', carregarUsuario)
+})
+
+const destinoNutricionistas = computed(() => {
+  if (isProfissional.value && usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/nutricionistas'
+})
+
+const rotaPerfilProfissional = computed(() => {
+  if (usuarioLogado.value?.id) {
+    return `/profissional/${usuarioLogado.value.id}`
+  }
+  return '/perfil'
+})
 </script>
 
 <template>
@@ -13,67 +41,78 @@
 
       <label for="menu-toggle" class="backdrop"></label>
 
-      <!-- Menu lateral -->
       <nav class="overlay">
         <ul class="menu-list">
           <li>
-            <RouterLink to="/">
+            <RouterLink to="/bannerHomeComponent">
               <i class="mdi mdi-home-circle"></i> Home
             </RouterLink>
           </li>
           <li>
-            <routerLink to="#">
+            <RouterLink :to="destinoNutricionistas">
               <i class="mdi mdi-food-apple-outline"></i>
               Nutricionistas
-            </routerLink>
+            </RouterLink>
           </li>
           <li>
-            <routerLink to="#">
+            <RouterLink to="/meus-agendamentos">
               <i class="mdi mdi-calendar-multiselect-outline"></i>
               Agendamentos
-            </routerLink>
+            </RouterLink>
           </li>
           <li>
-            <routerLink to="#">
+            <RouterLink to="/mensagens">
               <i class="mdi mdi-forum-outline"></i>
               Conversas
-            </routerLink>
+            </RouterLink>
           </li>
+
           <div class="user">
-            <li>
-              <routerLink to="#">
+            <li v-if="isPaciente">
+              <RouterLink to="/perfil">
                 <i class="mdi mdi-account-circle"></i>
-                Meu Perfil
-              </routerLink>
+                Perfil Paciente
+              </RouterLink>
+            </li>
+            <li v-if="isProfissional">
+              <RouterLink :to="rotaPerfilProfissional">
+                <i class="mdi mdi-account-circle"></i>
+                Perfil Profissional
+              </RouterLink>
             </li>
             <li>
-              <routerLink to="#">
+              <RouterLink to="/pratos/receitas">
                 <i class="mdi mdi-tag-heart"></i>
                 Receitas
-              </routerLink>
+              </RouterLink>
+            </li>
+
+            <li>
+              <RouterLink to="/login">
+                <i class="mdi mdi-login-variant"></i>
+                Login
+              </RouterLink>
             </li>
           </div>
           <li>
-            <RouterLink to="/equipe">
+            <RouterLink to="/sobreNos">
               <i class="mdi mdi-account-group"></i>
               Sobre nós
             </RouterLink>
           </li>
         </ul>
         <div class="div">
-          <RouterLink to="#">
-            Suporte
-          </RouterLink>
+          <RouterLink to="/CadastroSuporte"> Suporte </RouterLink>
           <RouterLink to="/">
             <img src="/logo.png" alt="logo" class="logo" />
           </RouterLink>
         </div>
       </nav>
-
     </div>
+
     <h1 class="logo">
       <RouterLink to="/">
-        <img src="/logo.png" alt="logo">
+        <img src="/logo.png" alt="logo" />
       </RouterLink>
     </h1>
   </header>
@@ -81,147 +120,185 @@
 
 <style scoped>
 /*====================================
-				HEADER
+     HEADER (DESKTOP - PADRÃO)
 =====================================*/
 header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 150px;
-  height: 100vh;
+  width: 100%;
+  height: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   background: #536236;
-  padding: 25px 50px;
+  padding: 8px 22px; 
   z-index: 1000;
-  box-shadow: 4px 0 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
 header h1 {
   margin: 0;
+  order: 2; 
 }
 
 header h1 img {
-  width: 150px;
+  width: 82px;
   height: auto;
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1));
 }
 
 header a {
   text-decoration: none;
-  font-size: 35px;
-  color: #F1EDD2;
-  transition: all 1s ease;
+  font-size: 14px;
+  color: #f1edd2;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
 }
 
 header .div {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-/*============ Menu hamburguer ===========*/
-.menu-hamburguer {
-  z-index: 1100;
-}
-
-#menu-toggle {
+/*============ Mobile ===========*/
+#menu-toggle,
+.menu-icon,
+.backdrop {
   display: none;
 }
 
-.menu-icon {
-  width: 35px;
-  height: 30px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  z-index: 1200;
-  position: relative;
-  transition: all 0.5s ease;
-  margin: 0;
+div.linha {
+  width: 25px;
+  height: 3px;
+  margin: 4px 0;
+  background: #f1edd2;
+  border-radius: 2px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .menu-icon:hover .linha {
-  background: #9A9E70;
-  scale: 1.5;
+  background: #9a9e70;
 }
 
-div.linha {
-  height: 2px;
-  background: #F1EDD2;
-  border-radius: 2px;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-  transition: all 1s ease;
-}
-
-/*============ Overlay escuro fora do menu ===========*/
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.4s ease;
-  z-index: 900;
-}
-
-#menu-toggle:checked~.backdrop {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/*============ Menu lateral ===========*/
 .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 500px;
-  height: 100vh;
-  background: #536236;
-  transform: translateX(-200%);
-  transition: 1.4s;
-  padding: 40px 25px;
-  box-shadow: 5px 0 20px rgba(0, 0, 0, .3);
-  z-index: 1000;
+  position: static;
+  background-color: transparent;
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  order: 1;
 }
 
-#menu-toggle:checked~.overlay {
-  transform: translateX(0);
-}
-
-/*============ Menu interno ===========*/
 .overlay .logo {
-  display: block;
-  margin: 0 40px;
-  height: 100px;
-      filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1));
-
+  display: none;
 }
 
 .menu-list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.9rem;
   list-style: none;
   padding: 0;
-  margin: 20px;
-  margin-top: 50px;
+  margin: 0;
 }
 
-.menu-list li {
-  margin: 15px 50px;
-
-  
+.menu-list li,
+.user li {
+  margin: 0;
 }
-& .user li{
-    margin: 5px 70px;
-  }
+
+.user {
+  display: flex;
+  gap: 0.9rem;
+}
+
 .menu-list a:hover {
-  color: #9A9E70;
-  scale: 1.1;
-  text-shadow: 0 0 5px #101010;
+  color: #9a9e70;
+  transform: scale(1.05);
+}
+
+/*====================================
+     ESTILO MOBILE (Até 768px)
+=====================================*/
+@media (max-width: 768px) {
+  header {
+    padding: 10px 16px;
+    width: 100vw;
+  }
+
+  .menu-hamburguer {
+    order: 1; 
+  }
+
+  h1.logo {
+    order: 2; 
+  }
+
+  .menu-icon {
+    display: block;
+    cursor: pointer;
+  }
+
+  .overlay .logo {
+    display: block;
+    margin: 14px auto;
+    height: 48px;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    right: auto;
+    width: 240px; /* Aumentado levemente para respiro lateral */
+    height: 100dvh; /* Usa altura dinâmica para evitar barras brancas no mobile */
+    background-color: #536236;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 22px 16px;
+    transition: left 0.4s ease-in-out;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto; /* Permite rolar caso o menu seja maior que a tela */
+  }
+
+  #menu-toggle:checked ~ .overlay {
+    left: 0;
+  }
+
+  #menu-toggle:checked ~ .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 900;
+  }
+
+  .menu-list {
+    flex-direction: column;
+    align-items: flex-start;
+      width: 100%;
+    gap: 0.8rem;
+  }
+
+  .user {
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  header a {
+    font-size: 13px;
+  }
 }
 </style>
