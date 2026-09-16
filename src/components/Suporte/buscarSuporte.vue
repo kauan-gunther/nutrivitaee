@@ -1,13 +1,15 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import router from '@/router'
+import { useRoute } from 'vue-router'
 
-const router = useRouter()
-
+const route = useRoute()
 const buscarTermo = ref('')
 const suportes = ref([])
 const filtros = ref({ data: '', status: '', prioridade: '' })
 const imagemSelecionada = ref(null)
+const alerta = ref('')
+const ehAdministrador = computed(() => route.query.admin === 'true')
 
 function obterStatus(item) {
   return item.status || item.chamada || 'em-andamento'
@@ -55,8 +57,18 @@ onMounted(() => {
 })
 
 function apagarSuporte(id) {
-  suportes.value = suportes.value.filter((item) => item.id !== id)
-  localStorage.setItem('suportes', JSON.stringify(suportes.value))
+  const suporte = suportes.value.find((item) => item.id === id)
+
+  if (!suporte) {
+    return
+  }
+
+  if (obterStatus(suporte) !== 'resolvido') {
+    alerta.value = 'Este suporte não pode ser apagado enquanto não estiver resolvido.'
+    return
+  }
+
+  router.push(`/deletar-suporte/${id}`)
 }
 
 function resolverSuporte(id) {
@@ -66,8 +78,11 @@ function resolverSuporte(id) {
   localStorage.setItem('suportes', JSON.stringify(suportes.value))
 }
 
-function voltarSuporte() {
-  router.push('/')
+function visualizarSuporte(id) {
+  router.push({
+    path: `/perfilSuporte/${id}`,
+    query: ehAdministrador.value ? { admin: 'true' } : {},
+  })
 }
 
 function limparFiltros() {
@@ -81,6 +96,10 @@ function abrirImagem(src, alt) {
 
 function fecharImagem() {
   imagemSelecionada.value = null
+}
+
+function fecharAlerta() {
+  alerta.value = ''
 }
 
 function fecharImagemComEsc(event) {
@@ -132,7 +151,7 @@ function fecharImagemComEsc(event) {
           title="Limpar filtros"
           @click="limparFiltros"
         >
-          <span class="mdi mdi-delete-outline" aria-hidden="true"></span>
+          <img src="/img/trash-icon.svg" alt="Limpar filtros" class="trash-icon" />
         </button>
       </div>
     </div>
@@ -143,7 +162,7 @@ function fecharImagemComEsc(event) {
           <div>
             <h2>
               {{ item.assunto || 'Suporte' }} -
-              <span class="id-titulo">ID: {{ item.id }}</span>
+              <span class="id-titulo">Id:{{ item.id }}</span>
             </h2>
             <div class="suporte-detalhes">
               <p>
@@ -196,27 +215,20 @@ function fecharImagemComEsc(event) {
           <span class="valor-suporte">{{ item.usuario.descrever }}</span>
         </p>
         <div class="acoes-suporte">
+          <button type="button" class="botao-visualizar" @click="visualizarSuporte(item.id)">
+            Visualizar
+          </button>
           <button
             v-if="obterStatus(item) !== 'resolvido'"
             type="button"
-            class="btn-pill botao-resolver"
+            class="botao-resolver"
             @click="resolverSuporte(item.id)"
           >
             Marcar como resolvido
           </button>
-          <button type="button" class="btn-pill botao-apagar" @click="apagarSuporte(item.id)">
-            Apagar
-          </button>
+          <button type="button" class="botao-apagar" @click="apagarSuporte(item.id)">Apagar</button>
         </div>
       </article>
-    </div>
-
-    <div v-else class="sem-resultados">
-      <p>Nenhum chamado de suporte encontrado.</p>
-    </div>
-
-    <div class="acoes">
-      <button type="button" class="btn-pill btn-voltar" @click="voltarSuporte">Voltar</button>
     </div>
   </main>
 
@@ -240,7 +252,23 @@ function fecharImagemComEsc(event) {
     </button>
     <img :src="imagemSelecionada.src" :alt="imagemSelecionada.alt" class="imagem-ampliada" />
   </div>
+
+  <div
+    v-if="alerta"
+    class="alerta-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-alerta"
+    @click.self="fecharAlerta"
+  >
+    <div class="alerta-caixa">
+      <h2 id="titulo-alerta">Atenção</h2>
+      <p>{{ alerta }}</p>
+      <button type="button" class="botao-alerta" @click="fecharAlerta">Entendi</button>
+    </div>
+  </div>
 </template>
+
 
 <style scoped>
 .principal {
