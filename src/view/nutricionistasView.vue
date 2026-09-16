@@ -1,7 +1,6 @@
 <script setup>
 import HeroNutricionistas from '@/components/nutricionistas/heroNutricionistasComponent.vue'
 import DiferencialNutricionistas from '@/components/nutricionistas/diferencialNutricionistasComponent.vue'
-import TecnologiaNutricionistas from '@/components/nutricionistas/tecnologiaNutricionistasComponent.vue'
 import DestaqueProfissionais from '@/components/nutricionistas/destaqueProfissionaisComponent.vue'
 </script>
 

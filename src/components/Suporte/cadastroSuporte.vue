@@ -1,87 +1,19 @@
-<template>
-  <main class="principal container-formulario grade-formulario">
-    <h1>Cadastro de suporte</h1>
-
-    <div class="nome cartao-entrada">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" v-model="cadastro.usuario.nome" />
-    </div>
-
-    <div class="email cartao-entrada">
-      <label for="email">Email:</label>
-      <input type="email" id="email" v-model="cadastro.usuario.email" />
-    </div>
-
-    <div class="assunto cartao-entrada">
-      <label for="assunto">Assunto:</label>
-      <input type="text" id="assunto" v-model="cadastro.usuario.assunto" />
-    </div>
-
-    <div class="categoria cartao-entrada">
-      <label for="categoria">Categoria:</label>
-      <select id="categoria" v-model="cadastro.usuario.categoria">
-        <option value="" disabled></option>
-        <option value="documentoErro">Erro no upload de documento</option>
-        <option value="resultadoErro">Resultado exibindo médicos inativos</option>
-        <option value="horarioErro">Choque de horário</option>
-        <option value="mobilidadeErro">Mobilidade no site</option>
-        <option value="filtroErro">Filtro não funciona</option>
-        <option value="linkErro">Falha no link da teleconsulta</option>
-      </select>
-    </div>
-
-    <!-- Painel de Anexo com o botão + -->
-    <div class="painel-quadrado cartao-entrada">
-      <label>Anexar imagem/arquivo</label>
-      <div class="upload-container" @click="triggerInput">
-        <div class="plus-box">
-          <span class="plus-icon">+</span>
-        </div>
-        <input 
-          ref="fileInput" 
-          id="foto" 
-          type="file" 
-          accept="image/*" 
-          class="input-file-hidden" 
-          @change="aoSelecionarFotoProblema" 
-        />
-      </div>
-    </div>
-
-    <!-- Painel da Descrição -->
-    <div class="painel-quadrado cartao-entrada">
-      <label for="descrever">Descrever problema:</label>
-      <textarea id="descrever" v-model="cadastro.usuario.descrever"></textarea>
-    </div>
-
-    <div class="acoes-container">
-      <button type="button" class="btn-pill" @click="validarFormulario">Confirmar</button>
-      <button type="button" class="btn-pill" @click="cancelar">Cancelar</button>
-    </div>
-  </main>
-</template>
-
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-const fileInput = ref(null)
+import router from '@/router'
 
 const cadastro = ref({
   usuario: {
     nome: '',
     email: '',
     assunto: '',
-    categoria: '',
+    categoria: '', //'Mobilidade no site', 'Erro no upload de documento', 'Perfil do profissional não aparece nos resultados', 'Filtro não funciona', 'Resultados exibindo médicos inativos ou suspensos',  'Choque de horário',  'Falha no envio do link da teleconsulta'.
     descrever: '',
+    anexar: '',
     foto: null,
   },
 })
-
-function triggerInput() {
-  fileInput.value.click()
-}
+const alerta = ref('')
 
 function converterParaBase64(arquivo, callback) {
   const reader = new FileReader()
@@ -115,6 +47,7 @@ function prioridadePorCategoria(categoria) {
 
 function gerarIdSuporte(suportes) {
   let id
+
   do {
     const quantidadeDigitos = (crypto.getRandomValues(new Uint32Array(1))[0] % 8) + 2
     const menorValor = 10 ** (quantidadeDigitos - 1)
@@ -136,29 +69,109 @@ function validarFormulario() {
     !usuario.assunto.trim() ||
     !usuario.categoria.trim()
   ) {
-    alert('Preencha os campos obrigatórios: Nome, E-mail, Assunto e Categoria.')
+    alerta.value = 'Preencha nome, email, assunto e categoria.'
+    return false
+  }
+
+  const emailValido = /^[^\s@]+@[^\s@]+$/.test(usuario.email.trim())
+
+  if (!emailValido) {
+    alerta.value = 'Informe um email válido.'
     return false
   }
 
   const suportes = JSON.parse(localStorage.getItem('suportes') || '[]')
-  
+  const idSuporte = gerarIdSuporte(suportes)
   suportes.push({
-    id: gerarIdSuporte(suportes),
+    id: idSuporte,
     usuario: { ...usuario },
     data: new Date().toISOString().slice(0, 10),
     status: 'em-andamento',
     prioridade: prioridadePorCategoria(usuario.categoria),
   })
-
   localStorage.setItem('suportes', JSON.stringify(suportes))
-  router.push('/buscar-suporte')
+  router.push(`/perfilSuporte/${idSuporte}`)
   return true
 }
 
 function cancelar() {
   router.push('/')
 }
+
+function fecharAlerta() {
+  alerta.value = ''
+}
 </script>
+
+<template>
+  <div class="principal container-formulario grade-formulario">
+    <h1>Cadastro de suporte</h1>
+
+    <div class="nome cartao-entrada">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" v-model="cadastro.usuario.nome" />
+    </div>
+
+    <div class="email cartao-entrada">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        v-model="cadastro.usuario.email"
+        placeholder="exemplo@email.com"
+      />
+    </div>
+
+    <div class="assunto cartao-entrada">
+      <label for="assunto">Assunto:</label>
+      <input type="text" id="assunto" v-model="cadastro.usuario.assunto" />
+    </div>
+
+    <div class="categoria cartao-entrada">
+      <label for="categoria">Categoria:</label>
+
+      <select id="categoria" v-model="cadastro.usuario.categoria">
+        <option value="" disabled>Categoria do problema</option>
+        <option value="documentoErro">Erro upload do documento</option>
+        <option value="resultadoErro">Resultado do Médico inativo</option>
+        <option value="horarioErro">Choque de horário</option>
+        <option value="mobilidadeErro">Mobilidade no site</option>
+        <option value="filtroErro">Filtro não funciona</option>
+        <option value="choqueHorario">Choque de horário</option>
+        <option value="linkErro">Falha teleconsulta</option>
+      </select>
+    </div>
+
+    <div class="anexar-imagem painel-quadrado cartao-entrada">
+      <label for="foto">Anexar imagem:</label>
+      <input id="foto" type="file" accept="image/*" @change="aoSelecionarFotoProblema" />
+    </div>
+
+    <div class="descrever-problema painel-quadrado cartao-entrada">
+      <label for="descrever">Descrever problema:</label>
+      <textarea id="descrever" v-model="cadastro.usuario.descrever"></textarea>
+    </div>
+
+    <button type="button" @click="validarFormulario" class="bnt-confirmar">Confirmar</button>
+    <button @click="cancelar" class="bnt-cancelar">Cancelar</button>
+  </div>
+
+  <div
+    v-if="alerta"
+    class="alerta-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-alerta"
+    @click.self="fecharAlerta"
+  >
+    <div class="alerta-caixa">
+      <h2 id="titulo-alerta">Atenção</h2>
+      <p>{{ alerta }}</p>
+      <button type="button" class="botao-alerta" @click="fecharAlerta">Entendi</button>
+    </div>
+  </div>
+</template>
+
 
 <style scoped>
 .container-formulario {
@@ -168,7 +181,6 @@ function cancelar() {
 }
 
 h1 {
-  font-family: 'Italiana', serif;
   grid-column: span 2;
   color: #705335;
   text-align: center;

@@ -151,7 +151,7 @@ function fecharImagemComEsc(event) {
           title="Limpar filtros"
           @click="limparFiltros"
         >
-          <img src="/img/trash-icon.svg" alt="Limpar filtros" class="trash-icon" />
+          <span class="trash-icon" aria-hidden="true">🗑️</span>
         </button>
       </div>
     </div>
@@ -374,6 +374,11 @@ h1 {
 .botao-limpar-filtros:hover {
   background-color: #536236;
   color: #f1ebd9;
+}
+
+.trash-icon {
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .filtro label {
@@ -608,5 +613,45 @@ h1 {
   .imagem-ampliada {
     max-height: calc(100vh - 92px);
   }
+}
+
+/* Botões do Suporte e Ações */
+.acoes-suporte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* Estilo padrão para os botões de ação (Visualizar / Marcar como resolvido) */
+.acoes-suporte button {
+  background-color: #536236;
+  color: #f1ebd9;
+  border: 1.5px solid #536236;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.acoes-suporte button:hover {
+  background-color: #43502a;
+  border-color: #43502a;
+  transform: translateY(-2px);
+}
+
+/* Estilo específico para o botão "Apagar" (seguindo o modelo outline da imagem) */
+.acoes-suporte .botao-apagar {
+  background-color: transparent;
+  color: #536236;
+  border: 1.5px solid #536236;
+}
+
+.acoes-suporte .botao-apagar:hover {
+  background-color: #536236;
+  color: #f1ebd9;
 }
 </style>
