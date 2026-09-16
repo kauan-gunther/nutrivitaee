@@ -159,7 +159,7 @@ const destaques = [
 .card-destaque h3 {
   color: #333F34;
   font-size: 1.4rem;
-  font-weight: normal;
+  font-weight: bold;
   text-align: center;
   margin: 0 0 20px 0;
 }
@@ -196,7 +196,9 @@ const destaques = [
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px 16px;
-  font-size: 0.85rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333F34;
   margin-bottom: 14px;
   border-bottom: 1px solid #73441B;
   padding-bottom: 10px;
@@ -214,8 +216,9 @@ const destaques = [
 
 .col-formacao h4 {
   margin: 0 0 6px 0;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: bold;
+  color: #333F34;
 }
 
 .col-formacao ul {
@@ -228,6 +231,8 @@ const destaques = [
   font-size: 0.78rem;
   margin-bottom: 4px;
   line-height: 1.3;
+  color: #73441B;
+  font-weight: bold;
 }
 
 .btn-ver-mais {

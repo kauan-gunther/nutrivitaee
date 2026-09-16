@@ -24,7 +24,7 @@ function rolarParaDiferencial() {
         </div>
 
         <ul class="lista-diferenciais">
-          <li>Suas preferêncisc\dc\dvcd\vdfas de sabor</li>
+          <li>Suas preferências de sabor</li>
           <li>Alergias e intolerâncias alimentares</li>
           <li>Sua rotina financeira e de tempo</li>
           <li>A alegria de comer o que você gosta</li>
@@ -36,7 +36,6 @@ function rolarParaDiferencial() {
 
 <style scoped>
 .diferencial-wrapper {
-  /* Aumentado de 1050px para 1250px para esticar bem o bloco deitado na tela */
   max-width: 1250px;
   margin: 0 auto;
   padding: 60px 20px 20px 20px;
@@ -45,8 +44,7 @@ function rolarParaDiferencial() {
 .diferencial-card {
   border: 1.5px solid #73441B;
   border-radius: 30px;
-  /* Aumentado o padding lateral interno para espalhar os itens com harmonia */
-  padding: 45px 60px;
+  padding: 30px 100px;
   background-color: transparent;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
@@ -54,38 +52,36 @@ function rolarParaDiferencial() {
 
 .diferencial-card h2 {
   color: #333F34;
-  font-size: 2.3rem;
+  font-size: 55px;
   font-weight: bold;
   margin-bottom: 12px;
 }
 
 .intro {
   color: #536236;
-  font-size: 1.05rem;
+  font-size: 22px;
   margin-bottom: 35px;
 }
 
 .diferencial-conteudo {
   display: flex;
   align-items: center;
-  /* Usa espaço uniforme entre os pratos e a lista para ocupar bem o comprimento */
-  justify-content: space-around;
-  gap: 50px;
+  justify-content: space-between;
+  width: 100%;
+  gap: 90px;
 }
 
 .grid-pratos {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  flex-shrink: 0;
+  gap: 40px;
 }
 
 .grid-pratos img {
-  width: 95px;
-  height: 95px;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  border-radius: 10%;
   object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .lista-diferenciais {
@@ -94,7 +90,7 @@ function rolarParaDiferencial() {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 30px;
   text-align: left;
 }
 
@@ -103,12 +99,12 @@ function rolarParaDiferencial() {
   align-items: center;
   color: #333F34;
   font-weight: 500;
-  font-size: 1.05rem;
+  font-size: 20px;
 }
 
 .lista-diferenciais li::before {
   content: "•";
-  color: #705335;
+  color: #536236;
   font-size: 2rem;
   margin-right: 12px;
   line-height: 0;
