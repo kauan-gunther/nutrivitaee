@@ -7,7 +7,7 @@ const cadastro = ref({
     nome: '',
     email: '',
     assunto: '',
-    categoria: '', //'Mobilidade no site', 'Erro no upload de documento', 'Perfil do profissional não aparece nos resultados', 'Filtro não funciona', 'Resultados exibindo médicos inativos ou suspensos',  'Choque de horário',  'Falha no envio do link da teleconsulta'.
+    categoria: '',
     descrever: '',
     anexar: '',
     foto: null,
@@ -152,8 +152,10 @@ function fecharAlerta() {
       <textarea id="descrever" v-model="cadastro.usuario.descrever"></textarea>
     </div>
 
-    <button type="button" @click="validarFormulario" class="bnt-confirmar">Confirmar</button>
-    <button @click="cancelar" class="bnt-cancelar">Cancelar</button>
+    <div class="acoes-container">
+      <button type="button" @click="validarFormulario" class="btn-pill bnt-confirmar">Confirmar</button>
+      <button type="button" @click="cancelar" class="btn-pill bnt-cancelar">Cancelar</button>
+    </div>
   </div>
 
   <div
@@ -171,7 +173,6 @@ function fecharAlerta() {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .container-formulario {
@@ -245,36 +246,6 @@ h1 {
   font-size: 1.25rem;
 }
 
-.upload-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  width: 100%;
-  cursor: pointer;
-}
-
-.plus-box {
-  border: 1.5px solid #8c7355;
-  width: 120px;
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-}
-
-.plus-icon {
-  font-size: 3rem;
-  color: #b3b3b3;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.input-file-hidden {
-  display: none;
-}
-
 .painel-quadrado textarea {
   width: 100%;
   flex: 1;
@@ -299,19 +270,89 @@ h1 {
   flex: 1;
   background-color: #536236;
   color: #f1ebd9;
-  border: none;
+  border: 1.5px solid #536236;
   border-radius: 50px;
   padding: 14px 28px;
   font-size: 1.25rem;
   font-weight: 500;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
   text-align: center;
 }
 
 .btn-pill:hover {
   background-color: #43502a;
+  border-color: #43502a;
+  transform: translateY(-2px);
+}
+
+.bnt-cancelar {
+  background-color: transparent;
+  color: #536236;
+  border: 1.5px solid #536236;
+}
+
+.bnt-cancelar:hover {
+  background-color: #536236;
+  color: #f1ebd9;
+}
+
+/* Estilização do Modal de Alerta */
+.alerta-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.alerta-caixa {
+  background-color: #ebe2cc;
+  border: 1.5px solid #8c7355;
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.alerta-caixa h2 {
+  color: #705335;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.alerta-caixa p {
+  color: #4a5435;
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.botao-alerta {
+  background-color: #536236;
+  color: #f1ebd9;
+  border: 1.5px solid #536236;
+  border-radius: 50px;
+  padding: 10px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.botao-alerta:hover {
+  background-color: #43502a;
+  border-color: #43502a;
   transform: translateY(-2px);
 }
 

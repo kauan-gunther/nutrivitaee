@@ -14,6 +14,7 @@ const temReceitas = computed(() => receitas.value.length > 0)
 
 onMounted(() => {
   carregarUsuario()
+
   const todas = JSON.parse(localStorage.getItem('listaPratos') || '[]')
 
   if (usuarioLogado.value) {
@@ -153,8 +154,7 @@ function conversar(prato) {
 
 <style scoped>
 .hero-banner {
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-receitasCliente.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('/img/banner-receitasCliente.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -278,6 +278,7 @@ function conversar(prato) {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  width: 100%;
 }
 
 .dish-img {
@@ -302,21 +303,33 @@ function conversar(prato) {
 
 .btn-ver,
 .btn-conversar {
-  background-color: #9a9e70;
-  color: #333f34;
+  display: block;
+  width: 100%;
+  background-color: #536236;
+  color: #f1ebd9;
   border: 1.5px solid #536236;
   border-radius: 12px;
-  padding: 6px 14px;
-  font-weight: bold;
-  font-size: 0.8rem;
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
 }
 
+.btn-ver:hover,
+.btn-conversar:hover {
+  background-color: #43502a;
+  border-color: #43502a;
+  transform: translateY(-1px);
+}
 
 @media (max-width: 700px) {
   .hero-banner {
-    min-height: 100vh; 
+    min-height: 100vh;
     width: 100%;
-    background-size: cover; 
+    background-size: cover;
     background-position: center;
     padding: 20px 16px;
   }
