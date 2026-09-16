@@ -41,5 +41,16 @@ const profissionaisFiltrados = computed(() => {
   max-width: 1300px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ====================================
+   ESTILOS PARA CELULAR (Responsividade)
+===================================== */
+@media (max-width: 768px) {
+  .container-busca {
+    padding: 10px;
+    width: 100%;
+  }
 }
 </style>

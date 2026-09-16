@@ -64,11 +64,13 @@ function apagarSuporte(id) {
   }
 
   if (obterStatus(suporte) !== 'resolvido') {
-    alerta.value = 'Este suporte não pode ser apagado enquanto não estiver resolvido.'
+    alerta.value = 'Atenção, para apagar você precisa marcar como resolvido.'
     return
   }
 
-  router.push(`/deletar-suporte/${id}`)
+  // Remove o suporte diretamente da lista e atualiza o localStorage
+  suportes.value = suportes.value.filter((item) => item.id !== id)
+  localStorage.setItem('suportes', JSON.stringify(suportes.value))
 }
 
 function resolverSuporte(id) {
@@ -215,9 +217,6 @@ function fecharImagemComEsc(event) {
           <span class="valor-suporte">{{ item.usuario.descrever }}</span>
         </p>
         <div class="acoes-suporte">
-          <button type="button" class="botao-visualizar" @click="visualizarSuporte(item.id)">
-            Visualizar
-          </button>
           <button
             v-if="obterStatus(item) !== 'resolvido'"
             type="button"
@@ -253,6 +252,7 @@ function fecharImagemComEsc(event) {
     <img :src="imagemSelecionada.src" :alt="imagemSelecionada.alt" class="imagem-ampliada" />
   </div>
 
+  <!-- Alerta Estilizado -->
   <div
     v-if="alerta"
     class="alerta-overlay"
@@ -268,7 +268,6 @@ function fecharImagemComEsc(event) {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .principal {
@@ -504,7 +503,7 @@ h1 {
 .imagem-ampliada {
   max-width: min(100%, 1100px);
   max-height: calc(100vh - 64px);
-  object-fit: contain;
+  object-exit: contain;
   border: 2px solid #8c7355;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
@@ -541,89 +540,6 @@ h1 {
   margin-top: 18px;
 }
 
-.btn-pill {
-  background-color: #536236;
-  color: #f1ebd9;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 24px;
-  font-size: 1.15rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.35);
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.btn-pill:hover {
-  background-color: #43502a;
-  transform: translateY(-2px);
-}
-
-.sem-resultados {
-  color: #4a5435;
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 40px 0;
-}
-
-.acoes {
-  display: flex;
-  justify-content: center;
-  max-width: 400px;
-  width: 100%;
-  margin: auto auto 0;
-  padding-top: 28px;
-}
-
-.btn-voltar {
-  width: 100%;
-  padding: 14px 28px;
-  font-size: 1.2rem;
-}
-
-@media (max-width: 768px) {
-  .principal {
-    padding: 28px 16px;
-  }
-  h1 {
-    font-size: 2.5rem;
-  }
-  .filtros {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .filtro-prioridade {
-    width: 100%;
-  }
-  .suporte-cabecalho,
-  .suporte-detalhes {
-    grid-template-columns: 1fr;
-  }
-  .botao-imagem {
-    justify-self: start;
-  }
-  .foto-suporte {
-    width: 120px;
-    height: 120px;
-  }
-  .visualizador {
-    padding: 68px 16px 24px;
-  }
-  .imagem-ampliada {
-    max-height: calc(100vh - 92px);
-  }
-}
-
-/* Botões do Suporte e Ações */
-.acoes-suporte {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-/* Estilo padrão para os botões de ação (Visualizar / Marcar como resolvido) */
 .acoes-suporte button {
   background-color: #536236;
   color: #f1ebd9;
@@ -643,7 +559,6 @@ h1 {
   transform: translateY(-2px);
 }
 
-/* Estilo específico para o botão "Apagar" (seguindo o modelo outline da imagem) */
 .acoes-suporte .botao-apagar {
   background-color: transparent;
   color: #536236;
@@ -653,5 +568,63 @@ h1 {
 .acoes-suporte .botao-apagar:hover {
   background-color: #536236;
   color: #f1ebd9;
+}
+
+/* Estilização do Alerta Personalizado */
+.alerta-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.alerta-caixa {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px;
+  background-color: #ebe2cc;
+  border: 1.5px solid #8c7355;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.alerta-caixa h2 {
+  font-family: 'Italiana', serif;
+  margin: 0 0 12px;
+  color: #705335;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.alerta-caixa p {
+  margin: 0 0 20px;
+  color: #4a5435;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.botao-alerta {
+  background-color: #536236;
+  color: #f1ebd9;
+  border: 1.5px solid #536236;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.botao-alerta:hover {
+  background-color: #43502a;
+  border-color: #43502a;
+  transform: translateY(-2px);
 }
 </style>

@@ -89,12 +89,18 @@ function conversar(prato) {
         <RouterLink to="/login" class="btn-action">Fazer login</RouterLink>
       </section>
 
-      <section v-else-if="!temReceitas" class="card-status-box dashed-border">
-        <h2 class="status-title">{{ textos.semReceitasTitulo }}</h2>
-        <p class="status-sub">{{ textos.semReceitasSub }}</p>
-        <RouterLink v-if="!estaLogado" to="/login" class="btn-action">Fazer login</RouterLink>
-      </section>
-
+  
+<section v-else-if="!temReceitas" class="card-status-box dashed-border">
+  <h2 class="status-title">{{ textos.semReceitasTitulo }}</h2>
+  <p class="status-sub">{{ textos.semReceitasSub }}</p>
+  <RouterLink
+    v-if="!isProfissional"
+    to="/consultas/:id/agendamento"
+    class="btn-action"
+  >
+    Agendar Consulta
+  </RouterLink>
+</section>
       <section v-else class="lista-receitas">
         <div class="search-bar">
           <input type="text" v-model="buscaTermo" :placeholder="textos.placeholderBusca" />

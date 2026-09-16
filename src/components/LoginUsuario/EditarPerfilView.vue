@@ -53,23 +53,27 @@
         <div class="icon-circle"><i class="mdi mdi-pencil-outline"></i></div>
       </div>
 
-      <!-- Cards de Preferências e Alergias -->
+      <!-- Cards de Preferências e Alergias (Editáveis) -->
       <div class="card-light card-edit col-half">
         <div class="card-header">
           <h3 class="card-title">Preferencias</h3>
           <div class="icon-circle"><i class="mdi mdi-pencil-outline"></i></div>
         </div>
         <hr class="card-divider" />
+        
         <p class="section-subtitle">gosto:</p>
-        <ul>
-          <li v-for="(p, i) in form.preferencias?.gosto" :key="i">• {{ p }}</li>
-          <li v-if="!form.preferencias?.gosto?.length">• Não registrado</li>
-        </ul>
+        <div v-for="(p, i) in form.preferencias?.gosto" :key="'gosto-'+i" class="editable-item-row">
+          <input v-model="form.preferencias.gosto[i]" placeholder="Ex: Soja" />
+          <button type="button" class="btn-remover" @click="removerItem(form.preferencias.gosto, i)">✕</button>
+        </div>
+        <button type="button" class="btn-adicionar" @click="adicionarItem(form.preferencias, 'gosto')">+ Adicionar gosto</button>
+
         <p class="section-subtitle mt-2">Não gosta</p>
-        <ul>
-          <li v-for="(np, i) in form.preferencias?.naoGosto" :key="i">• {{ np }}</li>
-          <li v-if="!form.preferencias?.naoGosto?.length">• Não registrado</li>
-        </ul>
+        <div v-for="(np, i) in form.preferencias?.naoGosto" :key="'naoGosto-'+i" class="editable-item-row">
+          <input v-model="form.preferencias.naoGosto[i]" placeholder="Ex: Cebola" />
+          <button type="button" class="btn-remover" @click="removerItem(form.preferencias.naoGosto, i)">✕</button>
+        </div>
+        <button type="button" class="btn-adicionar" @click="adicionarItem(form.preferencias, 'naoGosto')">+ Adicionar não gosta</button>
       </div>
 
       <div class="card-light card-edit col-half">
@@ -78,10 +82,12 @@
           <div class="icon-circle"><i class="mdi mdi-pencil-outline"></i></div>
         </div>
         <hr class="card-divider" />
-        <ul>
-          <li v-for="(a, i) in form.alergias" :key="i">• {{ a }}</li>
-          <li v-if="!form.alergias?.length">• Não registrado</li>
-        </ul>
+        
+        <div v-for="(a, i) in form.alergias" :key="'alergia-'+i" class="editable-item-row">
+          <input v-model="form.alergias[i]" placeholder="Ex: Frutos do Mar" />
+          <button type="button" class="btn-remover" @click="removerItem(form.alergias, i)">✕</button>
+        </div>
+        <button type="button" class="btn-adicionar" @click="adicionarAlergia">+ Adicionar alergia</button>
       </div>
 
       <!-- Botões Inferiores -->
@@ -107,6 +113,25 @@ const form = reactive({ ...props.usuario });
 watch(() => props.usuario, (novo) => {
   Object.assign(form, JSON.parse(JSON.stringify(novo)));
 }, { deep: true, immediate: true });
+
+// Funções auxiliares para gerenciar os arrays de preferências e alergias com segurança
+const removerItem = (array, index) => {
+  array.splice(index, 1);
+};
+
+const adicionarItem = (objPreferencias, chave) => {
+  if (!objPreferencias[chave]) {
+    objPreferencias[chave] = [];
+  }
+  objPreferencias[chave].push('');
+};
+
+const adicionarAlergia = () => {
+  if (!form.alergias) {
+    form.alergias = [];
+  }
+  form.alergias.push('');
+};
 
 const salvar = () => {
   emit('salvar-edicao', JSON.parse(JSON.stringify(form)));
@@ -156,18 +181,17 @@ const salvar = () => {
 }
 
 .serif-title {
-  font-family: 'Italiana', serif, sans-serif;
-  font-weight: 400;
+  font-weight: bold;
   margin: 0;
 }
 
 .page-title {
-  font-size: 3rem;
+  font-size: 40px;
   color: #705335;
 }
 
 .user-name {
-  font-size: 2.8rem;
+  font-size: 40px;
   color: #705335;
 }
 
@@ -204,8 +228,7 @@ const salvar = () => {
 .label-text {
   color: #4a5435;
   font-size: 1.15rem;
-  font-weight: 500;
-  font-family: 'Italiana', serif, sans-serif;
+  font-weight: bold;
   white-space: nowrap;
 }
 
@@ -253,10 +276,9 @@ const salvar = () => {
 }
 
 .card-title {
-  font-family: 'Italiana', serif, sans-serif;
   font-size: 1.4rem;
   color: #705335;
-  font-weight: 600;
+  font-weight: bold;
   margin: 0;
 }
 
@@ -274,18 +296,51 @@ const salvar = () => {
   margin: 0 0 4px 0;
 }
 
-ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
+.editable-item-row {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid #8c7355;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-bottom: 6px;
 }
 
-li {
-  color: #4a5435;
+.editable-item-row input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+  color: #705335;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.btn-remover {
+  background: transparent;
+  border: none;
+  color: #536236;
+  font-weight: bold;
+  cursor: pointer;
   font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-  padding-left: 12px;
+  padding: 0 4px;
+}
+
+.btn-adicionar {
+  background: transparent;
+  border: none;
+  color: #536236;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 0;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+.btn-adicionar:hover {
+  text-decoration: underline;
 }
 
 .mt-2 {

@@ -72,7 +72,7 @@
           <hr class="card-divider" />
 
           <div class="subsecao">
-            <span class="subtitulo">Objetivo do Usuário</span>
+            <span class="subtitulo">Objetivo do Paciente</span>
           </div>
           <ul>
             <li v-if="!usuario.preferencias?.objetivo">• Não registrado</li>
@@ -80,7 +80,7 @@
           </ul>
 
           <div class="subsecao">
-            <span class="subtitulo">Dieta do Usuário</span>
+            <span class="subtitulo">Dieta do Paciente</span>
           </div>
           <ul>
             <li v-if="!usuario.preferencias?.dieta?.length">• Não registrado</li>
@@ -88,7 +88,7 @@
           </ul>
 
           <div class="subsecao">
-            <span class="subtitulo">Preferências do Usuário</span>
+            <span class="subtitulo">Preferências do  Paciente</span>
           </div>
           <ul>
             <li v-if="!usuario.preferencias?.gosto?.length">• Não registrado</li>
@@ -103,7 +103,7 @@
           <hr class="card-divider" />
 
           <div class="subsecao">
-            <span class="subtitulo">Alergias do Usuário</span>
+            <span class="subtitulo">Alergias do  Paciente</span>
           </div>
 
           <ul>
@@ -360,9 +360,7 @@ const calcularIdade = (dataNasc) => {
 }
 
 .user-name {
-  font-family: 'Italiana', serif, sans-serif;
   font-size: 3rem;
-  font-weight: 400;
   color: #705335;
   margin: 0;
 }
@@ -391,7 +389,6 @@ const calcularIdade = (dataNasc) => {
   color: #4a5435;
   font-size: 1.15rem;
   font-weight: 500;
-  font-family: 'Italiana', serif, sans-serif;
 }
 
 .valor-text {
@@ -447,7 +444,6 @@ const calcularIdade = (dataNasc) => {
 
 .card-title {
   text-align: center;
-  font-family: 'Italiana', serif, sans-serif;
   font-size: 1.4rem;
   color: #705335;
   font-weight: 600;
@@ -455,15 +451,13 @@ const calcularIdade = (dataNasc) => {
 }
 
 .btn-definir-pref {
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1px solid #536236;
+  background-color: #536236;
+  color: #f1edd2;
   border-radius: 8px;
   padding: 4px 12px;
   font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .btn-definir-pref:hover {

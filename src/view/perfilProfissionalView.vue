@@ -64,6 +64,46 @@ function salvarFormacao(novaFormacao) {
   exibirModalAcademic.value = false
 }
 
+const persistirProfissional = (dadosAtualizados) => {
+  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
+  const idx = cadastros.findIndex((c) => String(c.id) === String(dadosAtualizados.id))
+  
+  if (idx !== -1) {
+    cadastros[idx] = dadosAtualizados
+    localStorage.setItem('cadastros', JSON.stringify(cadastros))
+  }
+
+  if (souDono.value) {
+    login(dadosAtualizados)
+  }
+}
+
+const selecionarFoto = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    alert('Selecione uma imagem válida.')
+    event.target.value = ''
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    const fotoBase64 = reader.result
+    profissional.value.foto = fotoBase64
+    persistirProfissional(profissional.value)
+  }
+
+  reader.readAsDataURL(file)
+  event.target.value = ''
+}
+
+function irParaEdicao() {
+  if (!profissional.value) return
+  router.push(`/profissional/${profissional.value.id}/edit`)
+}
+
 function sair() {
   logout()
   router.push('/login')
@@ -75,9 +115,9 @@ function sair() {
     <!-- Topo unificado: Botões de controle de Ações + Título -->
     <div class="acoes-topo">
       <div class="acoes-esquerda">
-        <RouterLink v-if="souDono" :to="`/profissional/${profissional.id}/edit`" class="btn-acao-topo" title="Editar Perfil">
+        <button v-if="souDono" class="btn-acao-topo" title="Editar Perfil" @click="irParaEdicao">
           <i class="mdi mdi-pencil-outline"></i> Editar
-        </RouterLink>
+        </button>
       </div>
 
       <div class="acoes-direita">
@@ -85,7 +125,7 @@ function sair() {
           <i class="mdi mdi-delete-outline"></i> Excluir
         </RouterLink>
         <button v-if="souDono" class="btn-sair" @click="sair">
-          <i class="mdi mdi-logout"></i> Sair
+          Sair
         </button>
       </div>
     </div>
@@ -95,11 +135,17 @@ function sair() {
     <div class="perfil-conteudo">
       <div class="dados-pessoais">
         <div class="linha-nome">
-          <img
-            :src="profissional.foto || 'https://via.placeholder.com/150'"
-            :alt="profissional.nome"
-            class="foto-perfil"
-          />
+          <div class="avatar-wrapper">
+            <img
+              :src="profissional.foto || 'https://via.placeholder.com/150'"
+              :alt="profissional.nome"
+              class="foto-perfil"
+            />
+            <label v-if="souDono" class="upload-foto" title="Adicionar foto de perfil">
+              <input type="file" accept="image/*" @change="selecionarFoto" />
+              <i class="mdi mdi-camera-plus-outline"></i>
+            </label>
+          </div>
           <div class="campo-dado flex-grow">
             <span class="label">Nome:</span>
             <span class="valor">{{ profissional.nome }}</span>
@@ -148,7 +194,10 @@ function sair() {
 
         <!-- Box Especializações -->
         <div class="card-info">
-          <h2>Especializações</h2>
+          <div class="card-header">
+            <h2>Especializações</h2>
+            <button v-if="souDono" class="btn-definir" @click="exibirModalAcademic = true">Definir</button>
+          </div>
           <ul>
             <li v-if="!profissional.especializacoes?.length" class="sem-registro">
               • Não registrada
@@ -210,39 +259,49 @@ function sair() {
   gap: 12px;
 }
 
-.btn-sair,
-.btn-acao-topo {
-  background-color: #536236;
+/* Estilização igualada aos botões do primeiro código */
+.btn-sair {
+  background-color: transparent;
   border: 1.5px solid #536236;
-  color: #efe8d3;
+  color: #536236;
   border-radius: 20px;
-  padding: 8px 20px;
-  font-size: 1rem;
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-acao-topo {
+  background-color: transparent;
+  border: 1.5px solid #8c7355;
+  color: #536236;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
+  background-color: #ebe2cc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.btn-sair:hover,
 .btn-acao-topo:hover {
-  background-color: #414e2a;
-  border-color: #414e2a;
-  color: #f1edd2;
+  transform: scale(1.05);
 }
 
 .btn-deletar-topo {
-  background-color: transparent;
+  background-color: #ebe2cc;
+  border: 1.5px solid #8c7355;
   color: #536236;
-  border-color: #536236;
-}
-
-.btn-deletar-topo:hover {
-  background-color: #536236;
-  color: #efe8d3;
 }
 
 h1 {
@@ -273,13 +332,59 @@ h1 {
   gap: 24px;
 }
 
-.foto-perfil {
+.avatar-wrapper {
+  position: relative;
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
+  flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 2px solid #8c7355;
+}
+
+.foto-perfil {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.upload-foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: #f1edd2;
+  cursor: pointer;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.avatar-wrapper:hover .upload-foto {
+  opacity: 1;
+}
+
+.upload-foto input {
+  display: none;
+}
+
+.upload-foto i {
+  font-size: 1.3rem;
+  background: #536236;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #f1edd2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .campo-dado {

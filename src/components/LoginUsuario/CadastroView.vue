@@ -1,7 +1,7 @@
 <template>
   <div class="cadastro-container">
     <div class="header">
-      <h1 class="serif-title">Cadastro de usuário</h1>
+      <h1 class="serif-title">Cadastro do Paciente</h1>
     </div>
 
     <form @submit.prevent="submitCadastro" class="form-grid">

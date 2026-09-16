@@ -38,7 +38,7 @@ const emit = defineEmits(["update:modelValue"])
     display: flex;
     align-items: center;
     width: 85%;
-    max-width: 600px;
+    max-width: 900px;
     padding: 10px 20px;
     border-radius: 40px;
     background: #536236;
