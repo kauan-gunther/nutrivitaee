@@ -219,7 +219,7 @@ const cancelInlineEdit = () => {
       <header class="top-bar">
         <div class="user-info">
           <div class="avatar">{{ userInitial }}</div>
-          <span>{{ userData.nome || 'Usuário' }}</span>
+          <span>{{ userData.nome || 'Paciente' }}</span>
           <button class="settings-btn" title="Perfil do Usuário" @click="toggleProfile">⚙️</button>
         </div>
 
@@ -288,7 +288,7 @@ const cancelInlineEdit = () => {
 
       <main v-else class="profile-view">
         <div class="profile-header">
-          <h2>Perfil do Usuário</h2>
+          <h2>Perfil do Paciente</h2>
         </div>
         
         <div class="profile-grid">

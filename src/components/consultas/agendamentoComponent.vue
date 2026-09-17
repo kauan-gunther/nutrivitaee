@@ -217,7 +217,7 @@ function agendar() {
       </section>
 
       <section class="section-block">
-        <div class="divider"><span>Seus Dados (Usuário)</span></div>
+        <div class="divider"><span>Seus Dados (Paciente)</span></div>
         <div class="grid-form">
           <div class="input-card">
             <label for="usr-nome">Nome:</label>

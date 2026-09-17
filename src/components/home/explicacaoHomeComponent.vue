@@ -24,7 +24,6 @@ const paginas = [
 const paginaAtual = ref(0)
 let timer = null
 
-// Alterna entre a página 0 e a página 1 a cada 5 segundos
 onMounted(() => {
   timer = setInterval(() => {
     paginaAtual.value = (paginaAtual.value + 1) % paginas.length

@@ -82,10 +82,10 @@ function confirmar() {
 
 <template>
   <main class="container">
-    <h1>Preferências do Usuário</h1>
+    <h1>Preferências do Paciente</h1>
 
     <!-- Objetivo do Usuário (Seleção Única) -->
-    <div class="secao-titulo"><span>Objetivo do Usuário</span></div>
+    <div class="secao-titulo"><span>Objetivo do Paciente</span></div>
     <div class="grid-form">
       <div 
         v-for="item in ['Emagrecimento', 'Comer Saudável', 'Pré-Treino', 'Ganho de Massa', 'Saúde']" 
@@ -103,7 +103,7 @@ function confirmar() {
     </div>
 
     <!-- Dieta do Usuário -->
-    <div class="secao-titulo"><span>Dieta do Usuário</span></div>
+    <div class="secao-titulo"><span>Dieta do Paciente</span></div>
     <div class="grid-form">
       <div 
         v-for="item in ['Vegetariano', 'Vegano', 'Onívoro', 'Carnívoro', 'Low Carb']" 
@@ -121,7 +121,7 @@ function confirmar() {
     </div>
 
     <!-- Preferências do Usuário -->
-    <div class="secao-titulo"><span>Preferências do Usuário</span></div>
+    <div class="secao-titulo"><span>Preferências do Paciente</span></div>
     <div class="grid-form">
       <div 
         v-for="item in ['Vegetais', 'Peixes', 'Integral', 'Carnes Magras', 'Leguminosas']" 
@@ -139,7 +139,7 @@ function confirmar() {
     </div>
 
     <!-- Alergias do Usuário -->
-    <div class="secao-titulo"><span>Alergias do Usuário</span></div>
+    <div class="secao-titulo"><span>Alergias do Paciente</span></div>
     <div class="grid-form">
       <div 
         v-for="item in ['Glúten', 'Soja', 'Ovos', 'Lactose', 'Frutos do Mar']" 
@@ -255,7 +255,6 @@ h1 {
   transform: translate(-50%, -50%);
 }
 
-/* Cor quando selecionado nas listas de Dieta, Preferências e Alergias */
 .input-card.card-ativo {
   background-color: #536236;
   border-color: #536236;
@@ -333,5 +332,31 @@ h1 {
 
 .btn-salvar:hover {
   background-color: #45522d;
+}
+
+/* --- ADAPTAÇÃO PARA CELULAR --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 30px;
+    margin: 30px 30px;
+  }
+
+  .grid-form {
+    grid-template-columns: 1fr; 
+  }
+
+  .botoes {
+    flex-direction: column-reverse; 
+  }
+
+  .btn-limpar, 
+  .btn-salvar {
+    width: 100%;
+    text-align: center;
+  }
 }
 </style>
