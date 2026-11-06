@@ -4,14 +4,14 @@
 <template>
   <section id="secao-escolha" class="comecar">
     <div class="users">
-      
+
       <RouterLink to="/cadastro" class="btn-card primary">
         <div class="user">
           <i class="mdi mdi-account-heart-outline"></i>
           <span>Cadastrar Paciente</span>
         </div>
       </RouterLink>
-      
+
       <RouterLink to="/cadastro-profissional" class="btn-card secondary">
         <div class="user">
           <i class="mdi mdi-stethoscope"></i>
@@ -30,16 +30,16 @@
   width: 100%;
   padding: 0 20px 60px;
   margin-top: 55px;
-  scroll-margin-top: 100px; 
+  scroll-margin-top: 100px;
 }
 
 .users {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 32px; 
+  gap: 32px;
   width: 100%;
-  max-width: 1050px; 
+  max-width: 1050px;
 }
 
 .btn-card {
@@ -54,12 +54,12 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 12px 10px; 
+  padding: 12px 10px;
   border-radius: 50px;
 }
 
 .user i {
-  font-size: 1rem; 
+  font-size: 1rem;
 }
 
 .user span {

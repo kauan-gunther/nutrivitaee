@@ -1,7 +1,6 @@
 <script setup>
-
 function rolarParaEscolha() {
-  const el = document.getElementById('beneficios')
+  const el = document.getElementById('secao-escolha')
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
   }
@@ -10,68 +9,113 @@ function rolarParaEscolha() {
 
 <template>
   <section class="banner">
-    <h1>Acompanhamento Nutricional</h1>
-    <h2>Mais saúde, organização e qualidade de vida</h2>
-    
-    <button class="btn-comecar" @click="rolarParaEscolha">
-      Começar agora
-    </button>
+    <div class="texto">
+      <h1>Acompanhamento nutricional</h1>
+      <h2>Mais saúde, organização e qualidade de vida</h2>
+
+      <div class="acoes">
+        <button class="btn-comecar" type="button" @click="rolarParaEscolha">
+          Começar agora
+        </button>
+        <RouterLink to="/login" class="btn-login">Já tenho conta</RouterLink>
+      </div>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .banner {
-  min-height: calc(100vh - 80px); 
-  width: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), 
-              url("/banner-home.png") no-repeat center center / cover;
-  position: relative;
+  /* Parte da foto que não pode ser cortada. Exemplos: center, 50% 20%, left center */
+  --foco: center;
+
+  /* Colado nas margens: a foto vai do topo da tela (o menu fica transparente por cima dela)
+     até o fim da tela (100svh = altura inteira da janela), sem faixa de fundo aparecendo.
+     O margin-bottom negativo desfaz o espaço (gap) que a home deixa entre os blocos. */
+  margin: 0 0 calc(var(--gutter) * -1);
+  border-radius: 0;
+  min-height: max(520px, 100svh);
+
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  padding: 0 5%;
+  align-items: flex-end;
+  padding: clamp(28px, 5vw, 72px);
+  /* Dois degradês escuros: um em cima (para o menu e a logo aparecerem bem)
+     e um embaixo (atrás do texto). O resto da foto aparece limpo. */
+  background:
+    linear-gradient(180deg, rgba(38, 48, 31, 0.7) 0%, rgba(38, 48, 31, 0.4) 100px, rgba(38, 48, 31, 0) 240px),
+    linear-gradient(0deg, rgba(38, 48, 31, 0.82) 0%, rgba(38, 48, 31, 0.45) 38%, rgba(38, 48, 31, 0) 70%),
+    url("/banner-home.png") no-repeat var(--foco) / cover;
+}
+
+.texto {
+  max-width: 760px;
 }
 
 .banner h1 {
-  font-size: 3.2rem;
-  font-weight: 600;
-  color: #F1EDD2;
-  margin: 0;
-  width: 55%;
-  line-height: 1.2;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 1.02;
+  color: var(--creme);
+  margin: 0 0 16px;
 }
 
 .banner h2 {
-  font-size: 2rem;
+  font-family: "Roboto", sans-serif;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   font-weight: 400;
-  color: #F1EDD2;
-  margin: 0;
-  width: 50%;
-  line-height: 1.4;
-  opacity: 0.9;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  line-height: 1.5;
+  color: rgba(241, 237, 210, 0.92);
+  max-width: 34rem;
+  margin: 0 0 28px;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-comecar,
+.btn-login {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .btn-comecar {
-  display: inline-block;
-  font-size: 1.1rem;
   font-weight: 500;
-  color: #F1EDD2;
-  background: #536236;
-  padding: 12px 36px;
-  border-radius: 25px;
-  border: none;
-  cursor: pointer;
-  width: fit-content;
-  margin-top: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  color: var(--tinta);
+  background: var(--creme);
+  border: 1.5px solid var(--creme);
 }
 
 .btn-comecar:hover {
-  background: #333F34;
-  transform: translateY(-2px);
+  background: #fff;
+  border-color: #fff;
+}
+
+.btn-login {
+  font-weight: 400;
+  color: var(--creme);
+  background: transparent;
+  border: 1.5px solid rgba(241, 237, 210, 0.7);
+}
+
+.btn-login:hover {
+  background: rgba(241, 237, 210, 0.16);
+}
+
+.btn-comecar:focus-visible,
+.btn-login:focus-visible {
+  outline: 3px solid var(--creme);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .banner {
+    min-height: max(480px, 100svh);
+  }
 }
 </style>

@@ -18,8 +18,22 @@ import FuncionabilidadeHome from '@/components/home/funcionabilidadeHomeComponen
 
 <style scoped>
 .home {
+  /* Paleta (as suas cores, agora com nome) */
+  --verde: #536236;
+  --verde-escuro: #333F34;
+  --creme: #F1EDD2;
+  --marrom: #73441B;
+  --sage: #8E996C;
+  --sage-claro: #A8B388;
+  --tinta: #26301F;
+  --linha: rgba(51, 63, 52, 0.22);
+
+  /* Espaço entre os blocos e margem lateral dos blocos arredondados */
+  --gutter: clamp(12px, 2vw, 24px);
+
   display: flex;
   flex-direction: column;
+  gap: var(--gutter);
   width: 100%;
 }
 </style>

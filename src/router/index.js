@@ -18,7 +18,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login-usuario',
-      component: () => import('@/components/LoginUsuario/index.vue'),
+      component: () => import('@/components/LoginUsuario/indexView.vue'),
     },
     {
       path: '/cadastro',
@@ -73,7 +73,7 @@ const router = createRouter({
       path: '/meus-agendamentos',
       alias: '/agendamentos',
       name: 'meus-agendamentos',
-      component: () => import('@/view/meusAgendamentosView.vue'), // 
+      component: () => import('@/view/meusAgendamentosView.vue'), //
     },
     {
       path: '/consultas',

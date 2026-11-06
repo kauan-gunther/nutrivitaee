@@ -1,8 +1,21 @@
 <template>
   <div class="perfil-container">
+    <!-- NOVO: mensagens de carregamento, sucesso e erro -->
+    <p v-if="mensagem.texto" class="feedback" :class="mensagem.tipo" role="status">
+      {{ mensagem.texto }}
+    </p>
+
+    <p v-if="carregando" class="estado" role="status">Carregando seu perfil...</p>
+
+    <div v-else-if="erroCarregar" class="estado estado-erro" role="alert">
+      <p>{{ erroCarregar }}</p>
+      <button class="btn-editar" @click="carregarPaciente">Tentar novamente</button>
+    </div>
+
     <EditarPerfilView
-      v-if="editando"
+      v-else-if="editando"
       :usuario="usuario"
+      :salvando="salvando"
       @salvar-edicao="salvarAlteracoes"
       @cancelar="editando = false"
     />
@@ -29,30 +42,39 @@
             <i class="mdi mdi-camera-plus-outline"></i>
           </label>
         </div>
-        <h1 class="user-name">{{ usuario.nome }}</h1>
-        <button class="btn-sair" @click="sair">Sair</button>
+        <div class="header-texto">
+          <h1 class="user-name">{{ usuario.nome }}</h1>
+          <div class="header-acoes">
+            <button class="btn-editar" @click="editando = true">Editar perfil</button>
+            <button class="btn-sair" @click="sair">Sair</button>
+          </div>
+        </div>
       </div>
 
       <div class="info-grid">
         <div class="info-box input-pill">
-          <span class="label-text">peso:</span>
+          <span class="label-text">Peso</span>
           <span class="valor-text">{{ usuario.peso }}</span>
         </div>
         <div class="info-box input-pill">
-          <span class="label-text">Telefone:</span>
-          <span class="valor-text">{{ usuario.telefone }}</span>
+          <span class="label-text">Telefone</span>
+          <span class="valor-text">{{ mascaraTelefone(usuario.telefone) }}</span>
         </div>
         <div class="info-box input-pill">
-          <span class="label-text">Idade:</span>
+          <span class="label-text">Idade</span>
           <span class="valor-text">{{ calcularIdade(usuario.dataNascimento) }} anos</span>
         </div>
         <div class="info-box input-pill">
-          <span class="label-text">email:</span>
+          <span class="label-text">E-mail</span>
           <span class="valor-text">{{ usuario.email }}</span>
         </div>
         <div class="info-box input-pill">
-          <span class="label-text">cpf</span>
-          <span class="valor-text">{{ usuario.cpf }}</span>
+          <span class="label-text">CPF</span>
+          <span class="valor-text">{{ mascaraCpf(usuario.cpf) }}</span>
+        </div>
+        <div class="info-box input-pill info-largo">
+          <span class="label-text">Endereço</span>
+          <span class="valor-text">{{ enderecoTexto }}</span>
         </div>
       </div>
 
@@ -97,7 +119,7 @@
         </div>
 
         <div class="card-box light-card">
-          <div class="subsecao titulo-alergias">
+          <div class="card-header-action">
             <h3 class="card-title">Alergias / Restrições</h3>
           </div>
           <hr class="card-divider" />
@@ -113,30 +135,40 @@
         </div>
       </div>
 
-      <button class="floating-edit-btn" title="Editar Perfil" @click="editando = true">
-        <i class="mdi mdi-pencil-outline"></i>
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { computed, reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import EditarPerfilView from './EditarPerfilView.vue'
 import { useAuth } from '@/composables/useAuth'
+import {
+  atualizarPaciente,
+  buscarPacientePorId,
+  buscarPacientes,
+} from '@/services/pacientesApi.js'
+import { cpfValido, emailValido, mascaraCpf, mascaraTelefone } from '@/utils/mascaras.js'
 
 const { logout } = useAuth()
+const router = useRouter()
 
 function sair() {
   logout()
   router.push('/login')
 }
 
-const router = useRouter()
 const editando = ref(false)
 
+// estados da tela: carregando, erro ao carregar, salvando e a mensagem de aviso
+const carregando = ref(true)
+const erroCarregar = ref('')
+const salvando = ref(false)
+const mensagem = ref({ tipo: '', texto: '' }) // tipo: 'carregando' | 'sucesso' | 'erro'
+
 const usuario = reactive({
+  id: null,
   nome: '',
   cpf: '',
   peso: '',
@@ -144,8 +176,16 @@ const usuario = reactive({
   email: '',
   telefone: '',
   foto: '',
+  endereco: { cep: '', rua: '', numero: '', bairro: '', cidade: '', estado: '' },
   preferencias: { objetivo: '', dieta: [], gosto: [], naoGosto: [] },
   alergias: [],
+})
+
+// "Rua X, 120 - Centro, Itajaí/SC"
+const enderecoTexto = computed(() => {
+  const e = usuario.endereco || {}
+  if (!e.rua && !e.cidade) return 'Não registrado'
+  return `${e.rua}, ${e.numero} - ${e.bairro}, ${e.cidade}/${e.estado}`
 })
 
 const carregarPreferenciasDoCadastro = () => {
@@ -185,52 +225,117 @@ const carregarPreferenciasDoCadastro = () => {
   }
 }
 
-onMounted(() => {
-  const dadosSalvos = localStorage.getItem('usuarioLogado')
-  if (dadosSalvos) {
-    Object.assign(usuario, JSON.parse(dadosSalvos))
+// GET /pacientes/:id -> busca o paciente logado na API
+async function carregarPaciente() {
+  carregando.value = true
+  erroCarregar.value = ''
+
+  // A sessão (localStorage) só guarda QUEM está logado; os dados vêm da API.
+  const sessao = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
+  if (!sessao?.id) {
+    erroCarregar.value = 'Nenhum usuário logado. Faça login para ver seu perfil.'
+    carregando.value = false
+    return
   }
 
-  carregarPreferenciasDoCadastro()
-})
-
-const persistirUsuario = (dadosUsuario) => {
-  const dados = { ...dadosUsuario }
-  localStorage.setItem('usuarioLogado', JSON.stringify(dados))
-
-  if (dados.id) {
-    const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
-    const listaAtualizada = cadastros.filter((cadastro) => String(cadastro.id) !== String(dados.id))
-    listaAtualizada.push(dados)
-    localStorage.setItem('cadastros', JSON.stringify(listaAtualizada))
+  try {
+    const dados = await buscarPacientePorId(sessao.id)
+    delete dados.senha // a senha não precisa ficar na tela
+    Object.assign(usuario, dados)
+    carregarPreferenciasDoCadastro()
+  } catch (erro) {
+    erroCarregar.value = erro.message
+  } finally {
+    carregando.value = false
   }
 }
 
-const selecionarFoto = (event) => {
+onMounted(carregarPaciente)
+
+// Mantém a sessão (quem está logado) igual aos dados novos, sem a senha
+const atualizarSessao = (dados) => {
+  const semSenha = { ...dados }
+  delete semSenha.senha
+  const sessao = JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
+  localStorage.setItem('usuarioLogado', JSON.stringify({ ...sessao, ...semSenha }))
+}
+
+// PATCH /pacientes/:id -> grava só os campos enviados
+async function enviarAtualizacao(dados, textoSucesso) {
+  salvando.value = true
+  mensagem.value = { tipo: 'carregando', texto: 'Salvando alterações...' }
+
+  try {
+    const atualizado = await atualizarPaciente(usuario.id, dados)
+    delete atualizado.senha
+    Object.assign(usuario, atualizado)
+    atualizarSessao(atualizado)
+    mensagem.value = { tipo: 'sucesso', texto: textoSucesso }
+    return true
+  } catch (erro) {
+    mensagem.value = { tipo: 'erro', texto: erro.message }
+    return false
+  } finally {
+    salvando.value = false
+  }
+}
+
+const selecionarFoto = async (event) => {
   const file = event.target.files?.[0]
+  event.target.value = ''
   if (!file) return
 
   if (!file.type.startsWith('image/')) {
-    alert('Selecione uma imagem válida.')
-    event.target.value = ''
+    mensagem.value = { tipo: 'erro', texto: 'Selecione uma imagem válida.' }
+    return
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    mensagem.value = { tipo: 'erro', texto: 'A imagem deve ter no máximo 2 MB.' }
     return
   }
 
   const reader = new FileReader()
-  reader.onload = () => {
-    const fotoBase64 = reader.result
-    usuario.foto = fotoBase64
-    persistirUsuario({ ...usuario, foto: fotoBase64 })
-  }
-
+  reader.onload = () => enviarAtualizacao({ foto: reader.result }, 'Foto atualizada com sucesso!')
   reader.readAsDataURL(file)
-  event.target.value = ''
 }
 
-const salvarAlteracoes = (novosDados) => {
-  Object.assign(usuario, novosDados)
-  persistirUsuario(novosDados)
-  editando.value = false
+const salvarAlteracoes = async (novosDados) => {
+  const erroForm = (texto) => {
+    mensagem.value = { tipo: 'erro', texto }
+  }
+
+  if (!novosDados.nome.trim()) return erroForm('Ops, o nome é obrigatório!')
+  if (!emailValido(novosDados.email)) return erroForm('Digite um e-mail válido.')
+  if (!cpfValido(novosDados.cpf)) return erroForm('Digite um CPF válido.')
+
+  const email = novosDados.email.trim().toLowerCase()
+
+  salvando.value = true
+  mensagem.value = { tipo: 'carregando', texto: 'Verificando os dados...' }
+
+  try {
+    // CPF e e-mail não podem ser de OUTRO paciente (filtra na API e ignora o próprio)
+    const [comMesmoCpf, comMesmoEmail] = await Promise.all([
+      buscarPacientes({ cpf: novosDados.cpf }),
+      buscarPacientes({ email }),
+    ])
+    const deOutro = (p) => String(p.id) !== String(usuario.id)
+
+    if (comMesmoCpf.some(deOutro) || comMesmoEmail.some(deOutro)) {
+      salvando.value = false
+      return erroForm('Já existe outro paciente com este CPF ou e-mail.')
+    }
+  } catch (erro) {
+    salvando.value = false
+    return erroForm(erro.message)
+  }
+
+  // id e senha não vão no PATCH: a senha continua como está na API
+  const dados = Object.fromEntries(
+    Object.entries(novosDados).filter(([chave]) => chave !== 'id' && chave !== 'senha'),
+  )
+  const salvo = await enviarAtualizacao({ ...dados, email }, 'Perfil atualizado com sucesso!')
+  if (salvo) editando.value = false
 }
 
 const calcularIdade = (dataNasc) => {
@@ -249,9 +354,9 @@ const calcularIdade = (dataNasc) => {
 <style scoped>
 .perfil-container {
   width: 100%;
-  max-width: 820px;
-  margin: 40px auto 80px auto;
-  padding: 0 20px;
+  max-width: 920px;
+  margin: 48px auto 96px;
+  padding: 0 24px;
   box-sizing: border-box;
   position: relative;
 }
@@ -262,57 +367,22 @@ const calcularIdade = (dataNasc) => {
   flex-direction: column;
 }
 
-.btn-sair {
-  background-color: transparent;
-  border: 1.5px solid #536236;
-  color: #536236;
-  border-radius: 20px;
-  padding: 6px 18px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.delete-icon-btn {
-  position: absolute;
-  top: 15px;
-  right: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
-  color: #536236;
-  font-size: 1.4rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-}
-
-.delete-icon-btn:hover {
-  transform: scale(1.05);
-}
-
+/* ===== Topo: foto, nome e ações ===== */
 .profile-header {
   display: flex;
   align-items: center;
-  gap: 25px;
-  margin-top: 10px;
-  margin-bottom: 35px;
+  gap: 28px;
+  margin: 8px 0 40px;
 }
 
 .avatar-wrapper {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(51, 63, 52, 0.25);
 }
 
 .avatar-img {
@@ -325,20 +395,18 @@ const calcularIdade = (dataNasc) => {
 .upload-foto {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(38, 48, 31, 0.4);
   color: #f1edd2;
   cursor: pointer;
-  border-radius: 50%;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-.avatar-wrapper:hover .upload-foto {
+.avatar-wrapper:hover .upload-foto,
+.upload-foto:focus-within {
   opacity: 1;
 }
 
@@ -350,68 +418,148 @@ const calcularIdade = (dataNasc) => {
   font-size: 1.3rem;
   background: #536236;
   border-radius: 50%;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid #f1edd2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.header-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .user-name {
-  font-family: 'Italiana', serif, sans-serif;
-  font-size: 3rem;
+  font-family: 'Italiana', serif;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
   font-weight: 400;
-  color: #705335;
+  line-height: 1.05;
+  color: #73441b;
   margin: 0;
 }
 
+.header-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-editar,
+.btn-sair {
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-editar {
+  background: #536236;
+  border: 1.5px solid #536236;
+  color: #f1edd2;
+}
+
+.btn-editar:hover {
+  background: #333f34;
+  border-color: #333f34;
+}
+
+.btn-sair {
+  background: transparent;
+  border: 1.5px solid #536236;
+  color: #536236;
+}
+
+.btn-sair:hover {
+  background: rgba(83, 98, 54, 0.1);
+}
+
+.btn-editar:focus-visible,
+.btn-sair:focus-visible,
+.btn-definir-pref:focus-visible,
+.delete-icon-btn:focus-visible {
+  outline: 3px solid #73441b;
+  outline-offset: 3px;
+}
+
+.delete-icon-btn {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid rgba(51, 63, 52, 0.3);
+  color: #536236;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.delete-icon-btn:hover {
+  border-color: #a13d3d;
+  color: #a13d3d;
+}
+
+/* ===== Dados pessoais ===== */
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 24px;
-  margin-bottom: 35px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  margin-bottom: 40px;
 }
 
 .input-pill {
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
-  border-radius: 14px;
-  padding: 12px 18px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 18px;
+  background: #f7f3e1;
+  border: 1px solid rgba(51, 63, 52, 0.18);
+  border-radius: 12px;
   box-sizing: border-box;
-  height: 52px;
 }
 
 .label-text {
-  color: #4a5435;
-  font-size: 1.15rem;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.82rem;
   font-weight: 500;
-  font-family: 'Italiana', serif, sans-serif;
+  letter-spacing: 0.02em;
+  color: #536236;
 }
 
 .valor-text {
-  color: #705335;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #333f34;
+  word-break: break-word;
 }
 
+/* ===== Cartões de preferências e alergias ===== */
 .cards-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .light-card {
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
+  background: #f7f3e1;
+  border: 1px solid rgba(51, 63, 52, 0.18);
   border-radius: 16px;
-  padding: 18px 22px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 24px 26px;
   min-height: 200px;
 }
 
@@ -419,69 +567,51 @@ const calcularIdade = (dataNasc) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.subsecao {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #73441b;
-  margin: 12px 0 8px;
-}
-
-.subsecao::before,
-.subsecao::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #536236;
-}
-
-.subtitulo {
-  padding: 0 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  gap: 12px;
 }
 
 .card-title {
-  text-align: center;
-  font-family: 'Italiana', serif, sans-serif;
-  font-size: 1.4rem;
-  color: #705335;
-  font-weight: 600;
+  font-family: 'Italiana', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: #73441b;
   margin: 0;
 }
 
 .btn-definir-pref {
-  background-color: #9a9e70;
-  color: #333f34;
-  border: 1px solid #536236;
+  background: transparent;
+  color: #536236;
+  border: 1.5px solid #536236;
   border-radius: 8px;
-  padding: 4px 12px;
+  padding: 5px 14px;
   font-size: 0.85rem;
-  font-weight: bold;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .btn-definir-pref:hover {
-  background-color: #888c60;
+  background: rgba(83, 98, 54, 0.1);
 }
 
 .card-divider {
   border: 0;
-  height: 1.5px;
-  background-color: #536236;
-  margin-bottom: 12px;
+  height: 1px;
+  background: rgba(51, 63, 52, 0.2);
+  margin: 12px 0 16px;
 }
 
-.section-subtitle {
-  color: #4a5435;
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin: 0 0 4px 0;
+.subsecao {
+  display: block;
+  margin: 16px 0 6px;
+}
+
+.subtitulo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #73441b;
 }
 
 ul {
@@ -491,38 +621,9 @@ ul {
 }
 
 li {
-  color: #4a5435;
+  color: #333f34;
   font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-  padding-left: 12px;
-}
-
-.mt-2 {
-  margin-top: 10px;
-}
-
-.floating-edit-btn {
-  position: absolute;
-  bottom: -60px;
-  left: -60px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
-  color: #536236;
-  font-size: 1.3rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
-}
-
-.floating-edit-btn:hover {
-  transform: scale(1.08);
+  margin-bottom: 4px;
 }
 
 @media (max-width: 768px) {
@@ -536,9 +637,55 @@ li {
     text-align: center;
   }
 
-  .floating-edit-btn {
-    bottom: -50px;
-    left: 0;
+  .header-texto {
+    align-items: center;
   }
+
+  .header-acoes {
+    justify-content: center;
+  }
+}
+
+/* ===== Novidades da versão com API ===== */
+.info-largo {
+  grid-column: 1 / -1;
+}
+
+.estado {
+  text-align: center;
+  color: #536236;
+  font-size: 1.1rem;
+  padding: 60px 0;
+}
+
+.estado-erro {
+  color: #8a2f2f;
+}
+
+.estado-erro p {
+  margin: 0 0 16px;
+}
+
+.feedback {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.feedback.carregando {
+  background: #ebe2cc;
+  color: #4a5435;
+}
+
+.feedback.sucesso {
+  background: #dfe8cf;
+  color: #3b4a22;
+}
+
+.feedback.erro {
+  background: #f3dcd6;
+  color: #8a2f2f;
 }
 </style>

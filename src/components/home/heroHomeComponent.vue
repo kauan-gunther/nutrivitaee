@@ -2,150 +2,117 @@
 </script>
 
 <template>
-  <section class="hero-container">
-    <div class="content">
-      
-      <h2>Alimentação saudável do seu jeito</h2>
-      <p>
-        Encontre nutricionistas, agende consultas e receba receitas personalizadas de acordo com seus gostos e objetivos.
-      </p>
+  <section class="hero">
+    <h2>Alimentação saudável do seu jeito</h2>
+    <p class="intro">
+      Encontre nutricionistas, agende consultas e receba receitas personalizadas de acordo com seus gostos e objetivos.
+    </p>
 
-      <ul id="beneficios" class="beneficios">
-        <li>
-          <i class="mdi mdi-check-circle-outline"></i>
-          Atendimento online e presencial
-        </li>
-        <li>
-          <i class="mdi mdi-check-circle-outline"></i>
-          Receitas adaptadas ao seu perfil
-        </li>
-        <li>
-          <i class="mdi mdi-check-circle-outline"></i>
-          Acompanhamento humanizado
-        </li>
-      </ul>
-</div>
+    <ul id="beneficios" class="beneficios">
+      <li>
+        <i class="mdi mdi-video-outline"></i>
+        <h3>Atendimento online e presencial</h3>
+        <p>Escolha o formato que cabe na sua rotina e agende no horário que preferir.</p>
+      </li>
+      <li>
+        <i class="mdi mdi-silverware-fork-knife"></i>
+        <h3>Receitas adaptadas ao seu perfil</h3>
+        <p>Pratos e receitas pensados para o seu dia a dia, indicados pelo seu nutricionista.</p>
+      </li>
+      <li>
+        <i class="mdi mdi-heart-outline"></i>
+        <h3>Acompanhamento humanizado</h3>
+        <p>Um profissional que acompanha sua evolução e ajusta o plano com você.</p>
+      </li>
+    </ul>
   </section>
 </template>
 
 <style scoped>
-.hero-container {
-  width: 100%;
-  padding: 80px 40px; 
-  display: flex;
-  justify-content: center;
-}
+/* Mesma fonte do título da seção "Por que fazer acompanhamento nutricional?" */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap');
 
-.content {
+.hero {
   width: 100%;
-  max-width: 1200px; 
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  padding: clamp(72px, 9vw, 128px) 24px clamp(40px, 5vw, 64px);
 }
 
-.content h2 {
-  color: #333F34;
-  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
-  font-weight: 400;
-  margin: 0 0 16px 0;
-  max-width: 1050px;
+.hero h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.3rem, 4.8vw, 4rem);
+  font-weight: 600;
+  line-height: 1.08;
+  color: #333f34;
+  margin: 0 0 20px;
 }
 
-.content p {
+.intro {
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  line-height: 1.7;
   color: #536236;
-  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
-  line-height: 1.6;
-  max-width: 900px;
-  margin: 0 0 32px 0;
+  max-width: 640px;
+  margin: 0 0 clamp(40px, 5vw, 64px);
 }
 
+/* Três colunas entre duas linhas finas, no mesmo estilo da seção de mensagens */
 .beneficios {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  justify-content: space-between; 
-  gap: 20px;
   width: 100%;
-  max-width: 1100px; 
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgba(51, 63, 52, 0.25);
+  border-bottom: 1px solid rgba(51, 63, 52, 0.25);
 }
 
 .beneficios li {
-  flex: 1; 
-  background: rgba(83, 98, 54, 0.06);
-  border: 1px solid #536236;
-  color: #333F34;
-  font-size: 1.05rem;
-  padding: 14px 20px;
-  border-radius: 50px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  white-space: nowrap;
+  padding: clamp(32px, 4vw, 48px) clamp(20px, 3vw, 48px);
+}
+
+.beneficios li + li {
+  border-left: 1px solid rgba(51, 63, 52, 0.25);
 }
 
 .beneficios i {
+  font-size: 2rem;
+  color: #73441b;
+}
+
+.beneficios h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.4rem, 2vw, 1.7rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: #333f34;
+  margin: 6px 0 0;
+}
+
+.beneficios li p {
+  font-size: 0.98rem;
+  line-height: 1.6;
   color: #536236;
-  font-size: 1.25rem;
-}
-
-.cta-group {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  width: 100%;
-  max-width: 850px; 
-  margin-top: 50px; 
-}
-
-.btn-card {
-  flex: 1;
-  text-decoration: none;
-  border-radius: 50px;
-  transition: all 0.25s ease;
-}
-
-.user {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 32px;
-  border-radius: 50px;
-}
-
-.user i {
-  font-size: 1.8rem;
-}
-
-.user span {
-  font-size: 1.2rem;
-  font-weight: 500;
-  white-space: nowrap;
+  max-width: 28ch;
+  margin: 0;
 }
 
 @media (max-width: 900px) {
   .beneficios {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .beneficios li {
-    width: 100%;
-    max-width: 450px;
+    grid-template-columns: 1fr;
   }
 
-  .cta-group {
-    flex-direction: column;
-    margin-top: 36px;
-    gap: 16px;
-  }
-
-  .btn-card {
-    width: 100%;
+  .beneficios li + li {
+    border-left: 0;
+    border-top: 1px solid rgba(51, 63, 52, 0.25);
   }
 }
 </style>

@@ -1,5 +1,19 @@
+
 <template>
   <div class="deletar-container">
+    <!-- NOVO: mensagens de carregamento, sucesso e erro -->
+    <p v-if="sucesso" class="feedback sucesso" role="status">{{ sucesso }}</p>
+
+    <p v-else-if="carregando" class="estado" role="status">Carregando seus dados...</p>
+
+    <div v-else-if="erroCarregar" class="estado estado-erro" role="alert">
+      <p>{{ erroCarregar }}</p>
+      <button type="button" class="btn-pill btn-cancelar" @click="carregarPaciente">
+        Tentar novamente
+      </button>
+    </div>
+
+    <template v-else>
     <!-- Header com Avatar, Título e Nome -->
     <div class="header-deletar">
       <div class="avatar-box">
@@ -14,26 +28,32 @@
     <!-- Pílulas de Informação -->
     <div class="info-grid">
       <div class="input-pill col-half">
-        <span class="label-text">peso:</span>
+        <span class="label-text">Peso</span>
         <span class="valor-text">{{ usuario.peso }}</span>
       </div>
 
       <div class="input-pill col-half">
-        <span class="label-text">Telefone:</span>
-        <span class="valor-text">{{ usuario.telefone }}</span>
+        <span class="label-text">Telefone</span>
+        <span class="valor-text">{{ mascaraTelefone(usuario.telefone) }}</span>
       </div>
 
       <div class="input-pill col-half">
-        <span class="label-text">Idade:</span>
+        <span class="label-text">Idade</span>
         <span class="valor-text">{{ calcularIdade(usuario.dataNascimento) }} anos</span>
       </div>
-               <div class="input-pill col-half">
-          <span class="label-text">email:</span>
-          <span class="valor-text">{{ usuario.email }}</span>
-        </div>
-             <div class="input-pill col-half">
-          <span class="label-text">cpf</span>
-          <span class="valor-text">{{ usuario.cpf }}</span>
+      <div class="input-pill col-half">
+        <span class="label-text">E-mail</span>
+        <span class="valor-text">{{ usuario.email }}</span>
+      </div>
+
+      <div class="input-pill col-half">
+        <span class="label-text">CPF</span>
+        <span class="valor-text">{{ mascaraCpf(usuario.cpf) }}</span>
+      </div>
+
+      <div class="input-pill col-full">
+        <span class="label-text">Endereço</span>
+        <span class="valor-text">{{ enderecoTexto }}</span>
       </div>
     </div>
 
@@ -41,12 +61,12 @@
     <div class="cards-grid">
       <!-- Card Preferências -->
       <div class="card-box light-card">
-        <h3 class="card-title">Preferencias</h3>
+        <h3 class="card-title">Preferências</h3>
         <hr class="card-divider" />
-        
+
         <div class="preferencias-columns">
           <div class="pref-col">
-            <p class="section-subtitle">gosto:</p>
+            <p class="section-subtitle">Gosto</p>
             <ul>
               <li v-if="!usuario.preferencias?.gosto?.length">• Não registrado</li>
               <li v-for="(item, i) in usuario.preferencias?.gosto" :key="i">• {{ item }}</li>
@@ -54,7 +74,7 @@
           </div>
 
           <div class="pref-col">
-            <p class="section-subtitle">Não gosta:</p>
+            <p class="section-subtitle">Não gosta</p>
             <ul>
               <li v-if="!usuario.preferencias?.naoGosto?.length">• Não registrado</li>
               <li v-for="(item, i) in usuario.preferencias?.naoGosto" :key="i">• {{ item }}</li>
@@ -89,53 +109,95 @@
       <div class="modal-card">
         <div class="modal-icon"><i class="mdi mdi-delete-outline"></i></div>
         <h2 class="modal-title">Excluir Perfil</h2>
-        
+
         <div class="input-modal">
           <label class="modal-label">Digite sua senha para confirmar exclusão:</label>
-          <input 
-            type="password" 
-            v-model="senhaConfirmacao" 
+          <input
+            type="password"
+            v-model="senhaConfirmacao"
           />
         </div>
 
+        <p v-if="erroModal" class="modal-erro" role="alert">{{ erroModal }}</p>
+
         <div class="modal-actions">
-          <button type="button" class="btn-modal-pill" @click="abrirModal = false">Cancelar</button>
-          <button type="button" class="btn-modal-pill" @click="confirmarExclusao">Confirmar</button>
+          <button type="button" class="btn-modal-pill" :disabled="excluindo" @click="fecharModal">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-pill" :disabled="excluindo" @click="confirmarExclusao">
+            {{ excluindo ? 'Excluindo...' : 'Confirmar' }}
+          </button>
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { computed, reactive, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import { buscarPacientePorId, excluirPaciente } from '@/services/pacientesApi.js';
+import { mascaraCpf, mascaraTelefone } from '@/utils/mascaras.js';
 
 const router = useRouter();
 const { logout } = useAuth();
 const abrirModal = ref(false);
 const senhaConfirmacao = ref('');
 
+// estados da tela
+const carregando = ref(true);
+const erroCarregar = ref('');
+const excluindo = ref(false);
+const erroModal = ref('');
+const sucesso = ref('');
+
 const usuario = reactive({
   id: '',
   tipo: 'paciente',
   nome: '',
+  cpf: '',
+  email: '',
   peso: '',
   telefone: '',
   dataNascimento: '',
-  senha: '',
   foto: '',
+  endereco: { cep: '', rua: '', numero: '', bairro: '', cidade: '', estado: '' },
   preferencias: { gosto: [], naoGosto: [] },
   alergias: []
 });
 
-onMounted(() => {
-  const dadosSalvos = localStorage.getItem('usuarioLogado');
-  if (dadosSalvos) {
-    Object.assign(usuario, JSON.parse(dadosSalvos));
-  }
+const enderecoTexto = computed(() => {
+  const e = usuario.endereco || {};
+  if (!e.rua && !e.cidade) return 'Não registrado';
+  return `${e.rua}, ${e.numero} - ${e.bairro}, ${e.cidade}/${e.estado}`;
 });
+
+// GET /pacientes/:id -> busca os dados na API para mostrar o que será excluído
+async function carregarPaciente() {
+  carregando.value = true;
+  erroCarregar.value = '';
+
+  const sessao = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+  if (!sessao?.id) {
+    erroCarregar.value = 'Nenhum usuário logado.';
+    carregando.value = false;
+    return;
+  }
+
+  try {
+    const dados = await buscarPacientePorId(sessao.id);
+    delete dados.senha; // a senha não fica guardada na tela
+    Object.assign(usuario, dados);
+  } catch (erro) {
+    erroCarregar.value = erro.message;
+  } finally {
+    carregando.value = false;
+  }
+}
+
+onMounted(carregarPaciente);
 
 const calcularIdade = (dataNasc) => {
   if (!dataNasc) return '--';
@@ -149,66 +211,72 @@ const calcularIdade = (dataNasc) => {
   return idade;
 };
 
-const confirmarExclusao = () => {
+const fecharModal = () => {
+  abrirModal.value = false;
+  senhaConfirmacao.value = '';
+  erroModal.value = '';
+};
+
+// A confirmação antes de excluir é o modal com a senha.
+// Depois: confere a senha na API e manda DELETE /pacientes/:id
+const confirmarExclusao = async () => {
+  erroModal.value = '';
+
   if (!senhaConfirmacao.value.trim()) {
-    alert('Por favor, digite sua senha.');
+    erroModal.value = 'Por favor, digite sua senha.';
     return;
   }
 
-  if (usuario.senha && senhaConfirmacao.value !== usuario.senha) {
-    alert('Senha incorreta! Não foi possível excluir a conta.');
-    return;
+  excluindo.value = true;
+
+  try {
+    // busca de novo para conferir a senha que está de verdade na API
+    const atual = await buscarPacientePorId(usuario.id);
+    if (senhaConfirmacao.value !== atual.senha) {
+      erroModal.value = 'Senha incorreta! Não foi possível excluir a conta.';
+      return;
+    }
+
+    await excluirPaciente(usuario.id);
+
+    logout();
+    fecharModal();
+    sucesso.value = 'Conta excluída com sucesso. Redirecionando...';
+    setTimeout(() => router.push('/login'), 1500);
+  } catch (erro) {
+    erroModal.value = erro.message;
+  } finally {
+    excluindo.value = false;
   }
-
-  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]');
-  const usuarioAtualId = usuario.id ? String(usuario.id) : '';
-  const usuarioAtualTipo = usuario.tipo || 'paciente';
-
-  const cadastrosAtualizados = cadastros.filter((cadastro) => {
-    const mesmoId = usuarioAtualId && String(cadastro.id) === usuarioAtualId;
-    const mesmoUsuario =
-      !mesmoId &&
-      String(cadastro.tipo || 'paciente') === usuarioAtualTipo &&
-      String(cadastro.cpf || '') === String(usuario.cpf || '') &&
-      String(cadastro.email || '').toLowerCase() === String(usuario.email || '').toLowerCase();
-
-    return !mesmoId && !mesmoUsuario;
-  });
-
-  localStorage.setItem('cadastros', JSON.stringify(cadastrosAtualizados));
-  logout();
-  alert('Conta excluída com sucesso.');
-  router.push('/login');
 };
 </script>
 
 <style scoped>
 .deletar-container {
   width: 100%;
-  max-width: 820px;
-  margin: 30px auto;
-  padding: 0 20px;
+  max-width: 920px;
+  margin: 40px auto 80px;
+  padding: 0 24px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
-/* Header com Avatar e Títulos */
+/* ===== Topo ===== */
 .header-deletar {
   display: flex;
   align-items: center;
-  gap: 25px;
-  margin-bottom: 30px;
-  justify-content: flex-start;
+  gap: 28px;
+  margin-bottom: 36px;
 }
 
 .avatar-box {
-  width: 110px;
-  height: 110px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(51, 63, 52, 0.25);
 }
 
 .avatar-box img {
@@ -220,99 +288,100 @@ const confirmarExclusao = () => {
 .titles {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .serif-title {
-  font-family: 'Italiana', serif, sans-serif;
+  font-family: 'Italiana', serif;
   font-weight: 400;
   margin: 0;
 }
 
 .page-title {
-  font-size: 3rem;
-  color: #705335;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  color: #a13d3d;
 }
 
 .user-name {
-  font-size: 2.8rem;
-  color: #705335;
+  font-size: 1.5rem;
+  color: #536236;
 }
 
-/* Grid de Informações Principais */
+/* ===== Dados ===== */
 .info-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px 24px;
+  gap: 16px 20px;
   margin-bottom: 24px;
 }
 
 .col-half {
-  width: calc(50% - 12px);
+  width: calc(50% - 10px);
 }
 
 .input-pill {
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
-  border-radius: 14px;
-  padding: 12px 18px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 18px;
+  background: #f7f3e1;
+  border: 1px solid rgba(51, 63, 52, 0.18);
+  border-radius: 12px;
   box-sizing: border-box;
-  height: 52px;
 }
 
 .label-text {
-  color: #4a5435;
-  font-size: 1.15rem;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.82rem;
   font-weight: 500;
-  font-family: 'Italiana', serif, sans-serif;
+  letter-spacing: 0.02em;
+  color: #536236;
 }
 
 .valor-text {
-  color: #705335;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #333f34;
+  word-break: break-word;
 }
 
-/* Cards Inferiores */
+/* ===== Cartões ===== */
 .cards-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
 }
 
 .light-card {
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
+  background: #f7f3e1;
+  border: 1px solid rgba(51, 63, 52, 0.18);
   border-radius: 16px;
-  padding: 18px 22px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 24px 26px;
   min-height: 200px;
 }
 
 .card-title {
-  text-align: center;
-  font-family: 'Italiana', serif, sans-serif;
-  font-size: 1.4rem;
-  color: #705335;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+  font-family: 'Italiana', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: #73441b;
+  margin: 0;
 }
 
 .card-divider {
   border: 0;
-  height: 1.5px;
-  background-color: #536236;
-  margin-bottom: 12px;
+  height: 1px;
+  background: rgba(51, 63, 52, 0.2);
+  margin: 12px 0 16px;
 }
 
 .preferencias-columns {
   display: flex;
   justify-content: space-between;
-  gap: 15px;
+  gap: 16px;
 }
 
 .pref-col {
@@ -320,10 +389,12 @@ const confirmarExclusao = () => {
 }
 
 .section-subtitle {
-  color: #4a5435;
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin: 0 0 4px 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #73441b;
+  margin: 0 0 6px;
 }
 
 ul {
@@ -333,46 +404,66 @@ ul {
 }
 
 li {
-  color: #4a5435;
+  color: #333f34;
   font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 3px;
-  padding-left: 12px;
+  margin-bottom: 4px;
 }
 
-/* Botões do Rodapé */
+/* ===== Botões ===== */
 .actions-bar {
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 
 .btn-pill {
   flex: 1;
-  background-color: #536236;
-  color: #f1ebd9;
-  border: none;
-  border-radius: 50px;
-  padding: 14px 28px;
-  font-size: 1.25rem;
+  border-radius: 12px;
+  padding: 15px 28px;
+  font-size: 1.05rem;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.2s ease, transform 0.2s ease;
   text-align: center;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.btn-pill:hover {
-  background-color: #43502a;
-  transform: translateY(-2px);
+/* Excluir é uma ação perigosa: o botão que confirma fica vermelho */
+.btn-confirmar {
+  background: #a13d3d;
+  border: 1.5px solid #a13d3d;
+  color: #f1edd2;
 }
 
-/* Modal Centralizado na Tela */
+.btn-confirmar:hover {
+  background: #832f2f;
+  border-color: #832f2f;
+}
+
+.btn-cancelar {
+  background: transparent;
+  border: 1.5px solid #536236;
+  color: #536236;
+}
+
+.btn-cancelar:hover {
+  background: rgba(83, 98, 54, 0.1);
+}
+
+.btn-pill:focus-visible,
+.btn-modal-pill:focus-visible {
+  outline: 3px solid #73441b;
+  outline-offset: 3px;
+}
+
+/* ===== Janela de confirmação ===== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(51, 63, 52, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -380,44 +471,49 @@ li {
 }
 
 .modal-card {
-  background-color: #ebe2cc;
-  border: 1.5px solid #8c7355;
-  padding: 28px 30px;
-  border-radius: 20px;
+  background: #f7f3e1;
+  border: 1px solid rgba(51, 63, 52, 0.2);
+  padding: 32px;
+  border-radius: 16px;
   width: 90%;
-  max-width: 440px;
+  max-width: 460px;
   text-align: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .modal-icon {
   font-size: 2rem;
-  color: #4a5435;
+  color: #a13d3d;
   margin-bottom: 6px;
 }
 
 .modal-title {
-  font-family: 'Italiana', serif, sans-serif;
-  font-size: 1.8rem;
-  color: #705335;
-  margin: 0 0 16px 0;
+  font-family: 'Italiana', serif;
+  font-size: 2rem;
   font-weight: 400;
+  color: #73441b;
+  margin: 0 0 20px;
 }
 
 .input-modal {
-  background-color: #f0e8d5;
-  border: 1px solid #8c7355;
+  background: #fbf8ec;
+  border: 1px solid rgba(115, 68, 27, 0.45);
   border-radius: 12px;
-  padding: 10px 14px;
-  margin-bottom: 20px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
   text-align: left;
+}
+
+.input-modal:focus-within {
+  border-color: #536236;
+  outline: 2px solid #536236;
+  outline-offset: 2px;
 }
 
 .modal-label {
   display: block;
   font-size: 0.85rem;
-  color: #4a5435;
-  font-weight: 600;
+  font-weight: 500;
+  color: #536236;
   margin-bottom: 4px;
 }
 
@@ -427,30 +523,47 @@ li {
   background: transparent;
   outline: none;
   font-size: 1rem;
-  color: #705335;
+  color: #333f34;
 }
 
 .modal-actions {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   justify-content: center;
 }
 
 .btn-modal-pill {
   flex: 1;
-  background-color: #536236;
-  color: #f1ebd9;
-  border: none;
-  border-radius: 50px;
-  padding: 10px 20px;
+  border-radius: 10px;
+  padding: 12px 20px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.btn-modal-pill:hover {
-  background-color: #43502a;
+/* Primeiro botão (Cancelar): contorno verde. Segundo (Confirmar): vermelho */
+.btn-modal-pill:first-child {
+  background: transparent;
+  border: 1.5px solid #536236;
+  color: #536236;
+}
+
+.btn-modal-pill:first-child:hover {
+  background: rgba(83, 98, 54, 0.1);
+}
+
+.btn-modal-pill:last-child {
+  background: #a13d3d;
+  border: 1.5px solid #a13d3d;
+  color: #f1edd2;
+}
+
+.btn-modal-pill:last-child:hover {
+  background: #832f2f;
+  border-color: #832f2f;
 }
 
 @media (max-width: 768px) {
@@ -462,6 +575,10 @@ li {
     grid-template-columns: 1fr;
   }
 
+  .preferencias-columns {
+    flex-direction: column;
+  }
+
   .header-deletar {
     flex-direction: column;
     text-align: center;
@@ -469,7 +586,51 @@ li {
 
   .actions-bar {
     flex-direction: column;
-    gap: 15px;
   }
+}
+
+/* ===== Novidades da versão com API ===== */
+.col-full {
+  width: 100%;
+}
+
+.estado {
+  text-align: center;
+  color: #536236;
+  font-size: 1.1rem;
+  padding: 60px 0;
+}
+
+.estado-erro {
+  color: #8a2f2f;
+}
+
+.estado-erro p {
+  margin: 0 0 16px;
+}
+
+.feedback {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.feedback.sucesso {
+  background: #dfe8cf;
+  color: #3b4a22;
+}
+
+.modal-erro {
+  margin: -8px 0 16px;
+  font-size: 0.92rem;
+  color: #a13d3d;
+}
+
+.btn-pill:disabled,
+.btn-modal-pill:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

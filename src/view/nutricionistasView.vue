@@ -8,7 +8,6 @@ import DestaqueProfissionais from '@/components/nutricionistas/destaqueProfissio
   <main class="nutricionistas">
     <HeroNutricionistas />
     <DiferencialNutricionistas />
-    <TecnologiaNutricionistas />
     <DestaqueProfissionais />
   </main>
 </template>

@@ -14,7 +14,14 @@
 
         <div class="input-pill">
           <span class="label-text">Cpf:</span>
-          <input type="text" v-model="form.cpf" required />
+          <input
+            type="text"
+            inputmode="numeric"
+            placeholder="000.000.000-00"
+            :value="form.cpf"
+            @input="form.cpf = mascaraCpf($event.target.value)"
+            required
+          />
         </div>
 
         <div class="input-pill">
@@ -37,7 +44,14 @@
 
         <div class="input-pill">
           <span class="label-text">Telefone:</span>
-          <input type="text" v-model="form.telefone" required />
+          <input
+            type="text"
+            inputmode="tel"
+            placeholder="(00) 00000-0000"
+            :value="form.telefone"
+            @input="form.telefone = mascaraTelefone($event.target.value)"
+            required
+          />
         </div>
 
         <div class="input-pill date-field">
@@ -51,10 +65,68 @@
         </div>
       </div>
 
+      <!-- NOVO: endereço (o CEP preenche rua, bairro, cidade e estado sozinho) -->
+      <div class="secao-titulo">Endereço</div>
+
+      <div class="form-col">
+        <div class="input-pill">
+          <span class="label-text">CEP:</span>
+          <input
+            type="text"
+            inputmode="numeric"
+            placeholder="00000-000"
+            :value="form.cep"
+            @input="aoDigitarCep($event.target.value)"
+            required
+          />
+        </div>
+
+        <div class="input-pill">
+          <span class="label-text">Rua:</span>
+          <input type="text" v-model="form.rua" required />
+        </div>
+
+        <div class="input-pill">
+          <span class="label-text">Bairro:</span>
+          <input type="text" v-model="form.bairro" required />
+        </div>
+      </div>
+
+      <div class="form-col">
+        <div class="input-pill">
+          <span class="label-text">Número:</span>
+          <input type="text" v-model="form.numero" required />
+        </div>
+
+        <div class="input-pill">
+          <span class="label-text">Cidade:</span>
+          <input type="text" v-model="form.cidade" required />
+        </div>
+
+        <div class="input-pill">
+          <span class="label-text">Estado:</span>
+          <input type="text" maxlength="2" placeholder="UF" v-model="form.estado" required />
+        </div>
+      </div>
+
+      <p v-if="avisoCep.texto" class="aviso-cep" :class="avisoCep.tipo">{{ avisoCep.texto }}</p>
+
+      <!-- NOVO: mensagens de carregamento, sucesso e erro -->
+      <p v-if="mensagem.texto" class="feedback" :class="mensagem.tipo" role="status">
+        {{ mensagem.texto }}
+      </p>
+
       <!-- Botões inferiores -->
       <div class="action-bar">
-        <button type="submit" class="btn-pill btn-confirmar">Confirmar</button>
-        <button type="button" class="btn-pill btn-cancelar" @click="cancelarCadastro">
+        <button type="submit" class="btn-pill btn-confirmar" :disabled="enviando">
+          {{ enviando ? 'Salvando...' : 'Confirmar' }}
+        </button>
+        <button
+          type="button"
+          class="btn-pill btn-cancelar"
+          :disabled="enviando"
+          @click="cancelarCadastro"
+        >
           Cancelar
         </button>
       </div>
@@ -63,10 +135,22 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+import { buscarCep, buscarPacientes, criarPaciente } from '@/services/pacientesApi.js'
+import {
+  cpfValido,
+  dataNascimentoValida,
+  emailValido,
+  mascaraCep,
+  mascaraCpf,
+  mascaraTelefone,
+  somenteNumeros,
+} from '@/utils/mascaras.js'
 
 const router = useRouter()
+const { login } = useAuth()
 
 const form = reactive({
   nome: '',
@@ -77,81 +161,115 @@ const form = reactive({
   telefone: '',
   senha: '',
   confirmarSenha: '',
+  // endereço
+  cep: '',
+  rua: '',
+  numero: '',
+  bairro: '',
+  cidade: '',
+  estado: '',
 })
 
-const somenteNumeros = (valor) => valor.replace(/\D/g, '')
+// mensagem principal do formulário: tipo = 'carregando' | 'sucesso' | 'erro'
+const mensagem = ref({ tipo: '', texto: '' })
+// aviso da busca de CEP
+const avisoCep = ref({ tipo: '', texto: '' })
+const enviando = ref(false)
 
-const dataValida = (data) => data && new Date(`${data}T00:00:00`) <= new Date()
+// Digitou o CEP: aplica a máscara e, quando completa os 8 números, consulta o ViaCEP
+async function aoDigitarCep(valor) {
+  form.cep = mascaraCep(valor)
+  avisoCep.value = { tipo: '', texto: '' }
 
-const gerarIdCadastro = (cadastros) => {
-  let id
-  do {
-    const quantidadeDigitos = (crypto.getRandomValues(new Uint32Array(1))[0] % 8) + 2
-    const menorValor = 10 ** (quantidadeDigitos - 1)
-    const intervalo = 10 ** quantidadeDigitos - menorValor
-    const valorAleatorio = crypto.getRandomValues(new Uint32Array(1))[0] % intervalo
-    id = String(menorValor + valorAleatorio)
-  } while (cadastros.some((cadastro) => String(cadastro.id) === id))
+  if (somenteNumeros(form.cep).length !== 8) return
 
-  return id
+  avisoCep.value = { tipo: 'carregando', texto: 'Buscando endereço...' }
+  try {
+    const endereco = await buscarCep(form.cep)
+    form.rua = endereco.rua
+    form.bairro = endereco.bairro
+    form.cidade = endereco.cidade
+    form.estado = endereco.estado
+    avisoCep.value = { tipo: '', texto: '' }
+  } catch (erro) {
+    avisoCep.value = { tipo: 'erro', texto: `${erro.message} Preencha o endereço manualmente.` }
+  }
 }
 
-const cadastroDuplicado = (tipo, cpf, email) => {
-  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
-  const atual = JSON.parse(localStorage.getItem('usuarioLogado') || 'null')
-  const registros = atual ? [...cadastros, atual] : cadastros
-  return registros.some(
-    (registro) =>
-      registro.tipo === tipo &&
-      (registro.cpf === cpf || registro.email.toLowerCase() === email.toLowerCase()),
-  )
-}
+const submitCadastro = async () => {
+  mensagem.value = { tipo: '', texto: '' }
 
-const submitCadastro = () => {
   const cpf = somenteNumeros(form.cpf)
   const telefone = somenteNumeros(form.telefone)
-  const email = form.email.trim()
+  const email = form.email.trim().toLowerCase()
 
-  if (!email || !email.includes('@')) {
-    alert('Digite um e-mail válido com @.')
-    return
-  }
-  if (!dataValida(form.dataNascimento)) {
-    alert('Digite uma data de nascimento válida.')
-    return
-  }
-  if (form.senha.length < 6) {
-    alert('A senha deve ter pelo menos 6 caracteres.')
-    return
-  }
-  if (form.senha !== form.confirmarSenha) {
-    alert('As senhas não coincidem!')
-    return
-  }
-  if (cadastroDuplicado('paciente', cpf, email)) {
-    alert('Já existe um paciente com este CPF ou e-mail.')
-    return
+  // ---- validações (antes de falar com a API) ----
+  const erroValidacao = (texto) => {
+    mensagem.value = { tipo: 'erro', texto }
   }
 
-  const dadosUsuario = {
-    id: gerarIdCadastro(JSON.parse(localStorage.getItem('cadastros') || '[]')),
-    tipo: 'paciente',
-    tag: 'paciente',
-    nome: form.nome,
-    cpf,
-    peso: form.peso.includes('kg') ? form.peso : `${form.peso}kg`,
-    dataNascimento: form.dataNascimento,
-    email,
-    telefone,
-    senha: form.senha,
-    preferencias: { gosto: [], naoGosto: [] },
-    alergias: [],
+  if (!emailValido(email)) return erroValidacao('Digite um e-mail válido.')
+  if (!cpfValido(cpf)) return erroValidacao('Digite um CPF válido.')
+  if (telefone.length < 10) return erroValidacao('Digite um telefone com DDD.')
+  if (!dataNascimentoValida(form.dataNascimento)) {
+    return erroValidacao('Digite uma data de nascimento válida.')
   }
+  if (form.senha.length < 6) return erroValidacao('A senha deve ter pelo menos 6 caracteres.')
+  if (form.senha !== form.confirmarSenha) return erroValidacao('As senhas não coincidem!')
 
-  const cadastros = JSON.parse(localStorage.getItem('cadastros') || '[]')
-  localStorage.setItem('cadastros', JSON.stringify([...cadastros, dadosUsuario]))
-  localStorage.setItem('usuarioLogado', JSON.stringify(dadosUsuario))
-  router.push('/perfil')
+  enviando.value = true
+  mensagem.value = { tipo: 'carregando', texto: 'Salvando seu cadastro...' }
+
+  try {
+    // 1) pergunta à API se já existe paciente com esse CPF ou e-mail
+    const [comMesmoCpf, comMesmoEmail] = await Promise.all([
+      buscarPacientes({ cpf }),
+      buscarPacientes({ email }),
+    ])
+
+    if (comMesmoCpf.length > 0 || comMesmoEmail.length > 0) {
+      return erroValidacao('Já existe um paciente com este CPF ou e-mail.')
+    }
+
+    // 2) monta o paciente. Não mandamos id: quem cria é a própria API
+    const novoPaciente = {
+      tipo: 'paciente',
+      tag: 'paciente',
+      nome: form.nome.trim(),
+      cpf,
+      peso: form.peso.includes('kg') ? form.peso : `${form.peso}kg`,
+      dataNascimento: form.dataNascimento,
+      email,
+      telefone,
+      senha: form.senha,
+      foto: '',
+      endereco: {
+        cep: somenteNumeros(form.cep),
+        rua: form.rua.trim(),
+        numero: form.numero.trim(),
+        bairro: form.bairro.trim(),
+        cidade: form.cidade.trim(),
+        estado: form.estado.trim().toUpperCase(),
+      },
+      preferencias: { gosto: [], naoGosto: [] },
+      alergias: [],
+    }
+
+    // 3) POST /pacientes: a API devolve o paciente salvo, já com o id
+    const salvo = await criarPaciente(novoPaciente)
+
+    // 4) já deixa a pessoa logada (sem guardar a senha na sessão)
+    const semSenha = { ...salvo }
+    delete semSenha.senha
+    login(semSenha)
+
+    mensagem.value = { tipo: 'sucesso', texto: 'Cadastro realizado com sucesso! Redirecionando...' }
+    setTimeout(() => router.push('/perfil'), 1200)
+  } catch (erro) {
+    erroValidacao(erro.message)
+  } finally {
+    enviando.value = false
+  }
 }
 
 const cancelarCadastro = () => {
@@ -269,7 +387,63 @@ const cancelarCadastro = () => {
   transform: translateY(-2px);
 }
 
+/* ===== Novidades da versão com API ===== */
+.secao-titulo {
+  grid-column: span 2;
+  font-family: 'Italiana', serif;
+  font-size: 1.8rem;
+  color: #705335;
+  margin-top: 10px;
+}
+
+.aviso-cep {
+  grid-column: span 2;
+  margin: -6px 0 0;
+  font-size: 0.95rem;
+  color: #4a5435;
+}
+
+.aviso-cep.erro {
+  color: #a13d3d;
+}
+
+.feedback {
+  grid-column: span 2;
+  margin: 10px 0 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.feedback.carregando {
+  background: #ebe2cc;
+  color: #4a5435;
+}
+
+.feedback.sucesso {
+  background: #dfe8cf;
+  color: #3b4a22;
+}
+
+.feedback.erro {
+  background: #f3dcd6;
+  color: #8a2f2f;
+}
+
+.btn-pill:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (max-width: 768px) {
+  .secao-titulo,
+  .aviso-cep,
+  .feedback {
+    grid-column: span 1;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }

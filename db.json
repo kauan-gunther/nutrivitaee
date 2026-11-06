@@ -1,0 +1,98 @@
+{
+  "pacientes": [
+    {
+      "id": 1,
+      "tipo": "paciente",
+      "tag": "paciente",
+      "nome": "Maria Souza",
+      "cpf": "52998224725",
+      "peso": "62kg",
+      "dataNascimento": "1995-04-12",
+      "email": "maria@email.com",
+      "telefone": "47991234567",
+      "senha": "123456",
+      "foto": "",
+      "endereco": {
+        "cep": "88301000",
+        "rua": "Rua Hercílio Luz",
+        "numero": "120",
+        "bairro": "Centro",
+        "cidade": "Itajaí",
+        "estado": "SC"
+      },
+      "preferencias": {
+        "gosto": [
+          "Frutas",
+          "Peixes"
+        ],
+        "naoGosto": [
+          "Fígado"
+        ]
+      },
+      "alergias": [
+        "Lactose"
+      ]
+    },
+    {
+      "id": 2,
+      "tipo": "paciente",
+      "tag": "paciente",
+      "nome": "João Pereira",
+      "cpf": "39053344705",
+      "peso": "84kg",
+      "dataNascimento": "1988-09-30",
+      "email": "joao@email.com",
+      "telefone": "47988887777",
+      "senha": "123456",
+      "foto": "",
+      "endereco": {
+        "cep": "89201001",
+        "rua": "Rua Jaguaruna",
+        "numero": "45",
+        "bairro": "Centro",
+        "cidade": "Joinville",
+        "estado": "SC"
+      },
+      "preferencias": {
+        "gosto": [
+          "Massas",
+          "Legumes"
+        ],
+        "naoGosto": []
+      },
+      "alergias": []
+    },
+    {
+      "id": 3,
+      "tipo": "paciente",
+      "tag": "paciente",
+      "nome": "Ana Beatriz Lima",
+      "cpf": "11144477735",
+      "peso": "58kg",
+      "dataNascimento": "2001-01-18",
+      "email": "ana@email.com",
+      "telefone": "47977776666",
+      "senha": "123456",
+      "foto": "",
+      "endereco": {
+        "cep": "88010400",
+        "rua": "Rua Felipe Schmidt",
+        "numero": "300",
+        "bairro": "Centro",
+        "cidade": "Florianópolis",
+        "estado": "SC"
+      },
+      "preferencias": {
+        "gosto": [
+          "Saladas"
+        ],
+        "naoGosto": [
+          "Cebola"
+        ]
+      },
+      "alergias": [
+        "Amendoim"
+      ]
+    }
+  ]
+}

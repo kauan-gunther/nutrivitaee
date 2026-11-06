@@ -36,6 +36,7 @@ onMounted(() => {
     <!-- Estado quando não há ninguém logado -->
     <div v-else class="nao-logado">
       <p>Nenhum usuário logado. Faça login para acessar seu perfil.</p>
+      <RouterLink to="/login" class="botao-login">Ir para o login</RouterLink>
     </div>
   </div>
 </template>
@@ -46,9 +47,33 @@ onMounted(() => {
 }
 
 .nao-logado {
-  margin-top: 50px;
-  font-size: 1.2rem;
-  color: #536236;
+  margin: 80px auto;
+  padding: 0 24px;
   text-align: center;
+  color: #536236;
+}
+
+.nao-logado p {
+  font-size: 1.15rem;
+  margin: 0 0 24px;
+}
+
+.botao-login {
+  display: inline-block;
+  padding: 13px 28px;
+  border-radius: 12px;
+  background: #536236;
+  color: #f1edd2;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.botao-login:hover {
+  background: #333f34;
+}
+
+.botao-login:focus-visible {
+  outline: 3px solid #73441b;
+  outline-offset: 3px;
 }
 </style>

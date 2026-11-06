@@ -3,103 +3,103 @@
 
 <template>
   <section class="funcionabilidade">
-    <div class="card">
-    <div class="left">
+    <div class="container">
       <h2>Bem-estar que faz sentido</h2>
-      <ul>
-        <li>Preferências e objetivos organizados de forma simples.</li>
-        <li>Encontre nutricionistas alinhados às suas necessidades.</li>
-        <li>Online ou presencial, no horário ideal para você.</li>
-        <li>Receitas e recomendações adaptadas ao seu paladar e evolução.</li>
+
+      <ul class="itens">
+        <li>
+          <span class="icone"><i class="mdi mdi-tune-variant"></i></span>
+          <p>Preferências e objetivos organizados de forma simples.</p>
+        </li>
+        <li>
+          <span class="icone"><i class="mdi mdi-account-search-outline"></i></span>
+          <p>Encontre nutricionistas alinhados às suas necessidades.</p>
+        </li>
+        <li>
+          <span class="icone"><i class="mdi mdi-calendar-clock-outline"></i></span>
+          <p>Online ou presencial, no horário ideal para você.</p>
+        </li>
+        <li>
+          <span class="icone"><i class="mdi mdi-food-apple-outline"></i></span>
+          <p>Receitas e recomendações adaptadas ao seu paladar e evolução.</p>
+        </li>
       </ul>
-    </div>
-    <div class="right">
-      <img src="/logo-branca.png" alt="logo">
-    </div>
     </div>
   </section>
 </template>
 
 <style scoped>
 .funcionabilidade {
-  width: 100%;
-  padding: 30px 10px; 
-  display: flex;
-  justify-content: center;
-}
+  --fundo-bloco: transparent;
+  --texto-bloco: #1B2418;
 
-.card {
-  border-radius: 20px;
-  padding: 40px clamp(20px, 4vw, 50px);
-  width: 98%; 
-  max-width: 1400px; 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
-}
-
-.left {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 600px;
-}
-
-.left h2 {
-  font-size: clamp(2.2rem, 4vw, 3.2rem);
-  color: #73441B;
-  font-weight: 400;
   margin: 0;
+  border-radius: 0;
+
+  padding: clamp(48px, 8vw, 112px) clamp(24px, 6vw, 96px);
+  background: var(--fundo-bloco);
+  color: var(--texto-bloco);
 }
 
-.left ul {
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.funcionabilidade h2 {
+  font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+  line-height: 1.05;
+  color: var(--texto-bloco);
+  margin: 0 0 clamp(32px, 5vw, 64px);
+}
+
+.itens {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(20px, 3vw, 40px);
+}
+
+.itens li {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  padding: 24px 0 8px;
+  border-top: 1px solid rgba(27, 36, 24, 0.35);
 }
 
-.left li {
-  font-size: clamp(1rem, 1.3vw, 1.25rem);
-  color: #333f34;
+.icone {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--creme);
+  color: var(--verde);
+}
+
+.icone i {
+  font-size: 1.5rem;
+}
+
+.itens p {
+  font-size: 1.05rem;
   line-height: 1.5;
-}
-
-.right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.right img {
-  width: clamp(220px, 25vw, 320px);
-  height: auto;
   margin: 0;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 
-@media (max-width: 768px) {
-  .funcionabilidade {
-    padding: 20px 8px;
+@media (max-width: 1000px) {
+  .itens {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px clamp(20px, 3vw, 40px);
   }
+}
 
-  .card {
-    flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
-  }
-
-  .left {
-    align-items: center;
-  }
-
-  .right img {
-    width: 200px;
+@media (max-width: 560px) {
+  .itens {
+    grid-template-columns: 1fr;
   }
 }
 </style>
